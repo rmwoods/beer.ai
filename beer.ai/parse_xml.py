@@ -24,15 +24,38 @@ Out[11]:
 
 """
 
+BASE = "./RECIPE/"
 
 def parse_beer_recipe(recipe):
     """Given a beer recipe in XML format, parse out the relevant
     information into a dict."""
     try:
-        root = etree.fromstring(recipe)[0]
+        root = etree.fromstring(recipe)
     except IndexError:
         print("Empty Recipe.")
         return
+    
+    try:
+        eff_text = root.findall(BASE + "EFFICIENCY")[0].text
+        eff = float(eff_text)
+    except IndexError:
+        # No efficiency specified - assume 1.0?
+        eff = 1.0
+    except ValueError:
+        print("Bad efficiency format: {}".format(eff_text))
+    try:
+        boil_text = root.findall(BASE + "BOIL_SIZE")[0]
+        boil_size = float(boil_text)
+    except IndexError:
+        # No boil_size specified - assume 1.0?
+        boil_size = 1.0
+    except ValueError:
+        print("Bad boil size format: {}".format(boil_text))
+
+    parse_hops(root.findall(BASE + "HOPS"))
+    parse_fermentables(root.findall(BASE + "FERMENTABLES"))
+    parse_yeast(root.findall(BASE + "YEAST"))
+    parse_misc(root.findall(BASE + "MISC"))
     
     return
 
