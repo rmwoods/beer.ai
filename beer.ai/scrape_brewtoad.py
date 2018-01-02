@@ -1,4 +1,5 @@
 import bs4
+from pathlib import Path
 import re
 import requests
 import sys
@@ -10,7 +11,7 @@ WEBSITE = "https://www.brewtoad.com"
 URL = "https://www.brewtoad.com/recipes?page={}&sort=created_at&sort_reverse=true"
 
 request = requests.get(URL.format(1))
-html = bs4.BeautifulSoup(request.text)
+html = bs4.BeautifulSoup(request.text,"lxml")
 
 r = re.compile("[0-9]+")
 pagination = html.find("div",attrs={"class":"pagination"})
@@ -27,9 +28,12 @@ for i in range(2,n_pages-1):
         sub = recipe.find("a",attrs={"class":"recipe-link"})
         address = sub.get("href")
         link = WEBSITE + address + ".xml"
-        fname = link.split("/")[-1]
-        wget.download(link,out="recipes/"+fname)
+        fname = "recipes/" + link.split("/")[-1]
+        f = Path(fname)
+        if not f.is_file():
+            wget.download(link,out=fname)
+    print("Done page {}".format(i-1))
     request = requests.get(URL.format(i))
-    html = bs4.BeautifulSoup(request.text)
+    html = bs4.BeautifulSoup(request.text,"lxml")
 
 print("Done")
