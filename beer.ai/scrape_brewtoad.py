@@ -56,7 +56,7 @@ for i in range(start+1,n_pages+1):
     # Checkpoint the page we finished so if we restart later, we continue from
     # the same page.
     with open(CHECKPOINT_FILE,"wb") as bf:
-        pickle.dump({"page":i},bf)
+        pickle.dump({"page":i-1},bf)
     # Grab the new page
     request = requests.get(URL.format(i))
     html = bs4.BeautifulSoup(request.text,"lxml")
