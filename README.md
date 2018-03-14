@@ -7,5 +7,5 @@ This project is a fun attempt to create beer recipes based on learning other rec
 
 # Authors
 
-Rory Woods
-Rob Welch
+- Rory Woods
+- Rob Welch
