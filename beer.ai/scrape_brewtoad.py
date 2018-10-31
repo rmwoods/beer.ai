@@ -28,8 +28,8 @@ print("Starting on page {}".format(start))
 request = requests.get(URL.format(start))
 html = bs4.BeautifulSoup(request.text,"lxml")
 
-pagination = html.find("div",attrs={"class":"pagination"})
-n = re.findall(R,pagination.text)
+pagination = html.find("div", attrs={"class":"pagination"})
+n = re.findall(R, pagination.text)
 if n:
     n_pages = int(n[-1])
 else:
@@ -38,10 +38,10 @@ else:
 
 # Need to loop to n_pages+1 since the current loop is actually working on the
 # nth-1 page.
-for i in range(start+1,n_pages+1):
-    recipes = html.find_all(name='li',attrs={"class":"recipe-container"})
+for i in range(start+1, n_pages+1):
+    recipes = html.find_all(name='li', attrs={"class":"recipe-container"})
     for recipe in recipes:
-        sub = recipe.find("a",attrs={"class":"recipe-link"})
+        sub = recipe.find("a", attrs={"class":"recipe-link"})
         address = sub.get("href")
         # The xml files are nicely named after the page they're from
         link = WEBSITE + address + ".xml"
@@ -51,7 +51,7 @@ for i in range(start+1,n_pages+1):
         # if it has the same name as another recipe, but I'm not sure if that's
         # an issue worth trying to get around.
         if not f.is_file():
-            wget.download(link,out=fname)
+            wget.download(link, out=fname)
     print("Done page {}".format(i-1))
     # Checkpoint the page we finished so if we restart later, we continue from
     # the same page.

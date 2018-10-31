@@ -1,4 +1,5 @@
 """Parse out data from xml format."""
+import argparse
 
 from lxml import etree
 
@@ -26,13 +27,19 @@ Out[11]:
 
 BASE = "./RECIPE/"
 
-def parse_beer_recipe(recipe):
+def parse_beer_recipe(filename):
     """Given a beer recipe in XML format, parse out the relevant
     information into a dict."""
+
     try:
+        with open(filename, "r") as f:
+            recipe = f.read()
         root = etree.fromstring(recipe)
     except IndexError:
         print("Empty Recipe.")
+        return
+    except FileNotFoundError:
+        print(f"File {filename} not found.")
         return
     
     try:
@@ -72,4 +79,15 @@ def parse_misc(misc):
     return
 
 
-
+if __name__=="__main__":
+    parser = argparse.ArgumentParser(
+        description="Script to parse a beer xml file into a recipe (sequence)."
+    )
+    parser.add_argument(
+        "--filename",
+        "-f",
+        required=True,
+        help="Path of the xml file containing the recipe to parse."
+    )
+    args = parser.parse_args()
+    parse_beer_recipe(args.filename)
