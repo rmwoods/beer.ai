@@ -114,7 +114,8 @@ def convert_a_bunch(path_to_recipes, n):
         dfs.append(result)
     df = pd.concat(dfs, axis=0, sort=False)
 
-    fname = str(hash(tuple(samples))) + ".h5"
+    # Calculate a filename as a hash of the xml files that were read in.
+    fname = str(abs(hash(tuple(samples)))) + ".h5"
     print(f"Writing results to {fname}")
     #with warnings.catch_warnings():
         #warnings.simplefilter("ignore", category=PerformanceWarning)
