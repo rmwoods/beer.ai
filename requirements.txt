@@ -1,7 +1,9 @@
 bs4
+joblib
 jupyter
 lxml
 pandas
 pybeerxml
 requests
+sklearn
 wget
