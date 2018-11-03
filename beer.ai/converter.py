@@ -1,59 +1,125 @@
 """Script to convert beer XMLs to a ML friendly format."""
 
+import glob
+import os.path as path
 import numpy as np
 import pandas as pd
+import random
+import re
+import warnings
 
 from joblib import delayed, Parallel
 from pybeerxml import Parser
 
-
-def beerxml_to_df(beerxml):
-    """Given a pybeerxml.recipe.Recipe, convert to a dataframe."""
-
-    # Need to determine how to store these recipes.
-    # 1. Determine batch size - recipe.boil_size (could be in G or L). Want to normalize grains to this.
-    #   - this could be pre-boil volume (before you've lost water to boil). There is also the amount that goes to the fermenter, and the amount that goes to the bottles.
-    #   - recipe.batch_size looks to be post boil?
-    # 2. Start with fermentables: recipe.fermentables
-    #   1. name + origin should be unique (though it looks like origin could be part of name)
-    #   2. Quantity we care about is fermentable.amount (kg) - should be normalized to boil size
-    #   3. All fermentables go in at the same time, so order is not important here. These get "mashed" (steeped in warm water)
-    #   4. Amount of time and temperature will change for above.
-    #   5. Can sometimes have multiple steps of mashing (e.g. temp 1 for t1 and temp 2 for t2).
-    #   Note - all grains are almost always involved in all the mashing
-    # *. Liquid strained from solids, but this always happens. Not part of the recipe.
-    # 3. Boil - usually boiled 60-90 minutes. Time is specified in recipe.boil_time (minutes)
-    #   *. Different intervals, we add hops. recipe.hops
-    #   *. Recipes specify when to add hops by the amount of time *left* in the boil
-    #   *. Need amount, alpha acid, form. hop.amount (g), hop.alpha (mass percentage?), hop.form (string, e.g. "Leaf", "Pellet").
-    #      - Need to normalize such that quantity of alpha acids is consistent if percent alpha acids changes.
-    #      - We need to normalize amount to the boil size
-    #      - Note: technically, we should take into account how boil size changes as time progresses but we probably don't need to.
-    #   1. Boil boil_time minutes
-    #   2. e.g. hop1 @ 90 min, hop2 @ 45 min, hop3 @ 10 min (boil hop 1 for 90 minutes, add hop 2 after 45 minutes, add hop 2 after 80 minutes)
-    #   3. Can also get hops at 0, e.g. after boil ends (flame out hopping or whirlpool hopping).
-    #   *. Sometimes other ingredients added to a boil, e.g. yeast nutrients or finings, but these are personal preference and we can ignore them.
-    # 4. Fermentation. Note - this is super important, but home brew recipes don't really specify this in any detail. All we can do is pick out yeast. recipe.yeasts
-    #   1. Need yeast name and laboratory: yeast.name, yeast.laboratory
-    #   2. There would be a lot more details here, but not in these recipes.
-    # 5. Potentially dry hopping. Specified in the recipe.hops list. recipe.hops
-    #   *. Dry hop step is specified by hop.use, e.g. "Boil" or "Dry Hop"
-    #   1. Need name, amount (g), time (minutes). Amount should be normalized to batch_size. hop.name, hop.amount, hop.time
-    # ?. Misc category
-    #    - These things can go in with the fermentation, after the fermentation, sometimes in the boil, sometimes in the mash.
-    #    - misc.name specifies unique item
-    #    - misc.use, misc.time (minutes? days?) specifies where in the recipe the ingredient goes and for how long. Normalization will depend on what stage it is added.
-    #    - misc.amount (kg?) specify how much
-    # 6. <EOR> (end of recipe)
-
-    # Extra notes:
-    #    - May be worth enforcing ordering of ingredients:
-    #       1. fermentables
-    #       2. hops + boil
-    #       3. Yeasts
-    #       ?. Misc can go anywhere
-    #    - Probably want to scale everything to a boil size of 1
-
-    pass
+# From https://coderwall.com/p/xww5mq/two-letter-country-code-regex
+ORIGIN_RE = "\((AF|AX|AL|DZ|AS|AD|AO|AI|AQ|AG|AR|AM|AW|AU|AT|AZ|BS|BH|BD|BB|BY|BE|BZ|BJ|BM|BT|BO|BQ|BA|BW|BV|BR|IO|BN|BG|BF|BI|KH|CM|CA|CV|KY|CF|TD|CL|CN|CX|CC|CO|KM|CG|CD|CK|CR|CI|HR|CU|CW|CY|CZ|DK|DJ|DM|DO|EC|EG|SV|GQ|ER|EE|ET|FK|FO|FJ|FI|FR|GF|PF|TF|GA|GM|GE|DE|GH|GI|GR|GL|GD|GP|GU|GT|GG|GN|GW|GY|HT|HM|VA|HN|HK|HU|IS|IN|ID|IR|IQ|IE|IM|IL|IT|JM|JP|JE|JO|KZ|KE|KI|KP|KR|KW|KG|LA|LV|LB|LS|LR|LY|LI|LT|LU|MO|MK|MG|MW|MY|MV|ML|MT|MH|MQ|MR|MU|YT|MX|FM|MD|MC|MN|ME|MS|MA|MZ|MM|NA|NR|NP|NL|NC|NZ|NI|NE|NG|NU|NF|MP|NO|OM|PK|PW|PS|PA|PG|PY|PE|PH|PN|PL|PT|PR|QA|RE|RO|RU|RW|BL|SH|KN|LC|MF|PM|VC|WS|SM|ST|SA|SN|RS|SC|SL|SG|SX|SK|SI|SB|SO|ZA|GS|SS|ES|LK|SD|SR|SJ|SZ|SE|CH|SY|TW|TJ|TZ|TH|TL|TG|TK|TO|TT|TN|TR|TM|TC|TV|UG|UA|AE|GB|US|UM|UY|UZ|VU|VE|VN|VG|VI|WF|EH|YE|ZM|ZW)\)"
+N_CPUS = -1
 
 
+def clean_text(text):
+    """Standard method for cleaning text in our recipes. Any changes to parsing
+    and storing text fields should happen here."""
+    if text is not None:
+        return text.lower().strip()
+
+
+def check_origin(text):
+    """Check a text object to see if 'origin' was included in it in the form of
+    '(US)'. If so, return the original text object with that bit stripped, and
+    the origin. Otherwise, return the original string and None."""
+    origin = None
+    mod_text = text
+    m = re.search(ORIGIN_RE, text)
+    if m is not None:
+        span = m.span()
+        # strip parens
+        origin = m.group()[1:-1]
+        mod_text = mod_text[:span[0]] + mod_text[span[1]:]
+    return mod_text, origin
+
+
+def safe_float(arg):
+    """Try to convert to float, return None otherwise."""
+    if arg is not None:
+        return float(arg)
+
+
+def recipe_to_df(recipe):
+    """Given a pybeerxml.recipe.Recipe, convert to a dataframe and write in a
+    more efficient format.
+    """
+
+    to_df = {}
+    to_df["name"] = clean_text(recipe.name)
+    to_df["batch_size"] = safe_float(recipe.batch_size)
+    to_df["boil_size"] = safe_float(recipe.boil_size)
+
+
+    for i, ferm in enumerate(recipe.fermentables):
+        col = f"ferm{i}_"
+        name, origin = check_origin(ferm.name)
+        to_df[col + "name"] = clean_text(name)
+        if origin is not None:
+            to_df[col + "origin"] = clean_text(origin)
+        else:
+            to_df[col + "origin"] = clean_text(ferm.origin)
+        to_df[col + "amount"] = safe_float(ferm.amount)
+
+    for i, hop in enumerate(recipe.hops):
+        col = f"hop{i}_"
+        to_df[col + "name"] = clean_text(hop.name)
+        to_df[col + "amount"] = safe_float(hop.amount)
+        to_df[col + "alpha"] = safe_float(hop.alpha)
+        to_df[col + "form"] = clean_text(hop.form)
+        to_df[col + "time"] = safe_float(hop.time)
+
+    for i, yeast in enumerate(recipe.yeasts):
+        col = f"yeast{i}_"
+        to_df[col + "name"] = clean_text(yeast.name)
+        to_df[col + "laboratory"] = clean_text(yeast.laboratory)
+        
+    for i, misc in enumerate(recipe.miscs):
+        col = f"miscs{i}_"
+        to_df[col + "name"] = clean_text(misc.name)
+        to_df[col + "amount"] = safe_float(misc.amount)
+        to_df[col + "use"] = clean_text(misc.use)
+        to_df[col + "time"] = safe_float(misc.time)
+
+    df = pd.DataFrame(data=to_df, index=[0])
+    return df
+
+
+def convert_runner(fname):
+    """Meant to be run on a single recipe file."""
+    parser = Parser()
+    recipes = parser.parse(fname)
+    try:
+        recipe = recipes[0]
+    except IndexError:
+        print(f"No recipe in {fname}")
+        return None
+    df = recipe_to_df(recipe)
+    return df
+
+
+def convert_a_bunch(path_to_recipes, n):
+    """Convert n randomly chosen recipes. Currently for inspecting the output."""
+    recipe_files = glob.glob(path.join(path_to_recipes, "*.xml"))
+    samples = random.sample(recipe_files, n)
+
+    results = Parallel(n_jobs=N_CPUS)(delayed(convert_runner)(fname) for fname in samples)
+
+    dfs = []
+    for result in results:
+        dfs.append(result)
+    df = pd.concat(dfs, axis=0, sort=False)
+
+    fname = str(hash(tuple(samples))) + ".h5"
+    print(f"Writing results to {fname}")
+    #with warnings.catch_warnings():
+        #warnings.simplefilter("ignore", category=PerformanceWarning)
+    df.to_hdf(fname, "test")
+
+
+if __name__=="__main__":
+    convert_a_bunch("recipes/", 20)
