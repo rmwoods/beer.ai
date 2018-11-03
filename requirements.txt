@@ -6,4 +6,5 @@ pandas
 pybeerxml
 requests
 sklearn
+tables
 wget
