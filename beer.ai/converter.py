@@ -13,16 +13,29 @@ from joblib import delayed, Parallel
 from pybeerxml import Parser
 
 # From https://coderwall.com/p/xww5mq/two-letter-country-code-regex
-ORIGIN_RE = "\((AF|AX|AL|DZ|AS|AD|AO|AI|AQ|AG|AR|AM|AW|AU|AT|AZ|BS|BH|BD|BB|BY|BE|BZ|BJ|BM|BT|BO|BQ|BA|BW|BV|BR|IO|BN|BG|BF|BI|KH|CM|CA|CV|KY|CF|TD|CL|CN|CX|CC|CO|KM|CG|CD|CK|CR|CI|HR|CU|CW|CY|CZ|DK|DJ|DM|DO|EC|EG|SV|GQ|ER|EE|ET|FK|FO|FJ|FI|FR|GF|PF|TF|GA|GM|GE|DE|GH|GI|GR|GL|GD|GP|GU|GT|GG|GN|GW|GY|HT|HM|VA|HN|HK|HU|IS|IN|ID|IR|IQ|IE|IM|IL|IT|JM|JP|JE|JO|KZ|KE|KI|KP|KR|KW|KG|LA|LV|LB|LS|LR|LY|LI|LT|LU|MO|MK|MG|MW|MY|MV|ML|MT|MH|MQ|MR|MU|YT|MX|FM|MD|MC|MN|ME|MS|MA|MZ|MM|NA|NR|NP|NL|NC|NZ|NI|NE|NG|NU|NF|MP|NO|OM|PK|PW|PS|PA|PG|PY|PE|PH|PN|PL|PT|PR|QA|RE|RO|RU|RW|BL|SH|KN|LC|MF|PM|VC|WS|SM|ST|SA|SN|RS|SC|SL|SG|SX|SK|SI|SB|SO|ZA|GS|SS|ES|LK|SD|SR|SJ|SZ|SE|CH|SY|TW|TJ|TZ|TH|TL|TG|TK|TO|TT|TN|TR|TM|TC|TV|UG|UA|AE|GB|US|UM|UY|UZ|VU|VE|VN|VG|VI|WF|EH|YE|ZM|ZW)\)"
+ORIGIN_RE = "\((AF|AX|AL|DZ|AS|AD|AO|AI|AQ|AG|AR|AM|AW|AU|AT|AZ|BS|BH|BD|BB|BY|BE|BZ|BJ|BM|BT|BO|BQ|BA|BW|BV|BR|IO|BN|BG|BF|BI|KH|CM|CA|CV|KY|CF|TD|CL|CN|CX|CC|CO|KM|CG|CD|CK|CR|CI|HR|CU|CW|CY|CZ|DK|DJ|DM|DO|EC|EG|SV|GQ|ER|EE|ET|FK|FO|FJ|FI|FR|GF|PF|TF|GA|GM|GE|DE|GH|GI|GR|GL|GD|GP|GU|GT|GG|GN|GW|GY|HT|HM|VA|HN|HK|HU|IS|IN|ID|IR|IQ|IE|IM|IL|IT|JM|JP|JE|JO|KZ|KE|KI|KP|KR|KW|KG|LA|LV|LB|LS|LR|LY|LI|LT|LU|MO|MK|MG|MW|MY|MV|ML|MT|MH|MQ|MR|MU|YT|MX|FM|MD|MC|MN|ME|MS|MA|MZ|MM|NA|NR|NP|NL|NC|NZ|NI|NE|NG|NU|NF|MP|NO|OM|PK|PW|PS|PA|PG|PY|PE|PH|PN|PL|PT|PR|QA|RE|RO|RU|RW|BL|SH|KN|LC|MF|PM|VC|WS|SM|ST|SA|SN|RS|SC|SL|SG|SX|SK|SI|SB|SO|ZA|GS|SS|ES|LK|SD|SR|SJ|SZ|SE|CH|SY|TW|TJ|TZ|TH|TL|TG|TK|TO|TT|TN|TR|TM|TC|TV|UG|UA|AE|GB|UK|US|UM|UY|UZ|VU|VE|VN|VG|VI|WF|EH|YE|ZM|ZW)\)"
+MODIFIER_RE = "\(\w*\)"
 LEAF_STR = "leaf"
-N_CPUS = 1
+N_CPUS = -1
 
 
 def clean_text(text):
     """Standard method for cleaning text in our recipes. Any changes to parsing
     and storing text fields should happen here."""
     if text is not None:
-        return text.lower().strip()
+        return str(text).lower().strip()
+
+
+def remove_ingredient_modifiers(text):
+    """Given an ingredient string, remove any modifiers, e.g. 'Cinnamon (Ground)'
+    would return 'Cinnamon '."""
+    mod_text = text
+    if mod_text is not None:
+        m = re.search(MODIFIER_RE, mod_text)
+        if m is not None:
+            span = m.span()
+            mod_text = mod_text[:span[0]] + mod_text[span[1]:]
+    return mod_text
 
 
 def check_origin(text):
@@ -31,12 +44,13 @@ def check_origin(text):
     the origin. Otherwise, return the original string and None."""
     origin = None
     mod_text = text
-    m = re.search(ORIGIN_RE, text)
-    if m is not None:
-        span = m.span()
-        # strip parens
-        origin = m.group()[1:-1]
-        mod_text = mod_text[:span[0]] + mod_text[span[1]:]
+    if mod_text is not None:
+        m = re.search(ORIGIN_RE, text)
+        if m is not None:
+            span = m.span()
+            # strip parens
+            origin = m.group()[1:-1]
+            mod_text = mod_text[:span[0]] + mod_text[span[1]:]
     return mod_text, origin
 
 
@@ -67,6 +81,7 @@ def recipe_to_df(recipe, fname):
         else:
             to_df[col + "origin"] = clean_text(ferm.origin)
         to_df[col + "amount"] = safe_float(ferm.amount)
+        to_df[col + "display_amount"] = clean_text(ferm.display_amount)
         to_df[col + "yield"] = safe_float(ferm._yield)*0.01
         # malt_scaled = <amount> * <yield> * <efficiency> / <boil_size>
         to_df[col + "scaled"] = to_df[col + "amount"] * to_df[col + "yield"]\
@@ -81,6 +96,7 @@ def recipe_to_df(recipe, fname):
         else:
             to_df[col + "origin"] = clean_text(hop.origin)
         to_df[col + "amount"] = safe_float(hop.amount)
+        to_df[col + "display_amount"] = clean_text(hop.display_amount)
         to_df[col + "alpha"] = safe_float(hop.alpha)/100.
         to_df[col + "form"] = clean_text(hop.form)
         is_leaf = int(to_df[col + "form"] == LEAF_STR)
@@ -101,7 +117,8 @@ def recipe_to_df(recipe, fname):
         
     for i, misc in enumerate(recipe.miscs):
         col = f"miscs{i}_"
-        to_df[col + "name"] = clean_text(misc.name)
+        misc_name = remove_ingredient_modifiers(misc.name)
+        to_df[col + "name"] = clean_text(misc_name)
         to_df[col + "amount"] = safe_float(misc.amount)
         to_df[col + "use"] = clean_text(misc.use)
         to_df[col + "time"] = safe_float(misc.time)
@@ -119,7 +136,12 @@ def convert_runner(fname):
     except IndexError:
         print(f"No recipe in {fname}")
         return None
-    df = recipe_to_df(recipe, fname)
+    try:
+        df = recipe_to_df(recipe, fname)
+    except Exception as e:
+        print(f"Failed {fname}:")
+        print(e)
+        df = pd.DataFrame()
     return df
 
 
@@ -147,7 +169,7 @@ def convert_a_bunch(path_to_recipes, n):
     print(f"Writing results to {fname}")
     #with warnings.catch_warnings():
         #warnings.simplefilter("ignore", category=PerformanceWarning)
-    df.to_hdf(fname, "test")
+    df.to_hdf(fname, "test", complevel=9, complib="blosc")
 
 
 def _setup_argparser():
