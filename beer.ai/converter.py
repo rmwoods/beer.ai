@@ -69,7 +69,11 @@ def recipe_to_df(recipe, fname):
     to_df["recipe_file"] = fname
     to_df["name"] = clean_text(recipe.name)
     to_df["batch_size"] = safe_float(recipe.batch_size)
+    if to_df["batch_size"] == 0:
+        to_df["batch_size"] = 1
     to_df["boil_size"] = safe_float(recipe.boil_size)
+    if to_df["boil_size"] == 0:
+        to_df["boil_size"] = 1
     to_df["efficiency"] = safe_float(recipe.efficiency)/100.
 
     for i, ferm in enumerate(recipe.fermentables):
