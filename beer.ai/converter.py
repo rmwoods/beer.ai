@@ -34,7 +34,7 @@ def clean_text(text):
 def remove_ingredient_modifiers(text):
     """Given an ingredient string, remove any modifiers, e.g. 'Cinnamon (Ground)'
     would return 'Cinnamon '."""
-    mod_text = text
+    mod_text = str(text)
     if mod_text is not None:
         m = re.search(MODIFIER_RE, mod_text)
         if m is not None:
@@ -48,7 +48,7 @@ def check_origin(text):
     '(US)'. If so, return the original text object with that bit stripped, and
     the origin. Otherwise, return the original string and None."""
     origin = None
-    mod_text = text
+    mod_text = str(text)
     if mod_text is not None:
         m = re.search(ORIGIN_RE, text)
         if m is not None:
@@ -171,7 +171,7 @@ def convert_runner(fname):
 def clean_cols(df):
     """For certain columns, fill in values to make writing succeed."""
 
-    misc_cols = [i for i in df.cols if i.startswith("miscs") and i.endswith("amount_is_weight")]
+    misc_cols = [i for i in df.columns if i.startswith("miscs") and i.endswith("amount_is_weight")]
     for col in misc_cols:
         df[col] = df[col].fillna(False)
 
