@@ -13,10 +13,15 @@ from joblib import delayed, Parallel
 from pybeerxml import Parser
 
 # From https://coderwall.com/p/xww5mq/two-letter-country-code-regex
-ORIGIN_RE = "\((AF|AX|AL|DZ|AS|AD|AO|AI|AQ|AG|AR|AM|AW|AU|AT|AZ|BS|BH|BD|BB|BY|BE|BZ|BJ|BM|BT|BO|BQ|BA|BW|BV|BR|IO|BN|BG|BF|BI|KH|CM|CA|CV|KY|CF|TD|CL|CN|CX|CC|CO|KM|CG|CD|CK|CR|CI|HR|CU|CW|CY|CZ|DK|DJ|DM|DO|EC|EG|SV|GQ|ER|EE|ET|FK|FO|FJ|FI|FR|GF|PF|TF|GA|GM|GE|DE|GH|GI|GR|GL|GD|GP|GU|GT|GG|GN|GW|GY|HT|HM|VA|HN|HK|HU|IS|IN|ID|IR|IQ|IE|IM|IL|IT|JM|JP|JE|JO|KZ|KE|KI|KP|KR|KW|KG|LA|LV|LB|LS|LR|LY|LI|LT|LU|MO|MK|MG|MW|MY|MV|ML|MT|MH|MQ|MR|MU|YT|MX|FM|MD|MC|MN|ME|MS|MA|MZ|MM|NA|NR|NP|NL|NC|NZ|NI|NE|NG|NU|NF|MP|NO|OM|PK|PW|PS|PA|PG|PY|PE|PH|PN|PL|PT|PR|QA|RE|RO|RU|RW|BL|SH|KN|LC|MF|PM|VC|WS|SM|ST|SA|SN|RS|SC|SL|SG|SX|SK|SI|SB|SO|ZA|GS|SS|ES|LK|SD|SR|SJ|SZ|SE|CH|SY|TW|TJ|TZ|TH|TL|TG|TK|TO|TT|TN|TR|TM|TC|TV|UG|UA|AE|GB|UK|US|UM|UY|UZ|VU|VE|VN|VG|VI|WF|EH|YE|ZM|ZW)\)"
-MODIFIER_RE = "\(\w*\)"
+
+ORIGIN_RE = re.compile("\((AF|AX|AL|DZ|AS|AD|AO|AI|AQ|AG|AR|AM|AW|AU|AT|AZ|BS|BH|BD|BB|BY|BE|BZ|BJ|BM|BT|BO|BQ|BA|BW|BV|BR|IO|BN|BG|BF|BI|KH|CM|CA|CV|KY|CF|TD|CL|CN|CX|CC|CO|KM|CG|CD|CK|CR|CI|HR|CU|CW|CY|CZ|DK|DJ|DM|DO|EC|EG|SV|GQ|ER|EE|ET|FK|FO|FJ|FI|FR|GF|PF|TF|GA|GM|GE|DE|GH|GI|GR|GL|GD|GP|GU|GT|GG|GN|GW|GY|HT|HM|VA|HN|HK|HU|IS|IN|ID|IR|IQ|IE|IM|IL|IT|JM|JP|JE|JO|KZ|KE|KI|KP|KR|KW|KG|LA|LV|LB|LS|LR|LY|LI|LT|LU|MO|MK|MG|MW|MY|MV|ML|MT|MH|MQ|MR|MU|YT|MX|FM|MD|MC|MN|ME|MS|MA|MZ|MM|NA|NR|NP|NL|NC|NZ|NI|NE|NG|NU|NF|MP|NO|OM|PK|PW|PS|PA|PG|PY|PE|PH|PN|PL|PT|PR|QA|RE|RO|RU|RW|BL|SH|KN|LC|MF|PM|VC|WS|SM|ST|SA|SN|RS|SC|SL|SG|SX|SK|SI|SB|SO|ZA|GS|SS|ES|LK|SD|SR|SJ|SZ|SE|CH|SY|TW|TJ|TZ|TH|TL|TG|TK|TO|TT|TN|TR|TM|TC|TV|UG|UA|AE|GB|UK|US|UM|UY|UZ|VU|VE|VN|VG|VI|WF|EH|YE|ZM|ZW)\)")
+MODIFIER_RE = re.compile("\([\w ]*\)")
 LEAF_STR = "leaf"
-N_CPUS = -1
+
+# Number to process at a time
+BATCH_SIZE = 1000
+# Number of processors to use. -1 = all
+N_CPUS = 1
 
 
 def clean_text(text):
@@ -58,6 +63,17 @@ def safe_float(arg):
     """Try to convert to float, return None otherwise."""
     if arg is not None:
         return float(arg)
+    else:
+        return np.nan
+
+
+def add_to_dicts(to_df, key, value, dtype_dict):
+    """set to_df[key] = value, infer type of value, and set type[key] = type."""
+    to_df[key] = value
+    if isinstance(value, str):
+        dtype_dict[key] = "string"
+    else:
+        dtype_dict[key] = "float32"
 
 
 def recipe_to_df(recipe, fname):
@@ -66,6 +82,7 @@ def recipe_to_df(recipe, fname):
     """
 
     to_df = {}
+    dtypes = {}
     to_df["recipe_file"] = fname
     to_df["name"] = clean_text(recipe.name)
     to_df["batch_size"] = safe_float(recipe.batch_size)
@@ -126,6 +143,8 @@ def recipe_to_df(recipe, fname):
         to_df[col + "amount"] = safe_float(misc.amount)
         to_df[col + "use"] = clean_text(misc.use)
         to_df[col + "time"] = safe_float(misc.time)
+        # Should be a boolean
+        to_df[col + "amount_is_weight"] = misc.amount_is_weight
 
     df = pd.DataFrame(data=to_df, index=[0])
     return df
@@ -161,19 +180,32 @@ def convert_a_bunch(path_to_recipes, n):
         else:
             samples = recipe_files
 
-    results = Parallel(n_jobs=N_CPUS)(delayed(convert_runner)(fname) for fname in samples)
 
-    dfs = []
-    for result in results:
-        dfs.append(result)
-    df = pd.concat(dfs, axis=0, sort=False)
+    for i_start in range(0,len(samples), BATCH_SIZE):
+        i_end = min(i_start + BATCH_SIZE, len(samples))
+        sub_samples = samples[i_start:i_end]
+        results = Parallel(n_jobs=N_CPUS)(delayed(convert_runner)(fname) for fname in sub_samples)
 
-    # Calculate a filename as a hash of the xml files that were read in.
-    fname = str(abs(hash(tuple(samples)))) + ".h5"
-    print(f"Writing results to {fname}")
-    #with warnings.catch_warnings():
-        #warnings.simplefilter("ignore", category=PerformanceWarning)
-    df.to_hdf(fname, "test", complevel=9, complib="blosc")
+        dfs = []
+        for result in results:
+            dfs.append(result)
+        df = pd.concat(dfs, axis=0, sort=False)
+        df.index = range(i_start,i_start+len(df))
+
+        # Calculate a filename as a hash of the xml files that were read in.
+        write_options = {
+            "complevel":9,
+            "complib":"blosc",
+            "format":"table",
+        }
+        if n == -1:
+            fname = "all_recipes.h5"
+            write_options["mode"] = "a"
+            write_options["append"] = True
+        else:
+            fname = str(abs(hash(tuple(samples)))) + ".h5"
+        print(f"Writing examples {i_start}-{i_end} to {fname}.")
+        df.to_hdf(fname, "test", **write_options)
 
 
 def _setup_argparser():
