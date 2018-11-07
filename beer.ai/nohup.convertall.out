@@ -1,0 +1,123 @@
+nohup: ignoring input
+Failed recipes/juicy-juice-iii.xml:
+expected string or bytes-like object
+Failed recipes/2024-tankhouse-homage.xml:
+expected string or bytes-like object
+Failed recipes/special-snowflake-1b5293.xml:
+expected string or bytes-like object
+Failed recipes/first-stout-8cf749.xml:
+expected string or bytes-like object
+Failed recipes/007-goldenrye.xml:
+expected string or bytes-like object
+Failed recipes/imperial-india-rye-lager-d5628e.xml:
+expected string or bytes-like object
+Failed recipes/test-batch-au-pale-ale-grain.xml:
+expected string or bytes-like object
+Failed recipes/straight-exp-grapefruit-shooter.xml:
+expected string or bytes-like object
+Failed recipes/old-jock-clone-c91e96.xml:
+expected string or bytes-like object
+Failed recipes/down-under-rye-pale.xml:
+expected string or bytes-like object
+Failed recipes/haringstout.xml:
+expected string or bytes-like object
+Failed recipes/ptf-partial-mash.xml:
+expected string or bytes-like object
+Failed recipes/april-2014-single-malt-full-batch.xml:
+expected string or bytes-like object
+Failed recipes/india-wit-ale-2.xml:
+expected string or bytes-like object
+Failed recipes/hopatoan-split.xml:
+expected string or bytes-like object
+Failed recipes/pekko-pale.xml:
+expected string or bytes-like object
+Failed recipes/shortest-straw-2.xml:
+expected string or bytes-like object
+Failed recipes/hunting-creek-brown-ipa.xml:
+expected string or bytes-like object
+Failed recipes/perfect-union-barleywine-tweaked.xml:
+expected string or bytes-like object
+Failed recipes/the-blonde-who-loved-me.xml:
+expected string or bytes-like object
+Failed recipes/d73.xml:
+expected string or bytes-like object
+Failed recipes/session-test-batch-4.xml:
+expected string or bytes-like object
+Failed recipes/at-the-helm-batch-001.xml:
+expected string or bytes-like object
+Failed recipes/the-brewknight.xml:
+expected string or bytes-like object
+Failed recipes/06300-and-05256-dragon-semen-ipa.xml:
+expected string or bytes-like object
+Failed recipes/lda-tnt-hopped-pale-e86931.xml:
+expected string or bytes-like object
+Failed recipes/ri4.xml:
+expected string or bytes-like object
+Failed recipes/iipa-1-ad42e8.xml:
+expected string or bytes-like object
+Failed recipes/spy-p-a.xml:
+expected string or bytes-like object
+Failed recipes/kitchen-sink-hop-single-malt-apa.xml:
+expected string or bytes-like object
+Failed recipes/leftovers-ii-248c30.xml:
+expected string or bytes-like object
+Failed recipes/007-maple-syrup-stout.xml:
+expected string or bytes-like object
+Failed recipes/spring-belma.xml:
+expected string or bytes-like object
+Failed recipes/belle-saision.xml:
+expected string or bytes-like object
+Failed recipes/tims-epa.xml:
+expected string or bytes-like object
+Failed recipes/ghosts.xml:
+expected string or bytes-like object
+Failed recipes/ballast-point-sculpin-inspired-ipa.xml:
+expected string or bytes-like object
+Failed recipes/007-pale-ale-2.xml:
+expected string or bytes-like object
+Failed recipes/here-s-the-thing-is-batch-002.xml:
+expected string or bytes-like object
+Failed recipes/saison-for-2014-comp.xml:
+expected string or bytes-like object
+Failed recipes/munich-smadh.xml:
+expected string or bytes-like object
+Failed recipes/california-roll.xml:
+expected string or bytes-like object
+Failed recipes/hopatoan.xml:
+expected string or bytes-like object
+Failed recipes/sierra-madre-summer-blush.xml:
+expected string or bytes-like object
+Failed recipes/ginger-claus.xml:
+expected string or bytes-like object
+Failed recipes/bna9-session-ipa.xml:
+expected string or bytes-like object
+Failed recipes/ginger-2017.xml:
+expected string or bytes-like object
+Failed recipes/man-with-the-golden-hop-8b369b.xml:
+expected string or bytes-like object
+Failed recipes/skinny-tug.xml:
+expected string or bytes-like object
+Failed recipes/icpa-mosaic-edition.xml:
+expected string or bytes-like object
+Failed recipes/drinkin-beer-7bec75.xml:
+expected string or bytes-like object
+Failed recipes/experimental-tag-2008002-071.xml:
+expected string or bytes-like object
+Failed recipes/wicked-smaht.xml:
+expected string or bytes-like object
+Failed recipes/hoppy-brett.xml:
+expected string or bytes-like object
+Failed recipes/291-ipa.xml:
+expected string or bytes-like object
+Failed recipes/experimental-tag-2008002-036.xml:
+expected string or bytes-like object
+Failed recipes/mooseterlander.xml:
+expected string or bytes-like object
+Failed recipes/ranga.xml:
+expected string or bytes-like object
+Failed recipes/metamorphosis.xml:
+expected string or bytes-like object
+Failed recipes/muckymess-fuckin-bullshit-time.xml:
+expected string or bytes-like object
+/home/rory/beer.ai/env/lib/python3.6/site-packages/joblib/externals/loky/backend/semaphore_tracker.py:198: UserWarning: semaphore_tracker: There appear to be 6 leaked semaphores to clean up at shutdown
+  len(cache))

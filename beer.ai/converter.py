@@ -19,7 +19,7 @@ MODIFIER_RE = re.compile("\([\w ]*\)")
 LEAF_STR = "leaf"
 
 # Number to process at a time
-BATCH_SIZE = 1000
+BATCH_SIZE = 100000000
 # Number of processors to use. -1 = all
 N_CPUS = 1
 
@@ -50,7 +50,7 @@ def check_origin(text):
     origin = None
     mod_text = str(text)
     if mod_text is not None:
-        m = re.search(ORIGIN_RE, text)
+        m = re.search(ORIGIN_RE, mod_text)
         if m is not None:
             span = m.span()
             # strip parens
@@ -159,6 +159,7 @@ def convert_runner(fname):
     except IndexError:
         print(f"No recipe in {fname}")
         return None
+    df = recipe_to_df(recipe, fname)
     try:
         df = recipe_to_df(recipe, fname)
     except Exception as e:
