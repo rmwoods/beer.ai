@@ -144,7 +144,7 @@ def recipe_to_df(recipe, fname):
         to_df[col + "use"] = clean_text(misc.use)
         to_df[col + "time"] = safe_float(misc.time)
         # Should be a boolean
-        to_df[col + "amount_is_weight"] = misc.amount_is_weight
+        to_df[col + "amount_is_weight"] = misc.amount_is_weight or False
 
     df = pd.DataFrame(data=to_df, index=[0])
     return df
@@ -166,6 +166,14 @@ def convert_runner(fname):
         print(e)
         df = pd.DataFrame()
     return df
+
+
+def clean_cols(df):
+    """For certain columns, fill in values to make writing succeed."""
+
+    misc_cols = [i for i in df.cols if i.startswith("miscs") and i.endswith("amount_is_weight")]
+    for col in misc_cols:
+        df[col] = df[col].fillna(False)
 
 
 def convert_a_bunch(path_to_recipes, n):
@@ -191,6 +199,7 @@ def convert_a_bunch(path_to_recipes, n):
             dfs.append(result)
         df = pd.concat(dfs, axis=0, sort=False)
         df.index = range(i_start,i_start+len(df))
+        clean_cols(df)
 
         # Calculate a filename as a hash of the xml files that were read in.
         write_options = {
