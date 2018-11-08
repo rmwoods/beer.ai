@@ -204,9 +204,9 @@ def convert_a_bunch(path_to_recipes, n):
 
         # Calculate a filename as a hash of the xml files that were read in.
         write_options = {
-            "complevel":9,
-            "complib":"blosc",
-            "format":"table",
+            "complevel": 9,
+            "complib": "blosc",
+            "format": "table",
         }
         if n == -1:
             fname = "all_recipes.h5"
