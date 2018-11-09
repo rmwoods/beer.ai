@@ -231,7 +231,7 @@ def convert_a_bunch(path_to_recipes, n, jobs=N_CPUS):
         fname = str(abs(hash(tuple(samples)))) + ".h5"
     print(f"Writing {len(samples)} examples to {fname}.")
     df_core.to_hdf(fname, "core", mode="w", **write_options)
-    df_ing.to_hdf(fname, "ingredients", mode="w", **write_options)
+    df_ing.to_hdf(fname, "ingredients", mode="a", **write_options)
 
 
 def _setup_argparser():
