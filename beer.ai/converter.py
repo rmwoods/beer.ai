@@ -7,8 +7,8 @@ import numpy as np
 import pandas as pd
 import random
 import re
-import warnings
 
+from itertools import zip_longest
 from joblib import delayed, Parallel
 from pybeerxml import Parser
 
@@ -18,10 +18,8 @@ ORIGIN_RE = re.compile("\((AF|AX|AL|DZ|AS|AD|AO|AI|AQ|AG|AR|AM|AW|AU|AT|AZ|BS|BH
 MODIFIER_RE = re.compile("\([\w ]*\)")
 LEAF_STR = "leaf"
 
-# Number to process at a time
-BATCH_SIZE = 100000000
 # Number of processors to use. -1 = all
-N_CPUS = 1
+N_CPUS = -1
 
 
 def clean_text(text):
@@ -76,81 +74,99 @@ def add_to_dicts(to_df, key, value, dtype_dict):
         dtype_dict[key] = "float32"
 
 
-def recipe_to_df(recipe, fname):
+def fill_ferm(d, ferm, core_vals):
+    """Given a ferm class, add the appropriate fields to the dict d."""
+    if ferm is not None:
+        ferm_name, ferm_origin = check_origin(ferm.name)
+        d["ferm_name"] = clean_text(ferm_name)
+        if ferm_origin is not None:
+            d["ferm_origin"] = clean_text(ferm_origin)
+        else:
+            d["ferm_origin"] = clean_text(ferm.origin)
+        d["ferm_amount"] = safe_float(ferm.amount)
+        d["ferm_display_amount"] = clean_text(ferm.display_amount)
+        d["ferm_yield"] = safe_float(ferm._yield)*0.01
+        # malt_scaled = <amount> * <yield> * <efficiency> / <boil_size>
+        d["ferm_scaled"] = d["ferm_amount"] * d["ferm_yield"]\
+                                * core_vals["efficiency"] / core_vals["boil_size"]
+
+
+def fill_hop(d, hop, core_vals):
+    """Given a hop class, add the appropriate fields to the dict d."""
+    if hop is not None:
+        hop_name, hop_origin = check_origin(hop.name)
+        d["hop_name"] = clean_text(hop_name)
+        if hop_origin is not None:
+            d["hop_origin"] = clean_text(hop_origin)
+        else:
+            d["hop_origin"] = clean_text(hop.origin)
+        d["hop_amount"] = safe_float(hop.amount)
+        d["hop_display_amount"] = clean_text(hop.display_amount)
+        d["hop_alpha"] = safe_float(hop.alpha)/100.
+        d["hop_form"] = clean_text(hop.form)
+        is_leaf = int(d["hop_form"] == LEAF_STR)
+        d["hop_time"] = safe_float(hop.time)
+        if d["hop_time"] > 0:
+            # hop_scaled  = <amount>*0.01*<alpha>*[1 - 0.1 * (leaf)]/<boil_size>
+            d["hop_scaled"] = (d["hop_amount"]
+                               * d["hop_alpha"] * (1 - 0.1 * is_leaf))\
+                               / core_vals["boil_size"]
+        else:
+            # dry_hop_scaled = <amount> / <batch_size>
+            d["hop_scaled"] = d["hop_amount"] / core_vals["batch_size"]
+
+
+def fill_yeast(d, yeast):
+    """Given a yeast class, add the appropriate fields to the dict d."""
+    if yeast is not None:
+        d["yeast_name"] = clean_text(yeast.name)
+        d["yeast_laboratory"] = clean_text(yeast.laboratory)
+
+
+def fill_misc(d, misc):
+    """Given a misc class, add the appropriate fields to the dict d."""
+    if misc is not None:
+        misc_name = remove_ingredient_modifiers(misc.name)
+        d["misc_name"] = clean_text(misc_name)
+        d["misc_amount"] = safe_float(misc.amount)
+        d["misc_use"] = clean_text(misc.use)
+        d["misc_time"] = safe_float(misc.time)
+        # Should be a boolean
+        d["misc_amount_is_weight"] = misc.amount_is_weight or False
+
+
+def recipe_to_dicts(recipe, fname, recipe_id):
     """Given a pybeerxml.recipe.Recipe, convert to a dataframe and write in a
     more efficient format.
     """
 
-    to_df = {}
-    dtypes = {}
-    to_df["recipe_file"] = fname
-    to_df["name"] = clean_text(recipe.name)
-    to_df["batch_size"] = safe_float(recipe.batch_size)
-    if to_df["batch_size"] == 0:
-        to_df["batch_size"] = 1
-    to_df["boil_size"] = safe_float(recipe.boil_size)
-    if to_df["boil_size"] == 0:
-        to_df["boil_size"] = 1
-    to_df["efficiency"] = safe_float(recipe.efficiency)/100.
+    core_vals = {}
+    ingredients = []
+    core_vals["id"] = recipe_id
+    core_vals["recipe_file"] = fname
+    core_vals["name"] = clean_text(recipe.name)
+    core_vals["batch_size"] = safe_float(recipe.batch_size)
+    if core_vals["batch_size"] == 0:
+        core_vals["batch_size"] = 1
+    core_vals["boil_size"] = safe_float(recipe.boil_size)
+    if core_vals["boil_size"] == 0:
+        core_vals["boil_size"] = 1
+    core_vals["efficiency"] = safe_float(recipe.efficiency)/100.
+    core_vals["boil_time"] = safe_float(recipe.boil_time)
 
-    for i, ferm in enumerate(recipe.fermentables):
-        col = f"ferm{i}_"
-        yeast_name, yeast_origin = check_origin(ferm.name)
-        to_df[col + "name"] = clean_text(yeast_name)
-        if yeast_origin is not None:
-            to_df[col + "origin"] = clean_text(yeast_origin)
-        else:
-            to_df[col + "origin"] = clean_text(ferm.origin)
-        to_df[col + "amount"] = safe_float(ferm.amount)
-        to_df[col + "display_amount"] = clean_text(ferm.display_amount)
-        to_df[col + "yield"] = safe_float(ferm._yield)*0.01
-        # malt_scaled = <amount> * <yield> * <efficiency> / <boil_size>
-        to_df[col + "scaled"] = to_df[col + "amount"] * to_df[col + "yield"]\
-                                * to_df["efficiency"] / to_df["boil_size"]
+    for ferm, hop, yeast, misc in zip_longest(
+            recipe.fermentables, recipe.hops, recipe.yeasts, recipe.miscs):
+        tmp = {"id":recipe_id}
+        fill_ferm(tmp, ferm, core_vals)
+        fill_hop(tmp, hop, core_vals)
+        fill_yeast(tmp, yeast)
+        fill_misc(tmp, misc)
+        ingredients.append(tmp)
 
-    for i, hop in enumerate(recipe.hops):
-        col = f"hop{i}_"
-        hop_name, hop_origin = check_origin(hop.name)
-        to_df[col + "name"] = clean_text(hop_name)
-        if hop_origin is not None:
-            to_df[col + "origin"] = clean_text(hop_origin)
-        else:
-            to_df[col + "origin"] = clean_text(hop.origin)
-        to_df[col + "amount"] = safe_float(hop.amount)
-        to_df[col + "display_amount"] = clean_text(hop.display_amount)
-        to_df[col + "alpha"] = safe_float(hop.alpha)/100.
-        to_df[col + "form"] = clean_text(hop.form)
-        is_leaf = int(to_df[col + "form"] == LEAF_STR)
-        to_df[col + "time"] = safe_float(hop.time)
-        if to_df[col + "time"] > 0:
-            # hop_scaled  = <amount>*0.01*<alpha>*[1 - 0.1 * (leaf)]/<boil_size>
-            to_df[col + "scaled"] = (to_df[col + "amount"]
-                                    * to_df[col + "alpha"] * (1 - 0.1 * is_leaf))\
-                                    / to_df["boil_size"]
-        else:
-            # dry_hop_scaled = <amount> / <batch_size>
-            to_df[col + "scaled"] = to_df[col + "amount"] / to_df["batch_size"]
-
-    for i, yeast in enumerate(recipe.yeasts):
-        col = f"yeast{i}_"
-        to_df[col + "name"] = clean_text(yeast.name)
-        to_df[col + "laboratory"] = clean_text(yeast.laboratory)
-        
-    for i, misc in enumerate(recipe.miscs):
-        col = f"miscs{i}_"
-        misc_name = remove_ingredient_modifiers(misc.name)
-        to_df[col + "name"] = clean_text(misc_name)
-        to_df[col + "amount"] = safe_float(misc.amount)
-        to_df[col + "use"] = clean_text(misc.use)
-        to_df[col + "time"] = safe_float(misc.time)
-        # Should be a boolean
-        to_df[col + "amount_is_weight"] = misc.amount_is_weight or False
-
-    df = pd.DataFrame(data=to_df, index=[0])
-    return df
+    return core_vals, ingredients
 
 
-def convert_runner(fname):
+def convert_runner(fname, recipe_id):
     """Meant to be run on a single recipe file."""
     parser = Parser()
     recipes = parser.parse(fname)
@@ -159,25 +175,23 @@ def convert_runner(fname):
     except IndexError:
         print(f"No recipe in {fname}")
         return None
-    df = recipe_to_df(recipe, fname)
     try:
-        df = recipe_to_df(recipe, fname)
+        core_vals, ingredients = recipe_to_dicts(recipe, fname, recipe_id)
     except Exception as e:
         print(f"Failed {fname}:")
         print(e)
-        df = pd.DataFrame()
-    return df
+        core_vals, ingredients = {}, []
+    return core_vals, ingredients
 
 
 def clean_cols(df):
     """For certain columns, fill in values to make writing succeed."""
 
-    misc_cols = [i for i in df.columns if i.startswith("miscs") and i.endswith("amount_is_weight")]
-    for col in misc_cols:
-        df[col] = df[col].fillna(False)
+    #df["misc_amount_is_weight"] = df["misc_amount_is_weight"].fillna(False)
+    pass
 
 
-def convert_a_bunch(path_to_recipes, n):
+def convert_a_bunch(path_to_recipes, n, jobs=N_CPUS):
     """Convert n randomly chosen recipes. Currently for inspecting the output."""
 
     if path_to_recipes is not None:
@@ -189,33 +203,35 @@ def convert_a_bunch(path_to_recipes, n):
         else:
             samples = recipe_files
 
+    results = Parallel(n_jobs=N_CPUS)(
+            delayed(convert_runner)(fname, i)
+            for i, fname in enumerate(samples))
 
-    for i_start in range(0,len(samples), BATCH_SIZE):
-        i_end = min(i_start + BATCH_SIZE, len(samples))
-        sub_samples = samples[i_start:i_end]
-        results = Parallel(n_jobs=N_CPUS)(delayed(convert_runner)(fname) for fname in sub_samples)
+    core_vals = []
+    ingredients = []
+    for result in results:
+        core_vals.append(result[0])
+        ingredients.extend(result[1])
+    
+    df_core = pd.DataFrame(core_vals)
+    df_core = df_core.set_index("id")
+    
+    df_ing = pd.DataFrame(ingredients)
+    df_ing = df_ing.set_index("id")
+    clean_cols(df_ing)
 
-        dfs = []
-        for result in results:
-            dfs.append(result)
-        df = pd.concat(dfs, axis=0, sort=False)
-        df.index = range(i_start,i_start+len(df))
-        clean_cols(df)
-
+    write_options = {
+        "complevel": 9,
+        "complib": "blosc",
+    }
+    if n == -1:
+        fname = "all_recipes.h5"
+    else:
         # Calculate a filename as a hash of the xml files that were read in.
-        write_options = {
-            "complevel": 9,
-            "complib": "blosc",
-            "format": "table",
-        }
-        if n == -1:
-            fname = "all_recipes.h5"
-            write_options["mode"] = "a"
-            write_options["append"] = True
-        else:
-            fname = str(abs(hash(tuple(samples)))) + ".h5"
-        print(f"Writing examples {i_start}-{i_end} to {fname}.")
-        df.to_hdf(fname, "test", **write_options)
+        fname = str(abs(hash(tuple(samples)))) + ".h5"
+    print(f"Writing {len(samples)} examples to {fname}.")
+    df_core.to_hdf(fname, "core", mode="w", **write_options)
+    df_ing.to_hdf(fname, "ingredients", mode="w", **write_options)
 
 
 def _setup_argparser():
@@ -239,11 +255,18 @@ def _setup_argparser():
             "conversion. Note that -1 means to convert *all* recipes. Default "
             "is 20."
     )
+    parser.add_argument(
+        "-j",
+        "--jobs",
+        type=int,
+        default=N_CPUS,
+        help="Number of processors to use."
+    )
     return parser
 
 
-if __name__=="__main__":
+if __name__ == "__main__":
     parser = _setup_argparser()
     args = parser.parse_args()
 
-    convert_a_bunch(args.filename, args.number)
+    convert_a_bunch(args.filename, args.number, args.jobs)
