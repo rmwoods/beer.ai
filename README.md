@@ -13,7 +13,7 @@ source env/bin/activate
 pip install -r requirements.txt
 ```
 
-Once installed, you're good to go. Note that there is currently an annoying print statement in the pybeerxml package. You can get rid of it by deleting line 22 in `env/lib/python3.6/site-packages/pybeerxml/fermentable.py`.
+Once installed, you're good to go. Note that there is currently an annoying print statement in the pybeerxml package. You can get rid of it by deleting line 22 in `.env/lib/python3.6/site-packages/pybeerxml/fermentable.py`.
 
 After this, you need data. Currently, you can either run the web scraper to get your own data (takes days), or you can ask Rory for the data. It should be stored in `beer.ai/recipes/*.xml`. As soon as we have finished pre-processing the recipes, you can likely skip this step and just load up an HDF containing all the recipes.
 
