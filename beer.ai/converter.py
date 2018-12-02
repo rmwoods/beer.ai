@@ -153,6 +153,8 @@ def recipe_to_dicts(recipe, fname, recipe_id):
         core_vals["boil_size"] = 1
     core_vals["efficiency"] = safe_float(recipe.efficiency)/100.
     core_vals["boil_time"] = safe_float(recipe.boil_time)
+    core_vals["category_number"] = int(safe_float(recipe.style.category_number))
+    core_vals["style"] = clean_text(recipe.style.name)
 
     for ferm, hop, yeast, misc in zip_longest(
             recipe.fermentables, recipe.hops, recipe.yeasts, recipe.miscs):
@@ -187,8 +189,7 @@ def convert_runner(fname, recipe_id):
 def clean_cols(df):
     """For certain columns, fill in values to make writing succeed."""
 
-    #df["misc_amount_is_weight"] = df["misc_amount_is_weight"].fillna(False)
-    pass
+    df["misc_amount_is_weight"] = df["misc_amount_is_weight"].fillna(False)
 
 
 def convert_a_bunch(path_to_recipes, n, jobs=N_CPUS):
@@ -223,6 +224,7 @@ def convert_a_bunch(path_to_recipes, n, jobs=N_CPUS):
     write_options = {
         "complevel": 9,
         "complib": "blosc",
+        "format": "table",
     }
     if n == -1:
         fname = "all_recipes.h5"
