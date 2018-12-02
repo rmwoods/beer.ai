@@ -11,13 +11,13 @@ VALID_CATEGORIES = [
 ]
 
 
-def apply_cleaning_dict(x, ferm_name_clean_dict):
+def apply_cleaning_dict(x, ingred_name_clean_dict):
     """ (str, dict) -> str
-    Take:   an entry from the 'ferm_name' column
-            a dictionary whose keys are ferm_name entries and whose values are cleaned ferm_name entries
-    Return an entry for the 'ferm_name_cleaned column"""
-    if x in ferm_name_clean_dict.keys():
-        return ferm_name_clean_dict[x]
+    Take:   an entry from the 'ingred_name' column
+            a dictionary whose keys are ingred_name entries and whose values are cleaned ingred_name entries
+    Return an entry for the 'ingred_name_cleaned column"""
+    if x in ingred_name_clean_dict.keys():
+        return ingred_name_clean_dict[x]
     else:
         pass
 
@@ -25,15 +25,15 @@ def apply_cleaning_dict(x, ferm_name_clean_dict):
 def matching_game(host, contestants):
     """ (str, list) -> dict
 
-    Prompt the user to select ferm_name entries match a category.
+    Prompt the user to select ingred_name entries match a category.
     (Get the studio audience to pick contestants that match the host.)
 
-    Take:   a ferm_name category to find matches for (the host)
-            a list of ferm_name entries to match with the category (the contestants)
+    Take:   a ingred_name category to find matches for (the host)
+            a list of ingred_name entries to match with the category (the contestants)
 
     Return: a dictionary
-                whose keys are the ferm_name entries that match (the contestants that match the host)
-                whose values are ferm_name category (the host)
+                whose keys are the ingred_name entries that match (the contestants that match the host)
+                whose values are ingred_name category (the host)
     """
     winners = {}
 
@@ -62,15 +62,19 @@ def matching_game(host, contestants):
     return winners
 
 
-def main():
+def main(ingred_path, category):
     # Load the ingredients DataFrame
-    ingred_path = r'C:\Users\rwelch\Documents\GitHub\beer.ai\beer.ai\all_recipes.h5'
+    #ingred_path = r'C:\Users\rwelch\Documents\GitHub\beer.ai\beer.ai\all_recipes.h5'
 
-    df = pd.read_hdf(ingred_path, key='ingredients')
+    store = pd.HDFStore(ingred_path, "r")
+    # Just work on subset for testing
+    df = store.select("ingredients", where="index < 10000")
+    col = category + "_name"
+    col_clean = col + "_clean"
 
-    # If it doesn't exist, create a ferm_name_clean column
-    if 'ferm_name_clean' not in df:
-        df['ferm_name_clean'] = ""
+    # If it doesn't exist, create a ingred_name_clean column
+    if col_clean not in df.columns:
+        df[col_clean] = ""
 
 
     # ITERATE
@@ -78,26 +82,26 @@ def main():
     # Open the mapping dictionary
     # Open the (in progress?) dataframe
 
-    # Get the subset of ferm_name to be cleaned
-    ferm_name_to_clean = df['ferm_name'][df['ferm_name_clean'].isnull()]
+    # Get the subset of ingred_name to be cleaned
+    ingred_name_to_clean = df[col][df[col_clean].isnull()]
 
     # Get the most common unique name remaining
-    ferm_name_category = ferm_name_to_clean.value_counts().index[0]
+    ingred_name_category = ingred_name_to_clean.value_counts().index[0]
 
     # Suggest similar names
-    ferm_name_similar = difflib.get_close_matches(ferm_name_category, ferm_name_to_clean.astype('str').unique(), n=10000, cutoff=0.6)
+    ingred_name_similar = difflib.get_close_matches(ingred_name_category, ingred_name_to_clean.astype('str').unique(), n=10000, cutoff=0.6)
 
-    # Play the ferm game
+    # Play the ingred game
 
-    for item in ferm_name_similar:
+    for item in ingred_name_similar:
         prompting = 1
         while prompting == 1:
 
-            prompt = 'Category:\n{}. Does this belong?\n-------------\n{}'.format(ferm_name_category,item)
+            prompt = f'Category:\n{ingred_name_category}. Does this belong?\n-------------\n{item}'
             print(prompt)
             belong = input('y/n')
             if belong == 'y':
-                ferm_name_clean_dict[item] = ferm_name_category
+                ingred_name_clean_dict[item] = ingred_name_category
                 print('Accepted')
                 prompting = 0
             elif belong == 'n':
@@ -109,7 +113,7 @@ def main():
 
     # Apply the cleaning dict
     # Add the new, cleaned ingredient names to the cleaned column
-    df['ferm_name_clean'] = df['ferm_name'].apply(lambda x: apply_cleaning_dict(x, ferm_name_clean_dict))
+    df['ferm_name_clean'] = df['ferm_name'].apply(lambda x: apply_cleaning_dict(x, ingred_name_clean_dict))
 
     # STEPS TO ITERATE
     # DONE Get list of names to be cleaned
@@ -151,6 +155,7 @@ def make_arg_parser():
         "-c",
         "--category",
         choices=VALID_CATEGORIES,
+        default="ferm",
         help="Which ingredient category to play the game with."
     )
     return parser
@@ -159,4 +164,4 @@ def make_arg_parser():
 if __name__ == "__main__":
     parser = make_arg_parser()
     args = parser.parse_args()
-    main()
+    main(args.filename, args.category)
