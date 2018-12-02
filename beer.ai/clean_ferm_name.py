@@ -1,5 +1,14 @@
+import argparse
 import pandas as pd
 import difflib
+
+# Categories to play the game with
+VALID_CATEGORIES = [
+    "ferm",
+    "hop",
+    "yeast",
+    "misc",
+]
 
 
 def apply_cleaning_dict(x, ferm_name_clean_dict):
@@ -123,5 +132,31 @@ def main():
     # Save the dataframe
 
 
+def make_arg_parser():
+    """Create and return argument parser."""
+
+    parser = argparse.ArgumentParser(
+        description="Script to run through beer data and map differently spelled "
+            "or referenced ingredients to a standard name."
+    )
+
+    parser.add_argument(
+        "-f",
+        "--filename",
+        default="all_recipes.h5",
+        help="path of HDF file containing ingredients. Default is "
+            "'all_recipes.h5' in current directory."
+    )
+    parser.add_argument(
+        "-c",
+        "--category",
+        choices=VALID_CATEGORIES,
+        help="Which ingredient category to play the game with."
+    )
+    return parser
+
+
 if __name__ == "__main__":
+    parser = make_arg_parser()
+    args = parser.parse_args()
     main()
