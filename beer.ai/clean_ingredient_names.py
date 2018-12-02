@@ -13,57 +13,6 @@ VALID_CATEGORIES = [
 ]
 
 
-def apply_cleaning_dict(x, ingred_map):
-    """ (str, dict) -> str
-    Take:   an entry from the 'ingred_name' column
-            a dictionary whose keys are ingred_name entries and whose values are cleaned ingred_name entries
-    Return an entry for the 'ingred_name_cleaned column"""
-    if x in ingred_map.keys():
-        return ingred_map[x]
-    else:
-        pass
-
-
-def matching_game(host, contestants):
-    """ (str, list) -> dict
-
-    Prompt the user to select ingred_name entries match a category.
-    (Get the studio audience to pick contestants that match the host.)
-
-    Take:   a ingred_name category to find matches for (the host)
-            a list of ingred_name entries to match with the category (the contestants)
-
-    Return: a dictionary
-                whose keys are the ingred_name entries that match (the contestants that match the host)
-                whose values are ingred_name category (the host)
-    """
-    winners = {}
-
-    for item in contestants:
-
-        airing = 1
-        # While the show is still on the air
-        while airing == 1:
-
-            # Ask the studio audience if the contestant matches the host
-            prompt = 'Category:\n{}. Does this belong?\n-------------\n{}'.format(host, item)
-            print(prompt)
-
-            match = input('y/n')
-            if match == 'y':
-                winners[item] = host
-                print('Accepted')
-                airing = 0
-            elif match == 'n':
-                print('Rejected')
-                airing = 0
-            else:
-                print('Invalid input. Try again.')
-                airing = 1
-
-    return winners
-
-
 def load_map(fname):
     """Given a fname (pickle), load in the map."""
     try:
@@ -74,7 +23,7 @@ def load_map(fname):
         return {}
 
 
-def main(ingred_path, category):
+def clean_ingredients(ingred_path, category):
 
     with pd.HDFStore(ingred_path, "r") as store:
         # Just work on subset for testing
@@ -153,4 +102,4 @@ def make_arg_parser():
 if __name__ == "__main__":
     parser = make_arg_parser()
     args = parser.parse_args()
-    main(args.filename, args.category)
+    clean_ingredients(args.filename, args.category)
