@@ -23,7 +23,21 @@ def load_map(fname):
         return {}
 
 
+def check_ingred_name(ingred_name):
+    """Given an ingredient name, check if user is happy with it. If not, ask
+    for a new string."""
+
+    prompt = f'Searching for similar names to {ingred_name}. Would you like to rename (y/n)?'
+    rename = input(prompt)
+    while rename == 'y':
+        ingred_name = input("Enter new name: ")
+    print(f"Proceeding with {ingred_name}.")
+    return ingred_name
+
+
 def clean_ingredients(ingred_path, category):
+    """Go through unique ingredients and find similar strings. Map from similar
+    cases to 'standard' name. Save results in a dict, written to a pickle."""
 
     with pd.HDFStore(ingred_path, "r") as store:
         # Just work on subset for testing
@@ -35,12 +49,15 @@ def clean_ingredients(ingred_path, category):
     ingred_map = load_map(out_name)
 
     # Get the subset of ingred_name to be cleaned
-    ingred_name_to_clean = df.loc[~df[col].isin(ingred_map.keys()), col]
+    ingred_names_to_clean = df.loc[~df[col].isin(ingred_map.keys()), col]
 
     # Get the most common unique name remaining
-    ingred_names = ingred_name_to_clean.value_counts()
+    ingred_names = ingred_names_to_clean.value_counts()
 
     for ingred_name in ingred_names.index:
+
+        ingred_name = check_ingred_name(ingred_name)
+
         # Suggest similar names
         ingred_name_similar = difflib.get_close_matches(
                                 ingred_name,
@@ -49,11 +66,10 @@ def clean_ingredients(ingred_path, category):
                                 cutoff=0.6
                               )
 
-        # Play the ingred game
+        # Play the matching game
         for item in ingred_name_similar:
             prompting = True
             while prompting:
-
                 prompt = f'Category:\n{ingred_name}. Does this belong?\n-------------'
                 print(prompt)
                 belong = input(f'{item}: (y/n)? ')
