@@ -29,8 +29,7 @@ def check_ingred_name(ingred_name):
 
     prompt = f'Searching for similar names to {ingred_name}. Would you like to rename (y/n)?'
     rename = input(prompt)
-    while rename == 'y':
-        ingred_name = input("Enter new name: ")
+    ingred_name = input("Enter new name: ")
     print(f"Proceeding with {ingred_name}.")
     return ingred_name
 
@@ -61,7 +60,7 @@ def clean_ingredients(ingred_path, category):
         # Suggest similar names
         ingred_name_similar = difflib.get_close_matches(
                                 ingred_name,
-                                ingred_name_to_clean.astype('str').unique(),
+                                ingred_names_to_clean.astype('str').unique(),
                                 n=10000,
                                 cutoff=0.6
                               )
