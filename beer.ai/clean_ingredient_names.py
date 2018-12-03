@@ -39,8 +39,9 @@ def clean_ingredients(ingred_path, category):
     cases to 'standard' name. Save results in a dict, written to a pickle."""
 
     with pd.HDFStore(ingred_path, "r") as store:
+        df = store.select("ingredients")
         # Just work on subset for testing
-        df = store.select("ingredients", where="index < 100")
+        #df = store.select("ingredients", where="index < 100")
 
     col = category + "_name"
     out_name = f"{category}map.pickle"
