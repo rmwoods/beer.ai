@@ -135,6 +135,26 @@ def fill_misc(d, misc):
         d["misc_amount_is_weight"] = misc.amount_is_weight or False
 
 
+def fill_core(d, recipe):
+    """Given a dictionary, put all the core value items from the recipe object
+    into the dict."""
+
+    d["name"] = clean_text(recipe.name)
+
+    d["batch_size"] = safe_float(recipe.batch_size)
+    if d["batch_size"] == 0:
+        d["batch_size"] = 1
+    d["boil_size"] = safe_float(recipe.boil_size)
+    if d["boil_size"] == 0:
+        d["boil_size"] = 1
+    d["efficiency"] = safe_float(recipe.efficiency)/100.
+    d["boil_time"] = safe_float(recipe.boil_time)
+
+    d["style_name"] = clean_text(recipe.style.name)
+    d["style_guide"] = clean_text(recipe.style.style_guide)
+    d["style_category"] = str(int(safe_float(recipe.style.category_number))) + clean_text(recipe.style.style_letter)
+    d["style_version"] = safe_float(recipe.style.version)
+
 def recipe_to_dicts(recipe, fname, recipe_id):
     """Given a pybeerxml.recipe.Recipe, convert to a dataframe and write in a
     more efficient format.
@@ -144,17 +164,7 @@ def recipe_to_dicts(recipe, fname, recipe_id):
     ingredients = []
     core_vals["id"] = recipe_id
     core_vals["recipe_file"] = fname
-    core_vals["name"] = clean_text(recipe.name)
-    core_vals["batch_size"] = safe_float(recipe.batch_size)
-    if core_vals["batch_size"] == 0:
-        core_vals["batch_size"] = 1
-    core_vals["boil_size"] = safe_float(recipe.boil_size)
-    if core_vals["boil_size"] == 0:
-        core_vals["boil_size"] = 1
-    core_vals["efficiency"] = safe_float(recipe.efficiency)/100.
-    core_vals["boil_time"] = safe_float(recipe.boil_time)
-    core_vals["category_number"] = int(safe_float(recipe.style.category_number))
-    core_vals["style"] = clean_text(recipe.style.name)
+    fill_core(core_vals, recipe)
 
     for ferm, hop, yeast, misc in zip_longest(
             recipe.fermentables, recipe.hops, recipe.yeasts, recipe.miscs):
