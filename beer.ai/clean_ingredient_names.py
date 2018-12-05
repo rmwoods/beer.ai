@@ -27,9 +27,14 @@ def check_ingred_name(ingred_name):
     """Given an ingredient name, check if user is happy with it. If not, ask
     for a new string."""
 
-    prompt = f'Searching for similar names to {ingred_name}. Would you like to rename (y/n)?'
+    prompt = f'Searching for similar names to {ingred_name}. Is this name correct? (y/n)?'
     rename = input(prompt)
-    ingred_name = input("Enter new name: ")
+    if rename == 'n':
+        ingred_name = input("Enter new name: ")
+    elif rename == 'y':
+        pass
+    else:
+        print('Invalid input.')
     print(f"Proceeding with {ingred_name}.")
     return ingred_name
 
@@ -67,9 +72,11 @@ def clean_ingredients(ingred_path, category):
                               )
 
         # Play the matching game
+        counter = 0
         for item in ingred_name_similar:
             prompting = True
             while prompting:
+                print('Ingredient names remaining: {}\n'.format(len(ingred_name_similar) - counter))
                 prompt = f'Category:\n{ingred_name}. Does this belong?\n-------------'
                 print(prompt)
                 belong = input(f'{item}: (y/n)? ')
@@ -83,7 +90,8 @@ def clean_ingredients(ingred_path, category):
                 else:
                     print('Invalid input. Try again.')
                     prompting = True
-
+                print('\n\n')
+                counter += 1
         # Save the dictionary
         print(f"Writing key/vals for {ingred_name}.")
         with open(f"{category}map.pickle", "wb") as f:

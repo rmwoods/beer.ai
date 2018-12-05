@@ -155,6 +155,7 @@ def fill_core(d, recipe):
     d["style_category"] = str(int(safe_float(recipe.style.category_number))) + clean_text(recipe.style.style_letter)
     d["style_version"] = safe_float(recipe.style.version)
 
+
 def recipe_to_dicts(recipe, fname, recipe_id):
     """Given a pybeerxml.recipe.Recipe, convert to a dataframe and write in a
     more efficient format.
@@ -168,7 +169,7 @@ def recipe_to_dicts(recipe, fname, recipe_id):
 
     for ferm, hop, yeast, misc in zip_longest(
             recipe.fermentables, recipe.hops, recipe.yeasts, recipe.miscs):
-        tmp = {"id":recipe_id}
+        tmp = {"id": recipe_id}
         fill_ferm(tmp, ferm, core_vals)
         fill_hop(tmp, hop, core_vals)
         fill_yeast(tmp, yeast)
