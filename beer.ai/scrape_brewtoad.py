@@ -28,7 +28,7 @@ print("Starting on page {}".format(start))
 request = requests.get(URL.format(start))
 html = bs4.BeautifulSoup(request.text,"lxml")
 
-pagination = html.find("div", attrs={"class":"pagination"})
+pagination = html.find("div", attrs={"class": "pagination"})
 n = re.findall(R, pagination.text)
 if n:
     n_pages = int(n[-1])
