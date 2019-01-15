@@ -27,7 +27,7 @@ def check_ingred_name(ingred_name):
     """Given an ingredient name, check if user is happy with it. If not, ask
     for a new string."""
 
-    prompt = f'Searching for similar names to {ingred_name}. Is this name correct? (y/n)?'
+    prompt = f'Searching for similar names to {ingred_name}. Is this name correct? (y/n)? '
     rename = input(prompt)
     if rename == 'n':
         ingred_name = input("Enter new name: ")
@@ -74,6 +74,9 @@ def clean_ingredients(ingred_path, category):
         # Play the matching game
         counter = 0
         for item in ingred_name_similar:
+            if item == ingred_name:
+                ingred_map[item] = ingred_name
+                continue
             prompting = True
             while prompting:
                 print('Ingredient names remaining: {}\n'.format(len(ingred_name_similar) - counter))
@@ -91,7 +94,8 @@ def clean_ingredients(ingred_path, category):
                     print('Invalid input. Try again.')
                     prompting = True
                 print('\n\n')
-                counter += 1
+                if not prompting:
+                    counter += 1
         # Save the dictionary
         print(f"Writing key/vals for {ingred_name}.")
         with open(f"{category}map.pickle", "wb") as f:
@@ -118,7 +122,7 @@ def make_arg_parser():
         "--category",
         choices=VALID_CATEGORIES,
         default="ferm",
-        help="Which ingredient category to play the game with."
+        help="Which ingredient category to play the game with. Default: 'ferm'."
     )
     return parser
 
