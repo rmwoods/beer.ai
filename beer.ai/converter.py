@@ -13,8 +13,8 @@ from joblib import delayed, Parallel
 from pybeerxml import Parser
 
 # From https://coderwall.com/p/xww5mq/two-letter-country-code-regex
-
 ORIGIN_RE = re.compile("\((AF|AX|AL|DZ|AS|AD|AO|AI|AQ|AG|AR|AM|AW|AU|AT|AZ|BS|BH|BD|BB|BY|BE|BZ|BJ|BM|BT|BO|BQ|BA|BW|BV|BR|IO|BN|BG|BF|BI|KH|CM|CA|CV|KY|CF|TD|CL|CN|CX|CC|CO|KM|CG|CD|CK|CR|CI|HR|CU|CW|CY|CZ|DK|DJ|DM|DO|EC|EG|SV|GQ|ER|EE|ET|FK|FO|FJ|FI|FR|GF|PF|TF|GA|GM|GE|DE|GH|GI|GR|GL|GD|GP|GU|GT|GG|GN|GW|GY|HT|HM|VA|HN|HK|HU|IS|IN|ID|IR|IQ|IE|IM|IL|IT|JM|JP|JE|JO|KZ|KE|KI|KP|KR|KW|KG|LA|LV|LB|LS|LR|LY|LI|LT|LU|MO|MK|MG|MW|MY|MV|ML|MT|MH|MQ|MR|MU|YT|MX|FM|MD|MC|MN|ME|MS|MA|MZ|MM|NA|NR|NP|NL|NC|NZ|NI|NE|NG|NU|NF|MP|NO|OM|PK|PW|PS|PA|PG|PY|PE|PH|PN|PL|PT|PR|QA|RE|RO|RU|RW|BL|SH|KN|LC|MF|PM|VC|WS|SM|ST|SA|SN|RS|SC|SL|SG|SX|SK|SI|SB|SO|ZA|GS|SS|ES|LK|SD|SR|SJ|SZ|SE|CH|SY|TW|TJ|TZ|TH|TL|TG|TK|TO|TT|TN|TR|TM|TC|TV|UG|UA|AE|GB|UK|US|UM|UY|UZ|VU|VE|VN|VG|VI|WF|EH|YE|ZM|ZW)\)")
+RECIPES_DIR = "test_recipes"
 MODIFIER_RE = re.compile("\([\w ]*\)")
 LEAF_STR = "leaf"
 
@@ -84,7 +84,7 @@ def fill_ferm(d, ferm, core_vals):
         else:
             d["ferm_origin"] = clean_text(ferm.origin)
         d["ferm_amount"] = safe_float(ferm.amount)
-        d["ferm_display_amount"] = clean_text(ferm.display_amount)
+        d["ferm_display_amount"] = clean_text(getattr(ferm, "display_amount", ""))
         d["ferm_yield"] = safe_float(ferm._yield)*0.01
         # malt_scaled = <amount> * <yield> * <efficiency> / <boil_size>
         d["ferm_scaled"] = d["ferm_amount"] * d["ferm_yield"]\
@@ -99,9 +99,9 @@ def fill_hop(d, hop, core_vals):
         if hop_origin is not None:
             d["hop_origin"] = clean_text(hop_origin)
         else:
-            d["hop_origin"] = clean_text(hop.origin)
+            d["hop_origin"] = clean_text(getattr(hop, "origin",""))
         d["hop_amount"] = safe_float(hop.amount)
-        d["hop_display_amount"] = clean_text(hop.display_amount)
+        d["hop_display_amount"] = clean_text(getattr(hop, "display_amount", ""))
         d["hop_alpha"] = safe_float(hop.alpha)/100.
         d["hop_form"] = clean_text(hop.form)
         is_leaf = int(d["hop_form"] == LEAF_STR)
@@ -135,6 +135,27 @@ def fill_misc(d, misc):
         d["misc_amount_is_weight"] = misc.amount_is_weight or False
 
 
+def fill_core(d, recipe):
+    """Given a dictionary, put all the core value items from the recipe object
+    into the dict."""
+
+    d["name"] = clean_text(recipe.name)
+
+    d["batch_size"] = safe_float(recipe.batch_size)
+    if d["batch_size"] == 0:
+        d["batch_size"] = 1
+    d["boil_size"] = safe_float(recipe.boil_size)
+    if d["boil_size"] == 0:
+        d["boil_size"] = 1
+    d["efficiency"] = safe_float(recipe.efficiency)/100.
+    d["boil_time"] = safe_float(recipe.boil_time)
+
+    d["style_name"] = clean_text(recipe.style.name)
+    d["style_guide"] = clean_text(recipe.style.style_guide)
+    d["style_category"] = str(int(safe_float(recipe.style.category_number))) + clean_text(recipe.style.style_letter)
+    d["style_version"] = safe_float(recipe.style.version)
+
+
 def recipe_to_dicts(recipe, fname, recipe_id):
     """Given a pybeerxml.recipe.Recipe, convert to a dataframe and write in a
     more efficient format.
@@ -144,21 +165,11 @@ def recipe_to_dicts(recipe, fname, recipe_id):
     ingredients = []
     core_vals["id"] = recipe_id
     core_vals["recipe_file"] = fname
-    core_vals["name"] = clean_text(recipe.name)
-    core_vals["batch_size"] = safe_float(recipe.batch_size)
-    if core_vals["batch_size"] == 0:
-        core_vals["batch_size"] = 1
-    core_vals["boil_size"] = safe_float(recipe.boil_size)
-    if core_vals["boil_size"] == 0:
-        core_vals["boil_size"] = 1
-    core_vals["efficiency"] = safe_float(recipe.efficiency)/100.
-    core_vals["boil_time"] = safe_float(recipe.boil_time)
-    core_vals["category_number"] = int(safe_float(recipe.style.category_number))
-    core_vals["style"] = clean_text(recipe.style.name)
+    fill_core(core_vals, recipe)
 
     for ferm, hop, yeast, misc in zip_longest(
             recipe.fermentables, recipe.hops, recipe.yeasts, recipe.miscs):
-        tmp = {"id":recipe_id}
+        tmp = {"id": recipe_id}
         fill_ferm(tmp, ferm, core_vals)
         fill_hop(tmp, hop, core_vals)
         fill_yeast(tmp, yeast)
@@ -171,6 +182,7 @@ def recipe_to_dicts(recipe, fname, recipe_id):
 def convert_runner(fname, recipe_id):
     """Meant to be run on a single recipe file."""
     parser = Parser()
+    print(fname)
     recipes = parser.parse(fname)
     try:
         recipe = recipes[0]
@@ -188,8 +200,8 @@ def convert_runner(fname, recipe_id):
 
 def clean_cols(df):
     """For certain columns, fill in values to make writing succeed."""
-
-    df["misc_amount_is_weight"] = df["misc_amount_is_weight"].fillna(False)
+    if "misc_amount_is_weight" in df.columns:
+        df["misc_amount_is_weight"] = df["misc_amount_is_weight"].fillna(False)
 
 
 def convert_a_bunch(path_to_recipes, n, jobs=N_CPUS):
@@ -198,13 +210,15 @@ def convert_a_bunch(path_to_recipes, n, jobs=N_CPUS):
     if path_to_recipes is not None:
         samples = path_to_recipes
     else:
-        recipe_files = glob.glob(path.join("recipes", "*.xml"))
+        recipe_files = glob.glob(path.join(RECIPES_DIR, "*.xml"))
         if n != -1:
+            # Make sure we don't try to grab more than exist
+            n = min(n, len(recipe_files))
             samples = random.sample(recipe_files, n)
         else:
             samples = recipe_files
 
-    results = Parallel(n_jobs=N_CPUS)(
+    results = Parallel(n_jobs=jobs)(
             delayed(convert_runner)(fname, i)
             for i, fname in enumerate(samples))
 
