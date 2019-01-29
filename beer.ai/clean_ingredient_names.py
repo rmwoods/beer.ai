@@ -13,64 +13,95 @@ VALID_CATEGORIES = [
     "misc",
 ]
 
+DEFAULT_PROMPT = "cleaner> "
+PROMPT_SUFFIX = "? > "
+EXIT_COMMANDS = ["q", "x", "quit"]
 
-class Cleaner(Cmd(completekey=None)):
+
+class Cleaner(Cmd):
     """Program for interacting with and cleaning ingredients."""
 
     intro = "Welcome to the ingredient cleaner! Type ? to list commands.\n"
-    prompt = "cleaner> "
+    prompt = DEFAULT_PROMPT
 
     hdf_path = "all_recipes.h5"
     category = None
-    hdf_col = None
-    map_name = None
-    ingred_map = None
+    hdf_col = ""
+    map_name = ""
+    ingred_map = {}
     cur_ingred_name = None
-    ingred_name_similar = []
-    df = None
+    cur_ingred_compare = None
+    # Which index in ingredients are we on?
+    index = 0
+    ingred_names_to_clean = pd.DataFrame()
+    ingred_names_similar = []
+    df = pd.DataFrame()
+    # Are we currently mapping an ingredient?
+    active = False
 
     record_file = None
 
     # ----- basic commands -----
-    def do_set_category(self, arg):
-        f"""Set the category to be mapped. Acceptable values are {VALID_CATEGORIES}."""
-        category = arg
-        if category not in VALID_CATEGORIES:
+    def do_set_cat(self, arg):
+        """Set the category to be mapped. Acceptable values are {VALID_CATEGORIES}."""
+        self.category = arg
+        if self.category not in VALID_CATEGORIES:
             print("Invalid category")
+            self.category = None
             return
         self.map_name = f"{arg}map.pickle"
-        self.ingred_map = load_map(map_name)
+        self.ingred_map = load_map(self.map_name)
         self.hdf_col = arg + "_name"
 
-        # XXX - update the number below to be a passed in parameter
-        with pd.HDFStore(self.hdf_path, "r") as store:
-            self.df = store.select("ingredients", where="index < 10000", columns=[sef.hdf_col])
+        self.load_df()
+
+        self.ingred_names_to_clean = self.df.loc[~self.df[self.hdf_col].isin(self.ingred_map.keys()), self.hdf_col]
+        self.set_cur_ingred()
+
+    def help_set_cat(self):
+        print(f"Set the category to be mapped. Acceptable values are {VALID_CATEGORIES}.")
+
+    def do_status(self, arg):
+        """Print the current status of important variables, maps, etc."""
+        print(f"    Category: {self.category}")
+        print(f"    Current ingredient to map: {self.cur_ingred_name}")
+        print(f"    N Mapped for current ingredient: {len(self.ingred_map.keys())}")
+        print(f"    N Left to map for current ingredient: {len(self.ingred_names_similar)}")
 
     def do_map(self, arg):
         """Begin the process of finding similar strings to the top unmapped ingredient."""
-        # Get the subset of ingred_name to be cleaned
-        ingred_names_to_clean = self.df.loc[~self.df[col].isin(self.ingred_map.keys()), self.hdf_col]
 
-        # Get the most common unique name remaining
-        try:
-            self.cur_ingred_name = ingred_names_to_clean.value_counts().index[0]
-        except IndexError:
-            print(f"No {self.category}'s left to map (or none found in current df).")
-            return
-
-        print("Mapping {self.category}'s similar to {self.cur_ingred_name}")
+        print(f"Mapping {self.category}'s similar to {self.cur_ingred_name}")
 
         # Suggest similar names
-        self.ingred_name_similar = difflib.get_close_matches(
+        self.ingred_names_similar = difflib.get_close_matches(
                                 self.cur_ingred_name,
-                                ingred_names_to_clean.astype('str').unique(),
+                                self.ingred_names_to_clean.astype('str').unique(),
                                 n=10000,
                                 cutoff=0.6
                               )
-        # XXX - loop over ingred_name_similar here? Add commands for it?
+        self.advance_ingredient()
 
-    def do_next(self, arg):
-        """Go to the next ingredient group to map."""
+    def do_y(self, arg):
+        """Approve cur_ingred_compare to map to cur_ingred_name and advance
+        to the next ingredient."""
+        print("Accepted.")
+        self.ingred_map[self.cur_ingred_compare] = self.cur_ingred_name
+        self.advance_ingredient()
+
+    def do_n(self, arg):
+        """Reject cur_ingred_compare to map to cur_ingred_name. Advance to the
+        next ingredient."""
+        print("Rejected.")
+        self.advance_ingredient()
+
+    def do_stop(self, arg):
+        """Stop the current mapping."""
+        self.active = False
+        self.prompt = DEFAULT_PROMPT
+
+    def do_merge(self, arg):
+        # merge this ingredient with previously mapped one
         pass
 
     # ----- boilerplate stuff ----
@@ -82,7 +113,7 @@ class Cleaner(Cmd(completekey=None)):
         print("Exit the application. Shorthand: x q Ctrl-D.")
 
     def default(self, arg):
-        if arg == 'x' or arg == 'q':
+        if arg in EXIT_COMMANDS:
             return self.do_exit(arg)
     
     # ----- record and playback -----
@@ -107,9 +138,47 @@ class Cleaner(Cmd(completekey=None)):
             self.record_file.close()
             self.record_file = None
 
+    # ----- shortcuts -----
     do_EOF = do_exit
     help_EOF = help_exit
 
+    # ----- Helper Functions -----
+    def load_df(self):
+        """Load the dataframe of global data."""
+        # XXX - update the number below to be a passed in parameter
+        with pd.HDFStore(self.hdf_path, "r") as store:
+            self.df = store.select("ingredients", where="index < 10000", columns=[self.hdf_col])
+
+    def advance_ingredient(self):
+        """Pop the next ingredient to compare to the current ingredient (if
+        available) and update the prompt and active fields."""
+        try:
+            self.cur_ingred_compare = self.ingred_names_similar.pop(0)
+            self.set_prompt_compare()
+        except IndexError:
+            print("Finished mapping for {self.cur_ingred_name}.")
+            self.index += 1
+            set_cur_ingred()
+            self.map()
+        #finally:
+        #    # I think we only get here if we have nothing left to map
+        #    print("Finished mapping.")
+        #    self.prompt = DEFAULT_PROMPT
+        #    self.active = False
+
+    def set_prompt_compare(self):
+        """Set the prompt according to the current ingred_name and
+        ingred_compare"""
+        self.prompt = self.cur_ingred_name + " == " + self.cur_ingred_compare
+        self.prompt += PROMPT_SUFFIX
+
+    def set_cur_ingred(self):
+        """Get the next ingredient to map to."""
+        # Get the most common unique name remaining
+        try:
+            self.cur_ingred_name = self.ingred_names_to_clean.value_counts().index[self.index]
+        except IndexError:
+            print(f"No {self.category}'s left to map (or none found in current df).")
 
 def load_map(fname):
     """Given a fname (pickle), load in the map."""
@@ -215,6 +284,5 @@ if __name__ == "__main__":
     parser = make_arg_parser()
     args = parser.parse_args()
     #clean_ingredients(args.filename, args.category)
-    c = Cleaner
-    c.cmdloop()
+    Cleaner().cmdloop()
 
