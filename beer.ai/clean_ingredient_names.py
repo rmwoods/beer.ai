@@ -34,7 +34,7 @@ class Cleaner(Cmd):
     # Which index in ingredients are we on?
     index = 0
     ingred_names_to_clean = pd.DataFrame()
-    ingred_names_similar = []
+    ingred_names_similar = None
     df = pd.DataFrame()
     # Are we currently mapping an ingredient?
     active = False
@@ -49,6 +49,7 @@ class Cleaner(Cmd):
             print("Invalid category")
             self.category = None
             return
+            
         self.map_name = f"{arg}map.pickle"
         self.ingred_map = load_map(self.map_name)
         self.hdf_col = arg + "_name"
@@ -63,17 +64,24 @@ class Cleaner(Cmd):
 
     def do_status(self, arg):
         """Print the current status of important variables, maps, etc."""
-        print(f"    Category: {self.category}")
-        print(f"    Current ingredient to map: {self.cur_ingred_name}")
-        print(f"    N Mapped for current ingredient: {len(self.ingred_map.keys())}")
-        print(f"    N Left to map for current ingredient: {len(self.ingred_names_similar)}")
+        if self.category:
+            print(f"    Category: {self.category}")
+            print(f"    N of ingredients mapped: {len(self.ingred_map.keys())}")
+            print(f"    Current ingredient to map: {self.cur_ingred_name}")
+            if self.ingred_names_similar is not None:
+                print(f"    N left to map for current ingredient: {len(self.ingred_names_similar)}")
+            else:
+                print("    No similar names found. Run map to generate similar names.")
+        else: 
+            print("     No category set. Run set_cat to set a category.")
 
     def do_map(self, arg):
         """Begin the process of finding similar strings to the top unmapped ingredient."""
 
-        print(f"Mapping {self.category}'s similar to {self.cur_ingred_name}")
+        print(f"Mapping {self.category}s similar to {self.cur_ingred_name}.")
 
         # Suggest similar names
+        self.ingred_names_similar = []
         self.ingred_names_similar = difflib.get_close_matches(
                                 self.cur_ingred_name,
                                 self.ingred_names_to_clean.astype('str').unique(),
@@ -156,16 +164,30 @@ class Cleaner(Cmd):
             self.cur_ingred_compare = self.ingred_names_similar.pop(0)
             self.set_prompt_compare()
         except IndexError:
-            print("Finished mapping for {self.cur_ingred_name}.")
-            self.index += 1
-            set_cur_ingred()
-            self.map()
+            print(f"Finished mapping for {self.cur_ingred_name}.")
+            # Save the map
+            save_map(self.map_name, self.ingred_map)
+            # Advance the ingredient to map
+            self.advance_ingredient_category()
+            # Update the prompt
+            self.set_prompt_compare()
+           
         #finally:
         #    # I think we only get here if we have nothing left to map
         #    print("Finished mapping.")
         #    self.prompt = DEFAULT_PROMPT
         #    self.active = False
 
+    def advance_ingredient_category(self):  
+        """After finshing mapping a set of ingredients to the category, move on to the next category."""
+        # Get the new ingredient category 
+        self.index += 1
+        self.set_cur_ingred()
+        # Get new similar names to clean
+        self.ingred_names_to_clean = self.df.loc[~self.df[self.hdf_col].isin(self.ingred_map.keys()), self.hdf_col]
+        # Start mapping again, in order to generate new suggested names 
+        self.do_map(self,)    
+        
     def set_prompt_compare(self):
         """Set the prompt according to the current ingred_name and
         ingred_compare"""
@@ -185,12 +207,20 @@ def load_map(fname):
     try:
         with open(fname, "rb") as f:
             d = pickle.load(f)
-            print("Loaded {fname}. Contains {len(d)} keys.")
+            print(f"Loaded {fname}. Contains {len(d)} keys.")
             return d
     except FileNotFoundError:
         print("No previous map found. Starting from scratch.")
         return {}
-
+        
+def save_map(fname, ingred_map):
+    """ Given a fname (pickle), and the current map, save the current map. """
+    try:
+        with open(fname, "wb") as f:
+            pickle.dump(ingred_map, f)
+        print(f"Saved {fname}.")
+    except NameError:
+        print("Trying to save the map, but no map to save. Run map.")
 
 def clean_ingredients(ingred_path, category):
     """Go through unique ingredients and find similar strings. Map from similar
