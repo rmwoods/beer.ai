@@ -212,7 +212,8 @@ def load_map(fname):
     except FileNotFoundError:
         print("No previous map found. Starting from scratch.")
         return {}
-        
+
+
 def save_map(fname, ingred_map):
     """ Given a fname (pickle), and the current map, save the current map. """
     try:
@@ -221,68 +222,6 @@ def save_map(fname, ingred_map):
         print(f"Saved {fname}.")
     except NameError:
         print("Trying to save the map, but no map to save. Run map.")
-
-def clean_ingredients(ingred_path, category):
-    """Go through unique ingredients and find similar strings. Map from similar
-    cases to 'standard' name. Save results in a dict, written to a pickle."""
-
-    with pd.HDFStore(ingred_path, "r") as store:
-        #df = store.select("ingredients")
-        # Just work on subset for testing
-        df = store.select("ingredients", where="index < 10000")
-
-    col = category + "_name"
-    out_name = f"{category}map.pickle"
-
-    ingred_map = load_map(out_name)
-
-    # Get the subset of ingred_name to be cleaned
-    ingred_names_to_clean = df.loc[~df[col].isin(ingred_map.keys()), col]
-
-    # Get the most common unique name remaining
-    ingred_names = ingred_names_to_clean.value_counts()
-
-    for ingred_name in ingred_names.index:
-
-        ingred_name = check_ingred_name(ingred_name)
-
-        # Suggest similar names
-        ingred_name_similar = difflib.get_close_matches(
-                                ingred_name,
-                                ingred_names_to_clean.astype('str').unique(),
-                                n=10000,
-                                cutoff=0.6
-                              )
-
-        # Play the matching game
-        counter = 0
-        for item in ingred_name_similar:
-            if item == ingred_name:
-                ingred_map[item] = ingred_name
-                continue
-            prompting = True
-            while prompting:
-                print('Ingredient names remaining: {}\n'.format(len(ingred_name_similar) - counter))
-                prompt = f'Category:\n{ingred_name}. Does this belong?\n-------------'
-                print(prompt)
-                belong = input(f'{item}: (y/n)? ')
-                if belong == 'y':
-                    ingred_map[item] = ingred_name
-                    print('Accepted')
-                    prompting = False
-                elif belong == 'n':
-                    print('Rejected')
-                    prompting = False
-                else:
-                    print('Invalid input. Try again.')
-                    prompting = True
-                print('\n\n')
-                if not prompting:
-                    counter += 1
-        # Save the dictionary
-        print(f"Writing key/vals for {ingred_name}.")
-        with open(f"{category}map.pickle", "wb") as f:
-            pickle.dump(ingred_map, f)
 
 
 def make_arg_parser():
