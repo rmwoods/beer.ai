@@ -207,9 +207,9 @@ class Cleaner(Cmd):
         #    self.prompt = DEFAULT_PROMPT
         #    self.active = False
 
-    def advance_ingredient_category(self):  
-        """After finshing mapping a set of ingredients to the category, move on to the next category."""
-        # Get the new ingredient category 
+    def advance_ingredient_target(self):  
+        """After finshing mapping a set of ingredients to the target ingredient, move on to the next target."""
+        # Get the new ingredient target
         self.index += 1
         self.set_cur_ingred()
         # Get new similar names to clean
