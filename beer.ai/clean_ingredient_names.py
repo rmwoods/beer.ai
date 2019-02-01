@@ -31,15 +31,24 @@ class Cleaner(Cmd):
     ingred_map = {}
     cur_ingred_name = None
     cur_ingred_compare = None
+    ingred_names_similar = []
+    prev_ingreds_compare = []
     # Which index in ingredients are we on?
     index = 0
-    ingred_names_to_clean = pd.DataFrame()
-    ingred_names_similar = None
     df = pd.DataFrame()
     # Are we currently mapping an ingredient?
     active = False
 
     record_file = None
+
+    #------ Dynamic properties ---
+    @property
+    def ingred_names_to_clean(self):
+        """List of ingredients remaining to map."""
+        try:
+            return self.df.loc[~self.df[self.hdf_col].isin(self.ingred_map.keys()), self.hdf_col].dropna()
+        except KeyError:
+            return pd.DataFrame()
 
     # ----- basic commands -----
     def do_set_cat(self, arg):
@@ -49,15 +58,14 @@ class Cleaner(Cmd):
             print("Invalid category")
             self.category = None
             return
-            
+
         self.map_name = f"{arg}map.pickle"
         self.ingred_map = load_map(self.map_name)
         self.hdf_col = arg + "_name"
 
         self.load_df()
-
-        self.ingred_names_to_clean = self.df.loc[~self.df[self.hdf_col].isin(self.ingred_map.keys()), self.hdf_col]
         self.set_cur_ingred()
+        self.set_ingred_names_similar()
 
     def help_set_cat(self):
         print(f"Set the category to be mapped. Acceptable values are {VALID_CATEGORIES}.")
@@ -75,19 +83,18 @@ class Cleaner(Cmd):
         else: 
             print("     No category set. Run set_cat to set a category.")
 
+    def do_print(self, arg):
+        try:
+            print(f"arg: {getattr(self, arg)}.")
+        except:
+            print(f"Can't find {arg}.")
+
     def do_map(self, arg):
         """Begin the process of finding similar strings to the top unmapped ingredient."""
 
         print(f"Mapping {self.category}s similar to {self.cur_ingred_name}.")
 
-        # Suggest similar names
-        self.ingred_names_similar = []
-        self.ingred_names_similar = difflib.get_close_matches(
-                                self.cur_ingred_name,
-                                self.ingred_names_to_clean.astype('str').unique(),
-                                n=10000,
-                                cutoff=0.6
-                              )
+        self.set_ingred_names_similar()
         self.advance_ingredient()
 
     def do_y(self, arg):
@@ -107,6 +114,27 @@ class Cleaner(Cmd):
         """Stop the current mapping."""
         self.active = False
         self.prompt = DEFAULT_PROMPT
+
+    def do_undo(self, arg):
+        """Remove the previous mapping and re-try."""
+        try:
+            del self.ingred_map[self.prev_ingreds_compare[-1]]
+        except IndexError:
+            print("Nothing to undo.")
+            return
+        self.cur_ingred_compare = self.prev_ingreds_compare.pop(-1)
+        self.set_prompt_compare()
+
+    def do_save(self, arg):
+        """Save the current map."""
+        save_map(self.map_name, self.ingred_map)
+
+    def do_exclude(self, arg):
+        """In current list of ingredients to compare, exclude all entries that
+        contain arg in their name."""
+        self.ingred_names_similar = [i for i in self.ingred_names_similar if arg not in i]
+        if arg in self.cur_ingred_compare:
+            self.advance_ingredient()
 
     def do_merge(self, arg):
         # merge this ingredient with previously mapped one
@@ -161,7 +189,9 @@ class Cleaner(Cmd):
         """Pop the next ingredient to compare to the current ingredient (if
         available) and update the prompt and active fields."""
         try:
+            tmp = self.cur_ingred_compare
             self.cur_ingred_compare = self.ingred_names_similar.pop(0)
+            self.prev_ingreds_compare.append(tmp)
             self.set_prompt_compare()
         except IndexError:
             print(f"Finished mapping for {self.cur_ingred_name}.")
@@ -171,7 +201,6 @@ class Cleaner(Cmd):
             self.advance_ingredient_category()
             # Update the prompt
             self.set_prompt_compare()
-           
         #finally:
         #    # I think we only get here if we have nothing left to map
         #    print("Finished mapping.")
@@ -186,7 +215,7 @@ class Cleaner(Cmd):
         # Get new similar names to clean
         self.ingred_names_to_clean = self.df.loc[~self.df[self.hdf_col].isin(self.ingred_map.keys()), self.hdf_col]
         # Start mapping again, in order to generate new suggested names 
-        self.do_map(self,)    
+        self.do_map(self, None)    
         
     def set_prompt_compare(self):
         """Set the prompt according to the current ingred_name and
@@ -201,6 +230,18 @@ class Cleaner(Cmd):
             self.cur_ingred_name = self.ingred_names_to_clean.value_counts().index[self.index]
         except IndexError:
             print(f"No {self.category}'s left to map (or none found in current df).")
+
+    def set_ingred_names_similar(self):
+        """Ingredient names similar to current ingredient."""
+        try:
+            self.ingred_names_similar = difflib.get_close_matches(
+                                            self.cur_ingred_name,
+                                            self.ingred_names_to_clean.astype('str').unique(),
+                                            n=10000,
+                                            cutoff=0.6
+                                            )
+        except AttributeError:
+            self.ingred_names_similar = []
 
 def load_map(fname):
     """Given a fname (pickle), load in the map."""
