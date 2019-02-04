@@ -117,6 +117,17 @@ class Cleaner(Cmd):
         print("Rejected.")
         self.advance_ingredient()
 
+    def do_rename(self, arg):
+        """Rename the [current | specific] target ingredient."""
+        for k, v in self.ingred_map.items():
+            if v == self.cur_ingred_name:
+                self.ingred_map[k] = arg
+        self.cur_ingred_name = arg
+        self.set_prompt_compare()
+
+    def help_rename(self, arg):
+        print("Rename the [current | specific] target ingredient.")
+
     def do_stop(self, arg):
         """Stop the current mapping."""
         self.active = False
