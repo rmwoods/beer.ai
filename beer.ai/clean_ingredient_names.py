@@ -99,7 +99,7 @@ class Cleaner(Cmd):
         print(f"Mapping {self.category}s similar to {self.cur_ingred_name}.")
 
         self.set_ingred_names_similar()
-        self.advance_ingredient()
+        self.advance_ingred()
 
     def help_map(self):
         print("Begin the process of finding similar strings to the top unmapped ingredient.")
@@ -109,14 +109,14 @@ class Cleaner(Cmd):
         to the next ingredient."""
         print("Accepted.")
         self.ingred_map[self.cur_ingred_compare] = self.cur_ingred_name
-        self.advance_ingredient()
+        self.advance_ingred()
         save_map(self.map_name, self.ingred_map)
 
     def do_n(self, arg):
         """Reject cur_ingred_compare to map to cur_ingred_name. Advance to the
         next ingredient."""
         print("Rejected.")
-        self.advance_ingredient()
+        self.advance_ingred()
 
     def do_rename(self, arg):
         """Rename the [current | specific] target ingredient."""
@@ -165,7 +165,7 @@ class Cleaner(Cmd):
         contain arg in their name."""
         self.ingred_names_similar = [i for i in self.ingred_names_similar if arg not in i]
         if arg in self.cur_ingred_compare:
-            self.advance_ingredient()
+            self.advance_ingred()
 
     def help_exclude(self):
         print("In current list of ingredients to compare, exclude all entries "
@@ -229,7 +229,7 @@ class Cleaner(Cmd):
         with pd.HDFStore(self.hdf_path, "r") as store:
             self.df = store.select("ingredients", where="index < 10000", columns=[self.hdf_col])
 
-    def advance_ingredient(self):
+    def advance_ingred(self):
         """Pop the next ingredient to compare to the current ingredient (if
         available) and update the prompt and active fields."""
         try:
@@ -241,11 +241,11 @@ class Cleaner(Cmd):
             # Save the map
             save_map(self.map_name, self.ingred_map)
             # Advance the ingredient to map
-            self.advance_ingredient_target()
+            self.advance_ingred_target()
         # Update the prompt
         self.set_prompt_compare()
 
-    def advance_ingredient_target(self):  
+    def advance_ingred_target(self):  
         """After finshing mapping a set of ingredients to the target ingredient, move on to the next target."""
         # Get the new ingredient target
         self.index += 1
