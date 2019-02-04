@@ -110,6 +110,7 @@ class Cleaner(Cmd):
         print("Accepted.")
         self.ingred_map[self.cur_ingred_compare] = self.cur_ingred_name
         self.advance_ingredient()
+        save_map(self.map_name, self.ingred_map)
 
     def do_n(self, arg):
         """Reject cur_ingred_compare to map to cur_ingred_name. Advance to the
@@ -217,9 +218,6 @@ class Cleaner(Cmd):
         if self.record_file and 'playback' not in line:
             print(line, file=self.file)
         return line
-
-    def postcmd(self, line):
-        save_map(self.map_name, self.ingred_map)
 
     # ----- shortcuts -----
     do_EOF = do_exit
