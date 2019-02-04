@@ -240,15 +240,14 @@ class Cleaner(Cmd):
             tmp = self.cur_ingred_compare
             self.cur_ingred_compare = self.ingred_names_similar.pop(0)
             self.prev_ingreds_compare.append(tmp)
-            self.set_prompt_compare()
         except IndexError:
             print(f"Finished mapping for {self.cur_ingred_name}.")
             # Save the map
             save_map(self.map_name, self.ingred_map)
             # Advance the ingredient to map
             self.advance_ingredient_target()
-            # Update the prompt
-            self.set_prompt_compare()
+        # Update the prompt
+        self.set_prompt_compare()
 
     def advance_ingredient_target(self):  
         """After finshing mapping a set of ingredients to the target ingredient, move on to the next target."""
@@ -256,7 +255,7 @@ class Cleaner(Cmd):
         self.index += 1
         self.set_cur_ingred()
         # Start mapping again, in order to generate new suggested names 
-        self.do_map("")
+        self.set_prompt_compare()
         
     def set_prompt_compare(self):
         """Set the prompt according to the current ingred_name and
