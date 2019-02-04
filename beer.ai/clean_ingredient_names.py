@@ -41,7 +41,7 @@ class Cleaner(Cmd):
 
     record_file = None
 
-    #------ Dynamic properties ---
+    #------ Dynamic properties ------
     @property
     def ingred_names_to_clean(self):
         """List of ingredients remaining to map."""
@@ -52,8 +52,8 @@ class Cleaner(Cmd):
 
     # ----- basic commands -----
     def do_set_cat(self, arg):
-        """Set the category to be mapped. Acceptable values are {VALID_CATEGORIES}."""
         self.category = arg
+        """Set the category to be mapped. Acceptable values are {VALID_CATEGORIES}."""
         if self.category not in VALID_CATEGORIES:
             print("Invalid category")
             self.category = None
@@ -83,7 +83,11 @@ class Cleaner(Cmd):
         else: 
             print("     No category set. Run set_cat to set a category.")
 
+    def help_status(self):
+        print("Print the current status of important variables, maps, etc.")
+
     def do_print(self, arg):
+        """Print a specific variable. Meant for debugging."""
         try:
             print(f"arg: {getattr(self, arg)}.")
         except:
@@ -96,6 +100,9 @@ class Cleaner(Cmd):
 
         self.set_ingred_names_similar()
         self.advance_ingredient()
+
+    def help_map(self):
+        print("Begin the process of finding similar strings to the top unmapped ingredient.")
 
     def do_y(self, arg):
         """Approve cur_ingred_compare to map to cur_ingred_name and advance
@@ -115,6 +122,9 @@ class Cleaner(Cmd):
         self.active = False
         self.prompt = DEFAULT_PROMPT
 
+    def help_stop(self):
+        print("Stop the current mapping.")
+
     def do_undo(self, arg):
         """Remove the previous mapping and re-try."""
         try:
@@ -125,9 +135,15 @@ class Cleaner(Cmd):
         self.cur_ingred_compare = self.prev_ingreds_compare.pop(-1)
         self.set_prompt_compare()
 
+    def help_undo(self):
+        print("Remove the previous mapping and re-try.")
+
     def do_save(self, arg):
         """Save the current map."""
         save_map(self.map_name, self.ingred_map)
+
+    def help_save(self):
+        print("Save the current map.")
 
     def do_exclude(self, arg):
         """In current list of ingredients to compare, exclude all entries that
@@ -136,13 +152,20 @@ class Cleaner(Cmd):
         if arg in self.cur_ingred_compare:
             self.advance_ingredient()
 
+    def help_exclude(self):
+        print("In current list of ingredients to compare, exclude all entries "
+              "that contain arg in their name.")
+
     def do_merge(self, arg):
         # merge this ingredient with previously mapped one
         pass
 
+    def help_merge(self):
+        print("")
+
     # ----- boilerplate stuff ----
     def do_exit(self, arg):
-        print("Bye.")
+        print("Goodbye!")
         return True
 
     def help_exit(self):
@@ -151,17 +174,25 @@ class Cleaner(Cmd):
     def default(self, arg):
         if arg in EXIT_COMMANDS:
             return self.do_exit(arg)
+        else:
+            print(f"Unknown command '{arg}'.")
     
     # ----- record and playback -----
     def do_record(self, arg):
-        '''Save future commands to filename:  RECORD blah.cmd'''
+        """Save future commands to filename:  RECORD blah.cmd"""
         self.record_file = open(arg, 'w')
 
+    def help_record(self):
+        print("Save future commands to filename:  RECORD blah.cmd")
+
     def do_playback(self, arg):
-        '''Playback commands from a file:  PLAYBACK blah.cmd'''
+        """Playback commands from a file:  PLAYBACK blah.cmd"""
         self.close()
         with open(arg) as f:
             self.cmdqueue.extend(f.read().splitlines())
+
+    def help_playback(self):
+        print("Playback commands from a file:  PLAYBACK blah.cmd")
 
     def precmd(self, line):
         line = line.lower()
@@ -201,11 +232,6 @@ class Cleaner(Cmd):
             self.advance_ingredient_category()
             # Update the prompt
             self.set_prompt_compare()
-        #finally:
-        #    # I think we only get here if we have nothing left to map
-        #    print("Finished mapping.")
-        #    self.prompt = DEFAULT_PROMPT
-        #    self.active = False
 
     def advance_ingredient_target(self):  
         """After finshing mapping a set of ingredients to the target ingredient, move on to the next target."""
