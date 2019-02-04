@@ -256,7 +256,7 @@ class Cleaner(Cmd):
         self.index += 1
         self.set_cur_ingred()
         # Start mapping again, in order to generate new suggested names 
-        self.do_map(self, None)    
+        self.do_map("")
         
     def set_prompt_compare(self):
         """Set the prompt according to the current ingred_name and
