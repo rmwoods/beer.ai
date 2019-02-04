@@ -171,10 +171,6 @@ class Cleaner(Cmd):
         print("In current list of ingredients to compare, exclude all entries "
               "that contain arg in their name.")
 
-    def do_merge(self, arg):
-        # merge this ingredient with previously mapped one
-        pass
-
     def help_merge(self):
         print("")
 
@@ -256,7 +252,7 @@ class Cleaner(Cmd):
         self.set_cur_ingred()
         # Start mapping again, in order to generate new suggested names 
         self.set_prompt_compare()
-        
+
     def set_prompt_compare(self):
         """Set the prompt according to the current ingred_name and
         ingred_compare"""
@@ -282,6 +278,7 @@ class Cleaner(Cmd):
                                             )
         except AttributeError:
             self.ingred_names_similar = []
+
 
 def load_map(fname):
     """Given a fname (pickle), load in the map."""
