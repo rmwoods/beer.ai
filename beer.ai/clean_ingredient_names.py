@@ -120,6 +120,9 @@ class Cleaner(Cmd):
 
     def do_rename(self, arg):
         """Rename the [current | specific] target ingredient."""
+        if arg == "":
+            print("Pass string to rename to.")
+            return
         for k, v in self.ingred_map.items():
             if v == self.cur_ingred_name:
                 self.ingred_map[k] = arg
@@ -243,7 +246,7 @@ class Cleaner(Cmd):
             # Save the map
             save_map(self.map_name, self.ingred_map)
             # Advance the ingredient to map
-            self.advance_ingredient_category()
+            self.advance_ingredient_target()
             # Update the prompt
             self.set_prompt_compare()
 
