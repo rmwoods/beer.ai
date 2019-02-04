@@ -255,8 +255,6 @@ class Cleaner(Cmd):
         # Get the new ingredient target
         self.index += 1
         self.set_cur_ingred()
-        # Get new similar names to clean
-        self.ingred_names_to_clean = self.df.loc[~self.df[self.hdf_col].isin(self.ingred_map.keys()), self.hdf_col]
         # Start mapping again, in order to generate new suggested names 
         self.do_map(self, None)    
         
