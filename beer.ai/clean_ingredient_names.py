@@ -206,7 +206,7 @@ class Cleaner(Cmd):
         print("Playback commands from a file:  PLAYBACK blah.cmd")
 
     def precmd(self, line):
-        line = line.lower()
+        #line = line.lower()
         if self.record_file and 'playback' not in line:
             print(line, file=self.file)
         return line
