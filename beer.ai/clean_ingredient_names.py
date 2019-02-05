@@ -93,11 +93,22 @@ class Cleaner(Cmd):
         except:
             print(f"Can't find {arg}.")
 
+    def do_remaining(self, arg):
+        """Print the remaining ingreds_names_similar or ingreds_to_clean"""
+        if self.active:
+            print(f"    Similar: {self.ingred_names_similar}")
+        else:
+            unique = self.ingred_names_to_clean.unique()
+            print(f"    {len(unique)} Left To Clean: {unique}")
+
+    def help_remaining(self, arg):
+        print("Print the remaining ingreds_names_similar or ingreds_to_map")
+
     def do_map(self, arg):
         """Begin the process of finding similar strings to the top unmapped ingredient."""
 
         print(f"Mapping {self.category}s similar to {self.cur_ingred_name}.")
-
+        self.active = True
         self.set_ingred_names_similar()
         self.advance_ingred()
 
