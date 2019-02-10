@@ -100,6 +100,16 @@ class Cleaner(Cmd):
 
     def help_remain(self, arg):
         print("Print the remaining ingreds_names_similar or ingreds_to_map")
+        
+    def do_impact(self, arg):
+        """Print the number of times the current ingredient appears in the ingredients to clean.
+        This is the number of records affected by the current mapping decision."""
+        num_records_affected = self.ingred_names_to_clean.value_counts()[self.cur_ingred_compare]
+        print(f"Records affected by mapping {self.cur_ingred_compare}: {num_records_affected}")
+        
+    def help_impact(self, arg):
+        print("Print the number of times the current ingredient appears in the ingredients to clean. \
+        This is the number of records affected by the current mapping decision.")
 
     def do_map(self, arg):
         """Begin the process of finding similar strings to the top unmapped ingredient."""
@@ -255,6 +265,8 @@ class Cleaner(Cmd):
             self.prev_ingreds_compare.append(tmp)
         except IndexError:
             print(f"Finished mapping for {self.cur_ingred_target}.")
+            # Store the trivial map  
+            self.ingred_map[self.cur_ingred_target] = self.cur_ingred_target
             # Advance the ingredient to map
             self.advance_ingred_target()
         # Update the prompt
@@ -265,11 +277,6 @@ class Cleaner(Cmd):
         
         self.set_cur_ingred_target()
         print(f"Starting mapping for {self.cur_ingred_target}.")
-
-        #   Store the trivial map and save the map 
-        self.ingred_map[self.cur_ingred_target] = self.cur_ingred_target
-        print(f"Adding the trivial map: {self.cur_ingred_target}.")
-        save_map(self.map_name, self.ingred_map)
         
         self.set_ingred_names_to_compare()
         self.cur_ingred_compare = self.ingred_names_to_compare.pop(0)
