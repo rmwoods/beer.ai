@@ -93,8 +93,10 @@ class Cleaner(Cmd):
         if self.active:
             print(f"    Ingredient names left to compare: {self.ingred_names_to_compare}")
         else:
-            unique = self.ingred_names_to_clean.unique()
-            print(f"    {len(unique)} unique ingredient names left to clean: {unique}")
+            unique = self.ingred_names_to_clean.value_counts()
+            print(f"    {len(unique)} unique ingredient names left to clean.")
+            print(f"Next 3 to clean (name, count):")
+            print(f"{unique.head(3)}")
 
     def help_remain(self, arg):
         print("Print the remaining ingreds_names_similar or ingreds_to_map")
@@ -178,7 +180,7 @@ class Cleaner(Cmd):
             self.ingred_names_to_compare = [i for i in self.ingred_names_to_compare if s not in i]
             # If the string to exclude is in the current one, reject it and advance the ingredient 
             if s in self.cur_ingred_compare:
-                print("Current ingredient rejected as part of excluding {s}.")
+                print(f"Current ingredient rejected as part of excluding {s}.")
                 self.advance_ingred()
 
     def help_exclude(self):
@@ -260,10 +262,17 @@ class Cleaner(Cmd):
     
     def advance_ingred_target(self):  
         """After finshing mapping a set of ingredients to the target ingredient, move on to the next target."""
+        
         self.set_cur_ingred_target()
+        print(f"Starting mapping for {self.cur_ingred_target}.")
+
+        #   Store the trivial map and save the map 
+        self.ingred_map[self.cur_ingred_target] = self.cur_ingred_target
+        print(f"Adding the trivial map: {self.cur_ingred_target}.")
+        save_map(self.map_name, self.ingred_map)
+        
         self.set_ingred_names_to_compare()
         self.cur_ingred_compare = self.ingred_names_to_compare.pop(0)
-        print(f"Starting mapping for {self.cur_ingred_target}.")
 
     def set_prompt_compare(self):
         """Set the prompt according to the current ingred_name and
