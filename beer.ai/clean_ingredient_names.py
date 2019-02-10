@@ -173,12 +173,12 @@ class Cleaner(Cmd):
         for s in exclude_strings: 
             # Print which ingredients are being excluded
             exclude_ingred = [i for i in self.ingred_names_to_compare if s in i]
-            print(f"Excluding ingredients: {exclude_ingred}")
+            print(f"Excluding ingredients containing {s}: {exclude_ingred}")
             # Exclude them 
             self.ingred_names_to_compare = [i for i in self.ingred_names_to_compare if s not in i]
             # If the string to exclude is in the current one, reject it and advance the ingredient 
             if s in self.cur_ingred_compare:
-                print("Current ingredient rejected as part of exclusion.")
+                print("Current ingredient rejected as part of excluding {s}.")
                 self.advance_ingred()
 
     def help_exclude(self):
@@ -260,7 +260,7 @@ class Cleaner(Cmd):
     
     def advance_ingred_target(self):  
         """After finshing mapping a set of ingredients to the target ingredient, move on to the next target."""
-        self.set_cur_ingred()
+        self.set_cur_ingred_target()
         self.set_ingred_names_to_compare()
         self.cur_ingred_compare = self.ingred_names_to_compare.pop(0)
         print(f"Starting mapping for {self.cur_ingred_target}.")
@@ -271,7 +271,7 @@ class Cleaner(Cmd):
         self.prompt = self.cur_ingred_target + " == " + self.cur_ingred_compare
         self.prompt += PROMPT_SUFFIX
 
-    def set_cur_ingred(self):
+    def set_cur_ingred_target(self):
         """Get the next target: the next ingredient to map to."""
         # Get the most common unique name remaining
         try:
