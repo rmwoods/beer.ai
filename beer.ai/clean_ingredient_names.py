@@ -37,7 +37,6 @@ class Cleaner(Cmd):
     df = pd.DataFrame()
     # Are we currently mapping an ingredient?
     active = False
-
     record_file = None
 
     #------ Dynamic properties ------
@@ -76,7 +75,7 @@ class Cleaner(Cmd):
             print(f"    N of ingredients mapped: {len(self.ingred_map.keys())}")
             print(f"    Current ingredient to map: {self.cur_ingred_name}")
             if self.ingred_names_to_compare is not None:
-                print(f"    N left to map for current ingredient: {len(self.ingred_names_to_compare)}")
+                print(f"    N left to map for current ingredient: {len(self.ingred_names_to_compare) + 1}")
             else:
                 print("    No similar names found. Run map to generate similar names.")
         else: 
@@ -119,8 +118,8 @@ class Cleaner(Cmd):
         to the next ingredient."""
         print("Accepted.")
         self.ingred_map[self.cur_ingred_compare] = self.cur_ingred_name
-        self.advance_ingred()
         save_map(self.map_name, self.ingred_map)
+        self.advance_ingred()
 
     def do_n(self, arg):
         """Reject cur_ingred_compare to map to cur_ingred_name. Advance to the
@@ -209,6 +208,7 @@ class Cleaner(Cmd):
     # ----- record and playback -----
     def do_record(self, arg):
         """Save future commands to filename:  RECORD blah.cmd"""
+        """Save future commands to filename:  RECORD blah.cmd"""
         self.record_file = open(arg, 'w')
 
     def help_record(self):
@@ -256,8 +256,6 @@ class Cleaner(Cmd):
             self.prev_ingreds_compare.append(tmp)
         except IndexError:
             print(f"Finished mapping for {self.cur_ingred_name}.")
-            # Save the map
-            save_map(self.map_name, self.ingred_map)
             # Advance the ingredient to map
             self.advance_ingred_target()
         # Update the prompt
@@ -265,10 +263,9 @@ class Cleaner(Cmd):
 
     def advance_ingred_target(self):  
         """After finshing mapping a set of ingredients to the target ingredient, move on to the next target."""
-        # Get the new ingredient target
-        # self.index += 1
-        self.set_ingred_names_to_compare()
         self.set_cur_ingred()
+        self.set_ingred_names_to_compare()
+        self.cur_ingred_compare = self.ingred_names_to_compare[0]
         print(f"Starting mapping for {self.cur_ingred_name}.")
 
     def set_prompt_compare(self):
