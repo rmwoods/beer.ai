@@ -110,6 +110,31 @@ class Cleaner(Cmd):
     def help_impact(self, arg):
         print("Print the number of times the current ingredient appears in the ingredients to clean. \
         This is the number of records affected by the current mapping decision.")
+        
+    def do_progress(self, arg):
+        """Print a message showing your progress on cleaning the category: 
+            the number of unique ingreds mapped / remaining
+            the number of total ingreds mapped / remaining"""
+        if self.df.empty:
+            print("No ingredients to clean found. Run set_cat.")
+            return
+            
+        mapped_unique = pd.Series(list(self.ingred_map.values())).nunique() 
+        mapped_total = len(self.ingred_map.keys())
+        to_clean_unique = self.ingred_names_to_clean.nunique()
+        to_clean_total = len(self.ingred_names_to_clean)
+        dataset_unique = self.df[self.hdf_col].nunique()
+        dataset_total = len(self.df[self.hdf_col])
+        cleaned_unique = dataset_unique - to_clean_unique 
+        cleaned_total = dataset_total - to_clean_total 
+        print(f"The map collapses {mapped_total} unique values to {mapped_unique}.")
+        print(f"Progress on targets of unique values: {100*cleaned_unique/to_clean_unique}% ({cleaned_unique}/{to_clean_unique})")
+        print(f"Progress on records in total : {100*cleaned_total/to_clean_total}% ({cleaned_total}/{to_clean_total})")
+    
+    def help_progress(self, arg):
+        print("""Print a message showing your progress on cleaning the category:
+            the number of unique ingreds mapped / remaining
+            the number of total ingreds mapped / remaining""")
 
     def do_map(self, arg):
         """Begin the process of finding similar strings to the top unmapped ingredient."""
