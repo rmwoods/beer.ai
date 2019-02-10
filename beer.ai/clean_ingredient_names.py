@@ -113,9 +113,18 @@ class Cleaner(Cmd):
 
     def do_map(self, arg):
         """Begin the process of finding similar strings to the top unmapped ingredient."""
+        # If there's no category set, give a warning and pass
+        if self.category is None:
+            print("No category set. Run set_cat.")
+            return
+        
         self.active = True
-        self.advance_ingred_target()
-        self.advance_ingred()
+        # If we haven't mapped before this session, start by advancing the ingredient (which will update the prompt)
+        if self.cur_ingred_target is None:
+            self.advance_ingred()
+        # If we've already started mapping, don't update the ingredient. Just update the prompt
+        else: 
+            self.set_prompt_compare()
 
     def help_map(self):
         print("Begin the process of finding similar strings to the top unmapped ingredient.")
@@ -258,29 +267,32 @@ class Cleaner(Cmd):
 
     def advance_ingred(self):
         """Pop the next ingredient to compare to the current ingredient (if
-        available) and update the prompt and active fields."""
+        available) and update the prompt."""
         try:
             tmp = self.cur_ingred_compare
             self.cur_ingred_compare = self.ingred_names_to_compare.pop(0)
-            self.prev_ingreds_compare.append(tmp)
+            self.prev_ingreds_compare.append(tmp)   
+            self.set_prompt_compare()
+        # In two scenarios, advance the target instead of the ingredient: 
+        #   When we're done mapping a target
+        #   Or if there's no target set (we haven't started mapping yet)
         except IndexError:
-            print(f"Finished mapping for {self.cur_ingred_target}.")
-            # Store the trivial map  
-            self.ingred_map[self.cur_ingred_target] = self.cur_ingred_target
             # Advance the ingredient to map
             self.advance_ingred_target()
-        # Update the prompt
-        self.set_prompt_compare()
     
     def advance_ingred_target(self):  
-        """After finshing mapping a set of ingredients to the target ingredient, move on to the next target."""
+        """Get a new target, list of names to compare to it, and next name to compare.
+        Update the prompt."""
         
         self.set_cur_ingred_target()
         print(f"Starting mapping for {self.cur_ingred_target}.")
+        # Add the trivial mapping 
+        self.ingred_map[self.cur_ingred_target] = self.cur_ingred_target
         
         self.set_ingred_names_to_compare()
         self.cur_ingred_compare = self.ingred_names_to_compare.pop(0)
-
+        self.set_prompt_compare()
+    
     def set_prompt_compare(self):
         """Set the prompt according to the current ingred_name and
         ingred_compare"""
