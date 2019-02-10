@@ -176,8 +176,10 @@ class Cleaner(Cmd):
             print(f"Excluding ingredients: {exclude_ingred}")
             # Exclude them 
             self.ingred_names_to_compare = [i for i in self.ingred_names_to_compare if s not in i]
-        if arg in self.cur_ingred_compare:
-            self.advance_ingred()
+            # If the string to exclude is in the current one, reject it and advance the ingredient 
+            if s in self.cur_ingred_compare:
+                print("Current ingredient rejected as part of exclusion.")
+                self.advance_ingred()
 
     def help_exclude(self):
         print("In current list of ingredients to compare, exclude all entries "
@@ -255,7 +257,7 @@ class Cleaner(Cmd):
             self.advance_ingred_target()
         # Update the prompt
         self.set_prompt_compare()
-
+    
     def advance_ingred_target(self):  
         """After finshing mapping a set of ingredients to the target ingredient, move on to the next target."""
         self.set_cur_ingred()
