@@ -128,8 +128,8 @@ class Cleaner(Cmd):
         cleaned_unique = dataset_unique - to_clean_unique 
         cleaned_total = dataset_total - to_clean_total 
         print(f"The map collapses {mapped_total} unique values to {mapped_unique}.")
-        print(f"Progress on targets of unique values: {100*cleaned_unique/to_clean_unique}% ({cleaned_unique}/{to_clean_unique})")
-        print(f"Progress on records in total : {100*cleaned_total/to_clean_total}% ({cleaned_total}/{to_clean_total})")
+        print(f"Progress on targets of unique values: {100*cleaned_unique/dataset_unique}% ({cleaned_unique}/{dataset_unique})")
+        print(f"Progress on records in total : {100*cleaned_total/dataset_total}% ({cleaned_total}/{dataset_total})")
     
     def help_progress(self, arg):
         print("""Print a message showing your progress on cleaning the category:
