@@ -31,7 +31,7 @@ class Cleaner(Cmd):
     ingred_map = {}
     cur_ingred_name = None
     cur_ingred_compare = None
-    ingred_names_similar = []
+    ingred_names_to_compare = []
     prev_ingreds_compare = []
     # Which index in ingredients are we on?
     index = 0
@@ -65,7 +65,7 @@ class Cleaner(Cmd):
 
         self.load_df()
         self.set_cur_ingred()
-        self.set_ingred_names_similar()
+        self.set_ingred_names_to_compare()
 
     def help_set_cat(self):
         print(f"Set the category to be mapped. Acceptable values are {VALID_CATEGORIES}.")
@@ -76,8 +76,8 @@ class Cleaner(Cmd):
             print(f"    Category: {self.category}")
             print(f"    N of ingredients mapped: {len(self.ingred_map.keys())}")
             print(f"    Current ingredient to map: {self.cur_ingred_name}")
-            if self.ingred_names_similar is not None:
-                print(f"    N left to map for current ingredient: {len(self.ingred_names_similar)}")
+            if self.ingred_names_to_compare is not None:
+                print(f"    N left to map for current ingredient: {len(self.ingred_names_to_compare)}")
             else:
                 print("    No similar names found. Run map to generate similar names.")
         else: 
@@ -93,15 +93,15 @@ class Cleaner(Cmd):
         except:
             print(f"Can't find {arg}.")
 
-    def do_remaining(self, arg):
+    def do_remain(self, arg):
         """Print the remaining ingreds_names_similar or ingreds_to_clean"""
         if self.active:
-            print(f"    Similar: {self.ingred_names_similar}")
+            print(f"    Ingredient names left to compare: {self.ingred_names_to_compare}")
         else:
             unique = self.ingred_names_to_clean.unique()
-            print(f"    {len(unique)} Left To Clean: {unique}")
+            print(f"    {len(unique)} unique ingredient names left to clean: {unique}")
 
-    def help_remaining(self, arg):
+    def help_remain(self, arg):
         print("Print the remaining ingreds_names_similar or ingreds_to_map")
 
     def do_map(self, arg):
@@ -109,7 +109,7 @@ class Cleaner(Cmd):
 
         print(f"Mapping {self.category}s similar to {self.cur_ingred_name}.")
         self.active = True
-        self.set_ingred_names_similar()
+        self.set_ingred_names_to_compare()
         self.advance_ingred()
 
     def help_map(self):
@@ -174,7 +174,7 @@ class Cleaner(Cmd):
     def do_exclude(self, arg):
         """In current list of ingredients to compare, exclude all entries that
         contain arg in their name."""
-        self.ingred_names_similar = [i for i in self.ingred_names_similar if arg not in i]
+        self.ingred_names_to_compare = [i for i in self.ingred_names_to_compare if arg not in i]
         if arg in self.cur_ingred_compare:
             self.advance_ingred()
 
@@ -245,7 +245,7 @@ class Cleaner(Cmd):
         available) and update the prompt and active fields."""
         try:
             tmp = self.cur_ingred_compare
-            self.cur_ingred_compare = self.ingred_names_similar.pop(0)
+            self.cur_ingred_compare = self.ingred_names_to_compare.pop(0)
             self.prev_ingreds_compare.append(tmp)
         except IndexError:
             print(f"Finished mapping for {self.cur_ingred_name}.")
@@ -259,10 +259,12 @@ class Cleaner(Cmd):
     def advance_ingred_target(self):  
         """After finshing mapping a set of ingredients to the target ingredient, move on to the next target."""
         # Get the new ingredient target
-        self.index += 1
+        # self.index += 1
+        self.set_ingred_names_to_compare()
         self.set_cur_ingred()
+        print(f"Starting mapping for {self.cur_ingred_name}.")
         # Start mapping again, in order to generate new suggested names 
-        self.set_prompt_compare()
+        # self.set_prompt_compare()
 
     def set_prompt_compare(self):
         """Set the prompt according to the current ingred_name and
@@ -274,21 +276,22 @@ class Cleaner(Cmd):
         """Get the next ingredient to map to."""
         # Get the most common unique name remaining
         try:
-            self.cur_ingred_name = self.ingred_names_to_clean.value_counts().index[self.index]
+            # self.cur_ingred_name = self.ingred_names_to_clean.value_counts().index[self.index]
+            self.cur_ingred_name = self.ingred_names_to_clean.value_counts().index[0]
         except IndexError:
             print(f"No {self.category}'s left to map (or none found in current df).")
 
-    def set_ingred_names_similar(self):
+    def set_ingred_names_to_compare(self):
         """Ingredient names similar to current ingredient."""
         try:
-            self.ingred_names_similar = difflib.get_close_matches(
+            self.ingred_names_to_compare = difflib.get_close_matches(
                                             self.cur_ingred_name,
                                             self.ingred_names_to_clean.astype('str').unique(),
                                             n=10000,
                                             cutoff=0.6
                                             )
         except AttributeError:
-            self.ingred_names_similar = []
+            self.ingred_names_to_compare = []
 
 
 def load_map(fname):
