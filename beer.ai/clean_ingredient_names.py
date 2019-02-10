@@ -34,7 +34,6 @@ class Cleaner(Cmd):
     ingred_names_to_compare = []
     prev_ingreds_compare = []
     # Which index in ingredients are we on?
-    index = 0
     df = pd.DataFrame()
     # Are we currently mapping an ingredient?
     active = False
@@ -173,8 +172,16 @@ class Cleaner(Cmd):
 
     def do_exclude(self, arg):
         """In current list of ingredients to compare, exclude all entries that
-        contain arg in their name."""
-        self.ingred_names_to_compare = [i for i in self.ingred_names_to_compare if arg not in i]
+        contain arg in their name.
+        arg can be one string to exclude, or a set of strings separated by commas and spaces 
+        """
+        exclude_strings = arg.split(', ') 
+        for s in exclude_strings: 
+            # Print which ingredients are being excluded
+            exclude_ingred = [i for i in self.ingred_names_to_compare if s in i]
+            print(f"Excluding ingredients: {exclude_ingred}")
+            # Exclude them 
+            self.ingred_names_to_compare = [i for i in self.ingred_names_to_compare if s not in i]
         if arg in self.cur_ingred_compare:
             self.advance_ingred()
 
@@ -263,8 +270,6 @@ class Cleaner(Cmd):
         self.set_ingred_names_to_compare()
         self.set_cur_ingred()
         print(f"Starting mapping for {self.cur_ingred_name}.")
-        # Start mapping again, in order to generate new suggested names 
-        # self.set_prompt_compare()
 
     def set_prompt_compare(self):
         """Set the prompt according to the current ingred_name and
