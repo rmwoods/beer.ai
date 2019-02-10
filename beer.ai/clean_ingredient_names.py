@@ -60,10 +60,7 @@ class Cleaner(Cmd):
         self.map_name = f"{arg}map.pickle"
         self.ingred_map = load_map(self.map_name)
         self.hdf_col = arg + "_name"
-
         self.load_df()
-        self.set_cur_ingred()
-        self.set_ingred_names_to_compare()
 
     def help_set_cat(self):
         print(f"Set the category to be mapped. Acceptable values are {VALID_CATEGORIES}.")
@@ -75,7 +72,7 @@ class Cleaner(Cmd):
             print(f"    N of ingredients mapped: {len(self.ingred_map.keys())}")
             print(f"    Current ingredient to map: {self.cur_ingred_target}")
             if self.ingred_names_to_compare is not None:
-                print(f"    N left to map for current ingredient: {len(self.ingred_names_to_compare) + 1}")
+                print(f"    N left to map for current ingredient: {len(self.ingred_names_to_compare)}")
             else:
                 print("    No similar names found. Run map to generate similar names.")
         else: 
@@ -104,10 +101,8 @@ class Cleaner(Cmd):
 
     def do_map(self, arg):
         """Begin the process of finding similar strings to the top unmapped ingredient."""
-
-        print(f"Mapping {self.category}s similar to {self.cur_ingred_target}.")
         self.active = True
-        self.set_ingred_names_to_compare()
+        self.advance_ingred_target()
         self.advance_ingred()
 
     def help_map(self):
@@ -265,7 +260,7 @@ class Cleaner(Cmd):
         """After finshing mapping a set of ingredients to the target ingredient, move on to the next target."""
         self.set_cur_ingred()
         self.set_ingred_names_to_compare()
-        self.cur_ingred_compare = self.ingred_names_to_compare[0]
+        self.cur_ingred_compare = self.ingred_names_to_compare.pop(0)
         print(f"Starting mapping for {self.cur_ingred_target}.")
 
     def set_prompt_compare(self):
@@ -275,7 +270,7 @@ class Cleaner(Cmd):
         self.prompt += PROMPT_SUFFIX
 
     def set_cur_ingred(self):
-        """Get the next ingredient to map to."""
+        """Get the next target: the next ingredient to map to."""
         # Get the most common unique name remaining
         try:
             # self.cur_ingred_target = self.ingred_names_to_clean.value_counts().index[self.index]
