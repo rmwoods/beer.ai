@@ -29,7 +29,7 @@ class Cleaner(Cmd):
     hdf_col = ""
     map_name = ""
     ingred_map = {}
-    cur_ingred_name = None
+    cur_ingred_target = None
     cur_ingred_compare = None
     ingred_names_to_compare = []
     prev_ingreds_compare = []
@@ -73,7 +73,7 @@ class Cleaner(Cmd):
         if self.category:
             print(f"    Category: {self.category}")
             print(f"    N of ingredients mapped: {len(self.ingred_map.keys())}")
-            print(f"    Current ingredient to map: {self.cur_ingred_name}")
+            print(f"    Current ingredient to map: {self.cur_ingred_target}")
             if self.ingred_names_to_compare is not None:
                 print(f"    N left to map for current ingredient: {len(self.ingred_names_to_compare) + 1}")
             else:
@@ -105,7 +105,7 @@ class Cleaner(Cmd):
     def do_map(self, arg):
         """Begin the process of finding similar strings to the top unmapped ingredient."""
 
-        print(f"Mapping {self.category}s similar to {self.cur_ingred_name}.")
+        print(f"Mapping {self.category}s similar to {self.cur_ingred_target}.")
         self.active = True
         self.set_ingred_names_to_compare()
         self.advance_ingred()
@@ -114,15 +114,15 @@ class Cleaner(Cmd):
         print("Begin the process of finding similar strings to the top unmapped ingredient.")
 
     def do_y(self, arg):
-        """Approve cur_ingred_compare to map to cur_ingred_name and advance
-        to the next ingredient."""
+        """Approve cur_ingred_compare to map to cur_ingred_target and advance
+        to the next target ingredient."""
         print("Accepted.")
-        self.ingred_map[self.cur_ingred_compare] = self.cur_ingred_name
+        self.ingred_map[self.cur_ingred_compare] = self.cur_ingred_target
         save_map(self.map_name, self.ingred_map)
         self.advance_ingred()
 
     def do_n(self, arg):
-        """Reject cur_ingred_compare to map to cur_ingred_name. Advance to the
+        """Reject cur_ingred_compare to map to cur_ingred_target. Advance to the
         next ingredient."""
         print("Rejected.")
         self.advance_ingred()
@@ -133,9 +133,9 @@ class Cleaner(Cmd):
             print("Pass string to rename to.")
             return
         for k, v in self.ingred_map.items():
-            if v == self.cur_ingred_name:
+            if v == self.cur_ingred_target:
                 self.ingred_map[k] = arg
-        self.cur_ingred_name = arg
+        self.cur_ingred_target = arg
         self.set_prompt_compare()
 
     def help_rename(self, arg):
@@ -255,7 +255,7 @@ class Cleaner(Cmd):
             self.cur_ingred_compare = self.ingred_names_to_compare.pop(0)
             self.prev_ingreds_compare.append(tmp)
         except IndexError:
-            print(f"Finished mapping for {self.cur_ingred_name}.")
+            print(f"Finished mapping for {self.cur_ingred_target}.")
             # Advance the ingredient to map
             self.advance_ingred_target()
         # Update the prompt
@@ -266,20 +266,20 @@ class Cleaner(Cmd):
         self.set_cur_ingred()
         self.set_ingred_names_to_compare()
         self.cur_ingred_compare = self.ingred_names_to_compare[0]
-        print(f"Starting mapping for {self.cur_ingred_name}.")
+        print(f"Starting mapping for {self.cur_ingred_target}.")
 
     def set_prompt_compare(self):
         """Set the prompt according to the current ingred_name and
         ingred_compare"""
-        self.prompt = self.cur_ingred_name + " == " + self.cur_ingred_compare
+        self.prompt = self.cur_ingred_target + " == " + self.cur_ingred_compare
         self.prompt += PROMPT_SUFFIX
 
     def set_cur_ingred(self):
         """Get the next ingredient to map to."""
         # Get the most common unique name remaining
         try:
-            # self.cur_ingred_name = self.ingred_names_to_clean.value_counts().index[self.index]
-            self.cur_ingred_name = self.ingred_names_to_clean.value_counts().index[0]
+            # self.cur_ingred_target = self.ingred_names_to_clean.value_counts().index[self.index]
+            self.cur_ingred_target = self.ingred_names_to_clean.value_counts().index[0]
         except IndexError:
             print(f"No {self.category}'s left to map (or none found in current df).")
 
@@ -287,7 +287,7 @@ class Cleaner(Cmd):
         """Ingredient names similar to current ingredient."""
         try:
             self.ingred_names_to_compare = difflib.get_close_matches(
-                                            self.cur_ingred_name,
+                                            self.cur_ingred_target,
                                             self.ingred_names_to_clean.astype('str').unique(),
                                             n=10000,
                                             cutoff=0.6
