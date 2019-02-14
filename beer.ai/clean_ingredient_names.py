@@ -124,7 +124,7 @@ class Cleaner(Cmd):
         to_clean_unique = self.ingred_names_to_clean.nunique()
         to_clean_total = len(self.ingred_names_to_clean)
         dataset_unique = self.df[self.hdf_col].nunique()
-        dataset_total = len(self.df[self.hdf_col])
+        dataset_total = len(self.df[self.hdf_col].dropna())
         cleaned_unique = dataset_unique - to_clean_unique 
         cleaned_total = dataset_total - to_clean_total 
         print(f"The map collapses {mapped_total} unique values to {mapped_unique}.")
