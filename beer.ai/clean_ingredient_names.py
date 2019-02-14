@@ -288,7 +288,7 @@ class Cleaner(Cmd):
         """Load the dataframe of global data."""
         # XXX - update the number below to be a passed in parameter
         with pd.HDFStore(self.hdf_path, "r") as store:
-            self.df = store.select("ingredients", where="index < 10000", columns=[self.hdf_col])
+            self.df = store.select("ingredients", columns=[self.hdf_col])
 
     def advance_ingred(self):
         """Pop the next ingredient to compare to the current ingredient (if
