@@ -1,9 +1,11 @@
 import argparse
-from cmd import Cmd
 import difflib
+import glob
 import pandas as pd
 import pickle
+import shutil
 
+from cmd import Cmd
 
 # Categories to play the game with
 VALID_CATEGORIES = [
@@ -251,7 +253,6 @@ class Cleaner(Cmd):
     # ----- record and playback -----
     def do_record(self, arg):
         """Save future commands to filename:  RECORD blah.cmd"""
-        """Save future commands to filename:  RECORD blah.cmd"""
         self.record_file = open(arg, 'w')
 
     def help_record(self):
@@ -361,11 +362,21 @@ def load_map(fname):
 def save_map(fname, ingred_map):
     """ Given a fname (pickle), and the current map, save the current map. """
     try:
+        rotate_files(fname)
         with open(fname, "wb") as f:
             pickle.dump(ingred_map, f)
         print(f"Saved {fname}.")
     except NameError:
         print("Trying to save the map, but no map to save. Run map.")
+
+
+def rotate_files(fname, n_backups=9):
+    """Rotate a file to at most n_backups copies."""
+    copies = sorted(glob.glob(fname + ".[0-9]"))
+    n_min = min(n_backups, len(copies)+1)
+    for i in range(n_min, 1, -1):
+        shutil.copyfile(fname + f".{i-1}", fname + f".{i}")
+    shutil.copyfile(fname, fname + ".1")
 
 
 def make_arg_parser():
