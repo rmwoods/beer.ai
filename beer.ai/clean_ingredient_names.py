@@ -1,6 +1,7 @@
 import argparse
 import difflib
 import glob
+import os
 import pandas as pd
 import pickle
 import shutil
@@ -362,7 +363,8 @@ def load_map(fname):
 def save_map(fname, ingred_map):
     """ Given a fname (pickle), and the current map, save the current map. """
     try:
-        rotate_files(fname)
+        if os.path.exists(fname):
+            rotate_files(fname)
         with open(fname, "wb") as f:
             pickle.dump(ingred_map, f)
         print(f"Saved {fname}.")
