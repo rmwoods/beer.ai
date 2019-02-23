@@ -77,17 +77,17 @@ def add_to_dicts(to_df, key, value, dtype_dict):
 def fill_ferm(d, ferm, core_vals):
     """Given a ferm class, add the appropriate fields to the dict d."""
     if ferm is not None:
-        ferm_name, ferm_origin = check_origin(ferm.name)
+        ferm_name, ferm_origin = check_origin(getattr(ferm, "name", None))
         d["ferm_name"] = clean_text(ferm_name)
         if ferm_origin is not None:
             d["ferm_origin"] = clean_text(ferm_origin)
         else:
-            d["ferm_origin"] = clean_text(ferm.origin)
-        d["ferm_amount"] = safe_float(ferm.amount)
-        d["ferm_display_amount"] = clean_text(ferm.display_amount)
-        d["ferm_yield"] = safe_float(ferm._yield)*0.01
-        d["color"] = safe_float(ferm.color)
-        d["potential"] = safe_float(ferm.potential)
+            d["ferm_origin"] = clean_text(getattr(ferm, "origin", None))
+        d["ferm_amount"] = safe_float(getattr(ferm, "amount", None))
+        d["ferm_display_amount"] = clean_text(getattr(ferm, "display_amount", None))
+        d["ferm_yield"] = safe_float(getattr(ferm, "_yield", None))*0.01
+        d["color"] = safe_float(getattr(ferm, "color", None))
+        d["potential"] = safe_float(getattr(ferm, "potential", None))
         # malt_scaled = <amount> * <yield> * <efficiency> / <boil_size>
         d["ferm_scaled"] = d["ferm_amount"] * d["ferm_yield"]\
                                 * core_vals["efficiency"] / core_vals["boil_size"]
@@ -96,18 +96,20 @@ def fill_ferm(d, ferm, core_vals):
 def fill_hop(d, hop, core_vals):
     """Given a hop class, add the appropriate fields to the dict d."""
     if hop is not None:
-        hop_name, hop_origin = check_origin(hop.name)
+        hop_name, hop_origin = check_origin(getattr(hop, "name", None))
         d["hop_name"] = clean_text(hop_name)
         if hop_origin is not None:
             d["hop_origin"] = clean_text(hop_origin)
         else:
-            d["hop_origin"] = clean_text(hop.origin)
-        d["hop_amount"] = safe_float(hop.amount)
-        d["hop_display_amount"] = clean_text(hop.display_amount)
-        d["hop_alpha"] = safe_float(hop.alpha)/100.
-        d["hop_form"] = clean_text(hop.form)
+            d["hop_origin"] = clean_text(getattr(hop, "origin", None))
+        d["hop_amount"] = safe_float(getattr(hop, "amount", None))
+        d["hop_display_amount"] = clean_text(getattr(hop, "display_amount", None))
+        d["hop_alpha"] = safe_float(getattr(hop, "alpha", None))
+        if d["hop_alpha"] is not None:
+            d["hop_alpha"] /= 100.
+        d["hop_form"] = clean_text(getattr(hop, "form", None))
         is_leaf = int(d["hop_form"] == LEAF_STR)
-        d["hop_time"] = safe_float(hop.time)
+        d["hop_time"] = safe_float(getattr(hop, "time", None))
         if d["hop_time"] > 0:
             # hop_scaled  = <amount>*0.01*<alpha>*[1 - 0.1 * (leaf)]/<boil_size>
             d["hop_scaled"] = (d["hop_amount"]
@@ -121,20 +123,26 @@ def fill_hop(d, hop, core_vals):
 def fill_yeast(d, yeast):
     """Given a yeast class, add the appropriate fields to the dict d."""
     if yeast is not None:
-        d["yeast_name"] = clean_text(yeast.name)
-        d["yeast_laboratory"] = clean_text(yeast.laboratory)
+        d["yeast_name"] = clean_text(getattr(yeast, "name", None))
+        d["yeast_laboratory"] = clean_text(getattr(yeast, "laboratory", None))
+        d["type"] = clean_text(getattr(yeast, "type", None))
+        d["form"] = clean_text(getattr(yeast, "form", None))
+        d["amount"] = safe_float(getattr(yeast, "amount", None))
+        d["product_id"] = getattr(yeast, "product_id", None)
+        d["attenuation"] = safe_float(getattr(yeast, "attenuation", None))
+        d["flocculation"] = safe_float(getattr(yeast, "flocculation", None))
 
 
 def fill_misc(d, misc):
     """Given a misc class, add the appropriate fields to the dict d."""
     if misc is not None:
-        misc_name = remove_ingredient_modifiers(misc.name)
+        misc_name = remove_ingredient_modifiers(getattr(misc, "name", None))
         d["misc_name"] = clean_text(misc_name)
-        d["misc_amount"] = safe_float(misc.amount)
-        d["misc_use"] = clean_text(misc.use)
-        d["misc_time"] = safe_float(misc.time)
+        d["misc_amount"] = safe_float(getattr(misc, "amount", None))
+        d["misc_use"] = clean_text(getattr(misc, "use", None))
+        d["misc_time"] = safe_float(getattr(misc, "time", None))
         # Should be a boolean
-        d["misc_amount_is_weight"] = misc.amount_is_weight or False
+        d["misc_amount_is_weight"] = getattr(misc, "amount_is_weight", None) or False
 
 
 def fill_core(d, recipe):
