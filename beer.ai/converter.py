@@ -142,6 +142,7 @@ def fill_core(d, recipe):
     into the dict."""
 
     d["name"] = clean_text(recipe.name)
+    d["brewer"] = clean_text(recipe.brewer)
 
     d["batch_size"] = safe_float(recipe.batch_size)
     if d["batch_size"] == 0:
