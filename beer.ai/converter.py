@@ -86,6 +86,8 @@ def fill_ferm(d, ferm, core_vals):
         d["ferm_amount"] = safe_float(ferm.amount)
         d["ferm_display_amount"] = clean_text(ferm.display_amount)
         d["ferm_yield"] = safe_float(ferm._yield)*0.01
+        d["color"] = safe_float(ferm.color)
+        d["potential"] = safe_float(ferm.potential)
         # malt_scaled = <amount> * <yield> * <efficiency> / <boil_size>
         d["ferm_scaled"] = d["ferm_amount"] * d["ferm_yield"]\
                                 * core_vals["efficiency"] / core_vals["boil_size"]
