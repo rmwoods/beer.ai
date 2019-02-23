@@ -149,22 +149,30 @@ def fill_core(d, recipe):
     """Given a dictionary, put all the core value items from the recipe object
     into the dict."""
 
-    d["name"] = clean_text(recipe.name)
-    d["brewer"] = clean_text(recipe.brewer)
+    d["name"] = clean_text(getattr(recipe, "name", None))
+    d["brewer"] = clean_text(getattr(recipe, "brewer", None))
 
-    d["batch_size"] = safe_float(recipe.batch_size)
+    d["batch_size"] = safe_float(getattr(recipe, "batch_size", None))
     if d["batch_size"] == 0:
         d["batch_size"] = 1
-    d["boil_size"] = safe_float(recipe.boil_size)
+    d["boil_size"] = safe_float(getattr(recipe, "boil_size", None))
     if d["boil_size"] == 0:
         d["boil_size"] = 1
-    d["efficiency"] = safe_float(recipe.efficiency)/100.
-    d["boil_time"] = safe_float(recipe.boil_time)
+    d["efficiency"] = safe_float(getattr(recipe, "efficiency", None))
+    if d["efficiency"] is not None:
+        d["efficiency"] /= 100.
+    d["boil_time"] = safe_float(getattr(recipe, "boil_time", None))
 
-    d["style_name"] = clean_text(recipe.style.name)
-    d["style_guide"] = clean_text(recipe.style.style_guide)
-    d["style_category"] = str(int(safe_float(recipe.style.category_number))) + clean_text(recipe.style.style_letter)
-    d["style_version"] = safe_float(recipe.style.version)
+    #estimated quantities
+    d["ibu"] = safe_float(get_attr(recipe, "ibu", None))
+    d["og"] = safe_float(get_attr(recipe, "ibu", None))
+    d["fg"] = safe_float(get_attr(recipe, "ibu", None))
+
+    d["style_name"] = clean_text(recipe.getattr(style, "name", None))
+    d["style_guide"] = clean_text(recipe.getattr(style, "style_guide", None))
+    d["style_category"] = str(int(safe_float(recipe.getattr(style, "category_number", None))))\
+            + clean_text(recipe.getattr(style, "style_letter", None))
+    d["style_version"] = safe_float(recipe.getattr(style, "version", None))
 
 
 def recipe_to_dicts(recipe, fname, recipe_id):
