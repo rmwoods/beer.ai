@@ -249,7 +249,7 @@ def convert_a_bunch(filenames, n, jobs=N_CPUS):
 
     results = Parallel(n_jobs=N_CPUS)(
             delayed(convert_runner)(fname, origin, i)
-            for i, fname in enumerate(samples))
+            for i, (origin, fname) in enumerate(samples))
 
     core_vals = []
     ingredients = []
