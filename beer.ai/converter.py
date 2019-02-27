@@ -2,6 +2,7 @@
 
 import argparse
 import glob
+import os
 import os.path as path
 import numpy as np
 import pandas as pd
@@ -175,15 +176,20 @@ def fill_core(d, recipe):
     d["style_version"] = safe_float(recipe.getattr(style, "version", None))
 
 
-def recipe_to_dicts(recipe, fname, recipe_id):
+def recipe_to_dicts(recipe, fname, recipe_id, origin):
     """Given a pybeerxml.recipe.Recipe, convert to a dataframe and write in a
     more efficient format.
+        recipe: pybeerxml Recipe object
+        fname: file name that beer xml object came from (for recording)
+        recipe_id: unique id to assign to recipe
+        origin: source where recipe came from (e.g. brewtoad.com)
     """
 
     core_vals = {}
     ingredients = []
     core_vals["id"] = recipe_id
     core_vals["recipe_file"] = fname
+    core_vals["origin"] = origin
     fill_core(core_vals, recipe)
 
     for ferm, hop, yeast, misc in zip_longest(
@@ -208,7 +214,7 @@ def convert_runner(fname, recipe_id):
         print(f"No recipe in {fname}")
         return None
     try:
-        core_vals, ingredients = recipe_to_dicts(recipe, fname, recipe_id)
+        core_vals, ingredients = recipe_to_dicts(recipe, fname, recipe_id, origin)
     except Exception as e:
         print(f"Failed {fname}:")
         print(e)
@@ -226,16 +232,26 @@ def convert_a_bunch(path_to_recipes, n, jobs=N_CPUS):
     """Convert n randomly chosen recipes. Currently for inspecting the output."""
 
     if path_to_recipes is not None:
-        samples = path_to_recipes
+        path = path_to_recipes
     else:
-        recipe_files = glob.glob(path.join("recipes", "*.xml"))
-        if n != -1:
-            samples = random.sample(recipe_files, n)
-        else:
-            samples = recipe_files
+        path = "recipes"
+
+    #recipe_files = glob.glob(path.join("recipes", "*.xml"))
+    # Note that this is a bit slower than just assuming the source directory
+    # has a certain structure of origin/*.xml and letting the OS glob the files
+    recipe_files = []
+    for dirpath, dirnames, filenames in os.walk(path):
+        for f in filenames:
+            if f.endswith("xml"):
+                origin = dirpath.split("/")[-1]
+                recipe_files.append(f)
+    if n != -1:
+        samples = random.sample(recipe_files, n)
+    else:
+        samples = recipe_files
 
     results = Parallel(n_jobs=N_CPUS)(
-            delayed(convert_runner)(fname, i)
+            delayed(convert_runner)(fname, origin, i)
             for i, fname in enumerate(samples))
 
     core_vals = []
