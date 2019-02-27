@@ -166,9 +166,9 @@ def fill_core(d, recipe):
     d["boil_time"] = safe_float(getattr(recipe, "boil_time", None))
 
     #estimated quantities
-    d["ibu"] = safe_float(get_attr(recipe, "ibu", None))
-    d["og"] = safe_float(get_attr(recipe, "ibu", None))
-    d["fg"] = safe_float(get_attr(recipe, "ibu", None))
+    d["ibu"] = safe_float(getattr(recipe, "ibu", None))
+    d["og"] = safe_float(getattr(recipe, "ibu", None))
+    d["fg"] = safe_float(getattr(recipe, "ibu", None))
 
     d["style_name"] = clean_text(recipe.getattr(style, "name", None))
     d["style_guide"] = clean_text(recipe.getattr(style, "style_guide", None))
@@ -223,7 +223,8 @@ def convert_runner(fname, origin, recipe_id):
         core_vals, ingredients = recipe_to_dicts(recipe, fname, recipe_id, origin)
     except Exception as e:
         print(f"Failed {fname}:")
-        print(e)
+        #print(e)
+        raise(e)
         core_vals, ingredients = {}, []
     return core_vals, ingredients
 
