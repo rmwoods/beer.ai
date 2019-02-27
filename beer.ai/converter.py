@@ -204,7 +204,7 @@ def recipe_to_dicts(recipe, fname, recipe_id, origin):
     return core_vals, ingredients
 
 
-def convert_runner(fname, recipe_id):
+def convert_runner(fname, origin, recipe_id):
     """Meant to be run on a single recipe file."""
     parser = Parser()
     recipes = parser.parse(fname)
