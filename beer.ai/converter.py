@@ -8,6 +8,7 @@ import numpy as np
 import pandas as pd
 import random
 import re
+import sys
 
 from itertools import zip_longest
 from joblib import delayed, Parallel
@@ -88,8 +89,8 @@ def fill_ferm(d, ferm, core_vals):
         d["ferm_amount"] = safe_float(getattr(ferm, "amount", None))
         d["ferm_display_amount"] = clean_text(getattr(ferm, "display_amount", None))
         d["ferm_yield"] = safe_float(getattr(ferm, "_yield", None))*0.01
-        d["color"] = safe_float(getattr(ferm, "color", None))
-        d["potential"] = safe_float(getattr(ferm, "potential", None))
+        d["ferm_color"] = safe_float(getattr(ferm, "color", None))
+        d["ferm_potential"] = safe_float(getattr(ferm, "potential", None))
         # malt_scaled = <amount> * <yield> * <efficiency> / <boil_size>
         d["ferm_scaled"] = d["ferm_amount"] * d["ferm_yield"]\
                                 * core_vals["efficiency"] / core_vals["boil_size"]
@@ -127,12 +128,12 @@ def fill_yeast(d, yeast):
     if yeast is not None:
         d["yeast_name"] = clean_text(getattr(yeast, "name", None))
         d["yeast_laboratory"] = clean_text(getattr(yeast, "laboratory", None))
-        d["type"] = clean_text(getattr(yeast, "type", None))
-        d["form"] = clean_text(getattr(yeast, "form", None))
-        d["amount"] = safe_float(getattr(yeast, "amount", None))
-        d["product_id"] = getattr(yeast, "product_id", None)
-        d["attenuation"] = safe_float(getattr(yeast, "attenuation", None))
-        d["flocculation"] = clean_text(getattr(yeast, "flocculation", None))
+        d["yeast_type"] = clean_text(getattr(yeast, "type", None))
+        d["yeast_form"] = clean_text(getattr(yeast, "form", None))
+        d["yeast_amount"] = safe_float(getattr(yeast, "amount", None))
+        d["yeast_product_id"] = getattr(yeast, "product_id", None)
+        d["yeast_attenuation"] = safe_float(getattr(yeast, "attenuation", None))
+        d["yeast_flocculation"] = clean_text(getattr(yeast, "flocculation", None))
 
 
 def fill_misc(d, misc):
@@ -212,20 +213,19 @@ def convert_runner(fname, origin, recipe_id):
         parser = Parser()
         recipes = parser.parse(fname)
     except ParseError as e:
-        print(f"Failed to parse {fname}:")
-        print(e)
+        print(f"Failed to parse {fname}:", file=sys.stderr)
+        print(e, file=sys.stderr)
         return None
     try:
         recipe = recipes[0]
     except IndexError:
-        print(f"No recipe in {fname}")
+        print(f"No recipe in {fname}", file=sys.stderr)
         return None
     try:
         core_vals, ingredients = recipe_to_dicts(recipe, fname, recipe_id, origin)
     except Exception as e:
-        print(f"Failed {fname}:")
-        #print(e)
-        raise(e)
+        print(f"Failed {fname}:", file=sys.stderr)
+        print(e, file=sys.stderr)
         core_vals, ingredients = {}, []
     return core_vals, ingredients
 
