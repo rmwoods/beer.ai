@@ -264,6 +264,9 @@ def convert_a_bunch(filenames, n, jobs=N_CPUS):
             core_vals.append(result[0])
             ingredients.extend(result[1])
     
+    if len(core_vals) == 0:
+        print("No recipes parsed. Exiting.")
+        return
     df_core = pd.DataFrame(core_vals)
     df_core = df_core.set_index("id")
     
