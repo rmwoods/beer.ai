@@ -260,8 +260,9 @@ def convert_a_bunch(filenames, n, jobs=N_CPUS):
     core_vals = []
     ingredients = []
     for result in results:
-        core_vals.append(result[0])
-        ingredients.extend(result[1])
+        if result is not None:
+            core_vals.append(result[0])
+            ingredients.extend(result[1])
     
     df_core = pd.DataFrame(core_vals)
     df_core = df_core.set_index("id")
