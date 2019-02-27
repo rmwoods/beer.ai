@@ -210,7 +210,7 @@ def convert_runner(fname, origin, recipe_id):
     try:
         parser = Parser()
         recipes = parser.parse(fname)
-    except ParseError:
+    except ParseError as e:
         print(f"Failed to parse {fname}:")
         print(e)
     try:
