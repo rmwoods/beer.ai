@@ -12,6 +12,7 @@ import re
 from itertools import zip_longest
 from joblib import delayed, Parallel
 from pybeerxml import Parser
+from xml.etree.ElementTree import ParseError
 
 # From https://coderwall.com/p/xww5mq/two-letter-country-code-regex
 
@@ -206,8 +207,12 @@ def recipe_to_dicts(recipe, fname, recipe_id, origin):
 
 def convert_runner(fname, origin, recipe_id):
     """Meant to be run on a single recipe file."""
-    parser = Parser()
-    recipes = parser.parse(fname)
+    try:
+        parser = Parser()
+        recipes = parser.parse(fname)
+    except ParseError:
+        print(f"Failed to parse {fname}:")
+        print(e)
     try:
         recipe = recipes[0]
     except IndexError:
