@@ -253,7 +253,7 @@ def convert_a_bunch(filenames, n, jobs=N_CPUS):
     else:
         samples = recipe_files
 
-    results = Parallel(n_jobs=N_CPUS)(
+    results = Parallel(n_jobs=jobs)(
             delayed(convert_runner)(fname, origin, i)
             for i, (origin, fname) in enumerate(samples))
 
