@@ -228,23 +228,20 @@ def clean_cols(df):
     df["misc_amount_is_weight"] = df["misc_amount_is_weight"].fillna(False)
 
 
-def convert_a_bunch(path_to_recipes, n, jobs=N_CPUS):
+def convert_a_bunch(filenames, n, jobs=N_CPUS):
     """Convert n randomly chosen recipes. Currently for inspecting the output."""
 
-    if path_to_recipes is not None:
-        path = path_to_recipes
+    if filenames is not None:
+        recipe_files = [(f.split("/")[-2], f.split("/")[-1]) for f in filenames]
     else:
-        path = "recipes"
-
-    #recipe_files = glob.glob(path.join("recipes", "*.xml"))
-    # Note that this is a bit slower than just assuming the source directory
-    # has a certain structure of origin/*.xml and letting the OS glob the files
-    recipe_files = []
-    for dirpath, dirnames, filenames in os.walk(path):
-        for f in filenames:
-            if f.endswith("xml"):
-                origin = dirpath.split("/")[-1]
-                recipe_files.append(f)
+        # Note that this is a bit slower than just assuming the source directory
+        # has a certain structure of origin/*.xml and letting the OS glob the files
+        recipe_files = []
+        for dirpath, dirnames, filenames in os.walk(path):
+            for f in filenames:
+                if f.endswith("xml"):
+                    origin = dirpath.split("/")[-1]
+                    recipe_files.append((origin, f))
     if n != -1:
         samples = random.sample(recipe_files, n)
     else:
@@ -295,6 +292,12 @@ def _setup_argparser():
             "times to specify multiple recipes to convert."
     )
     parser.add_argument(
+        "-s",
+        "--source-dir",
+        default="./recipes",
+        help="Source directory to parse recipes from."
+    )
+    parser.add_argument(
         "-n",
         "--number",
         type=int,
@@ -317,4 +320,4 @@ if __name__ == "__main__":
     parser = _setup_argparser()
     args = parser.parse_args()
 
-    convert_a_bunch(args.filename, args.number, args.jobs)
+    convert_a_bunch(args.source_directory, args.filename, args.number, args.jobs)
