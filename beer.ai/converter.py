@@ -232,7 +232,7 @@ def convert_a_bunch(filenames, n, jobs=N_CPUS):
     """Convert n randomly chosen recipes. Currently for inspecting the output."""
 
     if filenames is not None:
-        recipe_files = [(f.split("/")[-2], f.split("/")[-1]) for f in filenames]
+        recipe_files = [(f.split("/")[-2], f) for f in filenames]
     else:
         # Note that this is a bit slower than just assuming the source directory
         # has a certain structure of origin/*.xml and letting the OS glob the files
