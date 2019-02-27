@@ -292,12 +292,6 @@ def _setup_argparser():
             "times to specify multiple recipes to convert."
     )
     parser.add_argument(
-        "-s",
-        "--source-dir",
-        default="./recipes",
-        help="Source directory to parse recipes from."
-    )
-    parser.add_argument(
         "-n",
         "--number",
         type=int,
@@ -320,4 +314,4 @@ if __name__ == "__main__":
     parser = _setup_argparser()
     args = parser.parse_args()
 
-    convert_a_bunch(args.source_directory, args.filename, args.number, args.jobs)
+    convert_a_bunch(args.filename, args.number, args.jobs)
