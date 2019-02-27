@@ -213,6 +213,7 @@ def convert_runner(fname, origin, recipe_id):
     except ParseError as e:
         print(f"Failed to parse {fname}:")
         print(e)
+        return None
     try:
         recipe = recipes[0]
     except IndexError:
