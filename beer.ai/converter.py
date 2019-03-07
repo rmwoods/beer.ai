@@ -126,7 +126,10 @@ def fill_hop(d, hop, core_vals):
 def fill_yeast(d, yeast):
     """Given a yeast class, add the appropriate fields to the dict d."""
     if yeast is not None:
-        d["yeast_name"] = clean_text(getattr(yeast, "name", None))
+        yeast_name = getattr(yeast, "name", None)
+        if yeast_name is not None:
+            yeast_name.replace(" yeast","")
+        d["yeast_name"] = clean_text(yeast_name)
         d["yeast_laboratory"] = clean_text(getattr(yeast, "laboratory", None))
         d["yeast_type"] = clean_text(getattr(yeast, "type", None))
         d["yeast_form"] = clean_text(getattr(yeast, "form", None))
