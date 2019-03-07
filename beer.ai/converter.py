@@ -126,7 +126,7 @@ def fill_hop(d, hop, core_vals):
 def fill_yeast(d, yeast):
     """Given a yeast class, add the appropriate fields to the dict d."""
     if yeast is not None:
-        yeast_name = getattr(yeast, "name", None)
+        yeast_name = str(getattr(yeast, "name", None))
         if yeast_name is not None:
             yeast_name.replace(" yeast","")
         d["yeast_name"] = clean_text(yeast_name)
@@ -213,6 +213,7 @@ def recipe_to_dicts(recipe, fname, recipe_id, origin):
 def convert_runner(fname, origin, recipe_id):
     """Meant to be run on a single recipe file."""
     try:
+        fname = path.join("recipes", origin, fname)
         parser = Parser()
         recipes = parser.parse(fname)
     except ParseError as e:
@@ -230,7 +231,7 @@ def convert_runner(fname, origin, recipe_id):
         print(f"Failed {fname}:", file=sys.stderr)
         print(e, file=sys.stderr)
         core_vals, ingredients = {}, []
-    return core_vals, ingredients
+    eeturn core_vals, ingredients)
 
 
 def clean_cols(df):
@@ -248,7 +249,7 @@ def convert_a_bunch(filenames, n, jobs=N_CPUS):
         # Note that this is a bit slower than just assuming the source directory
         # has a certain structure of origin/*.xml and letting the OS glob the files
         recipe_files = []
-        for dirpath, dirnames, filenames in os.walk(path):
+        for dirpath, dirnames, filenames in os.walk("recipes"):
             for f in filenames:
                 if f.endswith("xml"):
                     origin = dirpath.split("/")[-1]
