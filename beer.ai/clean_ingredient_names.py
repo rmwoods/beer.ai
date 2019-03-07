@@ -314,7 +314,7 @@ class Cleaner(Cmd):
         self.set_cur_ingred_target()
         print(f"Starting mapping for {self.cur_ingred_target}.")
         # Add the trivial mapping 
-        self.ingred_map[self.cur_ingred_target] = self.cur_ingred_target
+        # self.ingred_map[self.cur_ingred_target] = self.cur_ingred_target
         
         self.set_ingred_names_to_compare()
         self.cur_ingred_compare = self.ingred_names_to_compare.pop(0)
