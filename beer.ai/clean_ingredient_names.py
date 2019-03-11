@@ -47,7 +47,7 @@ class Cleaner(Cmd):
     def ingred_names_to_clean(self):
         """List of ingredients remaining to map."""
         try:
-            return self.df.loc[~self.df[self.hdf_col].isin(self.ingred_map.keys()), self.hdf_col].dropna()
+            return self.df.loc[~self.df[self.hdf_col].isin(self.ingred_map.keys()), self.hdf_col].dropna().str.replace(' yeast', '')
         except KeyError:
             return pd.DataFrame()
 
