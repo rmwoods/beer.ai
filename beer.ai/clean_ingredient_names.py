@@ -47,7 +47,9 @@ class Cleaner(Cmd):
     def ingred_names_to_clean(self):
         """List of ingredients remaining to map."""
         try:
-            return self.df.loc[~self.df[self.hdf_col].isin(self.ingred_map.keys()), self.hdf_col].dropna().str.replace(' yeast', '')
+            # Remove the word yeast from ingredient names, to help make yeast strain names more distinguishable
+            ingred_names_total = self.df[self.hdf_col].str.replace(' yeast', '')
+            return self.df.loc[~ingred_names_total.isin(self.ingred_map.keys()), self.hdf_col].dropna().str.replace(' yeast', '')
         except KeyError:
             return pd.DataFrame()
 
@@ -126,7 +128,7 @@ class Cleaner(Cmd):
         mapped_total = len(self.ingred_map.keys())
         to_clean_unique = self.ingred_names_to_clean.nunique()
         to_clean_total = len(self.ingred_names_to_clean)
-        dataset_unique = self.df[self.hdf_col].nunique()
+        dataset_unique = self.df[self.hdf_col].dropna().nunique()
         dataset_total = len(self.df[self.hdf_col].dropna())
         cleaned_unique = dataset_unique - to_clean_unique 
         cleaned_total = dataset_total - to_clean_total 
