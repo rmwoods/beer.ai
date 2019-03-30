@@ -167,6 +167,26 @@ class Cleaner(Cmd):
     def help_map(self):
         print("Begin the process of finding similar strings to the top unmapped ingredient.")
 
+    def do_remove_ingreds(self, arg):
+        """Remove entries in the ingred_map dictionary whose values are arg."""
+        if not self.category:
+            print("No category set. Set a category before removing ingreds.")
+            return
+        if not arg: 
+            print("No argument set. Specify a substring!")
+            return
+        if self.active:
+            print("Mapping is still active. Stop mapping before removing entries.")
+        if not self.active:
+            del_key_list = [k for k in self.ingred_map.keys() if self.ingred_map[k] == arg]
+            for i in del_key_list:
+                print(f"Removing ingred map entry: {i} -> {self.ingred_map[i]}")
+                del self.ingred_map[i]
+            save_map(self.map_name, self.ingred_map)
+    
+    def help_remove_ingreds(self):
+        print("Remove entries in the ingred_map dictionary whose values are arg.")
+        
     def do_y(self, arg):
         """Approve cur_ingred_compare to map to cur_ingred_target and advance
         to the next target ingredient."""
