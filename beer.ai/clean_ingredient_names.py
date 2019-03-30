@@ -325,7 +325,7 @@ class Cleaner(Cmd):
     def set_prompt_compare(self):
         """Set the prompt according to the current ingred_name and
         ingred_compare"""
-        self.prompt = self.cur_ingred_target + " == " + self.cur_ingred_compare
+        self.prompt = self.cur_ingred_target + " == " + self.cur_ingred_compare + " (" + str(self.ingred_names_to_clean.value_counts()[self.cur_ingred_compare]) + ")"
         self.prompt += PROMPT_SUFFIX
 
     def set_cur_ingred_target(self):
