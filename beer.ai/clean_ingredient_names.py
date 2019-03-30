@@ -94,18 +94,26 @@ class Cleaner(Cmd):
             print(f"Can't find {arg}.")
 
     def do_remain(self, arg):
-        """Print the remaining ingreds_names_similar or ingreds_to_clean"""
+        """Print the remaining ingreds_names_similar or ingreds_to_clean that contains the substring specified in the argument"""
         if self.active:
-            print(f"    Ingredient names left to compare: {self.ingred_names_to_compare}")
+            remain_list = [ele for ele in self.ingred_names_to_compare if arg in ele]
+            if arg:
+                print(f"Ingreds left to compare that contain {arg}: \n")
+            else:
+                print("Ingreds left to compare: \n")
+                
+            for ingred_name in remain_list:
+                print(f"{ingred_name}")
+            print("\n")
         else:
             unique = self.ingred_names_to_clean.value_counts()
             print(f"    {len(unique)} unique ingredient names left to clean.")
             print(f"Next 3 to clean (name, count):")
             print(f"{unique.head(3)}")
-
+                        
     def help_remain(self, arg):
-        print("Print the remaining ingreds_names_similar or ingreds_to_map")
-        
+        print("Print the remaining ingreds_names_similar or ingreds_to_map that contain the substring arg")
+    
     def do_impact(self, arg):
         """Print the number of times the current ingredient appears in the ingredients to clean.
         This is the number of records affected by the current mapping decision."""
