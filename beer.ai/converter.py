@@ -214,7 +214,6 @@ def recipe_to_dicts(recipe, fname, recipe_id, origin):
 def convert_runner(fname, origin, recipe_id):
     """Meant to be run on a single recipe file."""
     try:
-        fname = path.join("recipes", origin, fname)
         parser = Parser()
         recipes = parser.parse(fname)
     except ParseError as e:
@@ -232,7 +231,7 @@ def convert_runner(fname, origin, recipe_id):
         print(f"Failed {fname}:", file=sys.stderr)
         print(e, file=sys.stderr)
         core_vals, ingredients = {}, []
-    eeturn core_vals, ingredients)
+    return (core_vals, ingredients)
 
 
 def clean_cols(df):
@@ -254,7 +253,8 @@ def convert_a_bunch(filenames, n, jobs=N_CPUS):
             for f in filenames:
                 if f.endswith("xml"):
                     origin = dirpath.split("/")[-1]
-                    recipe_files.append((origin, f))
+                    fpath = path.join(dirpath, f)
+                    recipe_files.append((origin, fpath))
     if n != -1:
         samples = random.sample(recipe_files, n)
     else:
