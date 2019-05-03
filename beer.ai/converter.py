@@ -113,15 +113,18 @@ def fill_hop(d, hop, core_vals):
             d["hop_alpha"] /= 100.
         d["hop_form"] = clean_text(getattr(hop, "form", None))
         is_leaf = int(d["hop_form"] == LEAF_STR)
+        # From brewerstoad:
+        # ['boil', 'dry hop', 'first wort', 'whirlpool', 'mash', 'aroma']
+        d["hop_use"] = clean_text(getattr(hop, "use", None))
         d["hop_time"] = safe_float(getattr(hop, "time", None))
-        if d["hop_time"] > 0:
+        if d["hop_use"] in ["dry hop"]:
+            # dry_hop_scaled = <amount> / <batch_size>
+            d["hop_scaled"] = d["hop_amount"] / core_vals["batch_size"]
+        else:
             # hop_scaled  = <amount>*0.01*<alpha>*[1 - 0.1 * (leaf)]/<boil_size>
             d["hop_scaled"] = (d["hop_amount"]
                                * d["hop_alpha"] * (1 - 0.1 * is_leaf))\
                                / core_vals["boil_size"]
-        else:
-            # dry_hop_scaled = <amount> / <batch_size>
-            d["hop_scaled"] = d["hop_amount"] / core_vals["batch_size"]
 
 
 def fill_yeast(d, yeast):
@@ -238,6 +241,8 @@ def clean_cols(df):
     """For certain columns, fill in values to make writing succeed."""
     if "misc_amount_is_weight" in df.columns:
         df["misc_amount_is_weight"] = df["misc_amount_is_weight"].fillna(False)
+    if "yeast_product_id" in df.columns:
+        df["yeast_product_id"] = df["yeast_product_id"].astype(str)
 
 
 def convert_a_bunch(filenames, n, jobs=N_CPUS):
@@ -250,6 +255,8 @@ def convert_a_bunch(filenames, n, jobs=N_CPUS):
         # has a certain structure of origin/*.xml and letting the OS glob the files
         recipe_files = []
         for dirpath, dirnames, filenames in os.walk("recipes"):
+            if "brewersfriend" in dirpath:
+                continue
             for f in filenames:
                 if f.endswith("xml"):
                     origin = dirpath.split("/")[-1]
