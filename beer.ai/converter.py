@@ -24,6 +24,10 @@ LEAF_STR = "leaf"
 # Number of processors to use. -1 = all
 N_CPUS = -1
 
+CLEAN_STEPS = {
+    "misc_amount_is_weight": {"type":bool, "fill": False},
+    "yeast_product_id": {"type":str, "fill": np.nan}
+}
 
 def clean_text(text):
     """Standard method for cleaning text in our recipes. Any changes to parsing
@@ -238,11 +242,17 @@ def convert_runner(fname, origin, recipe_id):
 
 
 def clean_cols(df):
-    """For certain columns, fill in values to make writing succeed."""
-    if "misc_amount_is_weight" in df.columns:
-        df["misc_amount_is_weight"] = df["misc_amount_is_weight"].fillna(False)
-    if "yeast_product_id" in df.columns:
-        df["yeast_product_id"] = df["yeast_product_id"].astype(str)
+    """For any special case columns, clean the column to make sure NaNs and
+    dtypes are consistent from chunk to chunk.
+    """
+    for col in df.columns:
+        if col in CLEAN_STEPS.keys():
+            steps = CLEAN_STEPS[col]
+            step_keys = steps.keys()
+            if "fill" in step_keys:
+                df[col] = df[col].fillna(value=steps["fill"])
+            if "type" in step_keys:
+                df[col] = df[col].astype(steps["type"])
 
 
 def convert_a_bunch(filenames, n, jobs=N_CPUS):
@@ -255,8 +265,6 @@ def convert_a_bunch(filenames, n, jobs=N_CPUS):
         # has a certain structure of origin/*.xml and letting the OS glob the files
         recipe_files = []
         for dirpath, dirnames, filenames in os.walk("recipes"):
-            if "brewersfriend" in dirpath:
-                continue
             for f in filenames:
                 if f.endswith("xml"):
                     origin = dirpath.split("/")[-1]
