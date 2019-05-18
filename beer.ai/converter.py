@@ -25,8 +25,9 @@ LEAF_STR = "leaf"
 N_CPUS = -1
 
 CLEAN_STEPS = {
-    "misc_amount_is_weight": {"type":bool, "fill": False},
-    "yeast_product_id": {"type":str, "fill": np.nan}
+    "style_category": {"type": str},
+    "misc_amount_is_weight": {"type": bool, "fill": False},
+    "yeast_product_id": {"type": str, "fill": np.nan}
 }
 
 def clean_text(text):
