@@ -1,8 +1,5 @@
 import json
 
-with open("../supporting_files/styleguide-2015.json","r") as f:
-    styles = json.load(f)
-
 # Format is as follows:
 # styles = {"styleguide":
 #              {"class": 
@@ -27,5 +24,35 @@ with open("../supporting_files/styleguide-2015.json","r") as f:
 # global dict, and make sure that if "subcategory" exists, to do the same for
 # those.
 
-def category_to_dict(cat):
-    cat_id = cat.pop("id")
+def categories_to_dict(cat):
+    """Given a category, convert it to a more manageable dict keyed on style
+    id.
+    """
+
+    cat_id = cat.pop("id").lower()
+    data = {cat_id: {}}
+    for k,v in cat.items():
+        data[cat_id][k] = v
+    return data
+
+def main():
+
+    with open("../supporting_files/styleguide-2015.json","r") as f:
+        # Format specified in comments at top of script
+        styles = json.load(f)["styleguide"]["class"][0]["category"]
+
+    converted = {}
+    for style in styles:
+        # Remove sub categories list
+        sub_styles = style.pop("subcategory", [])
+        # Add parent style
+        converted.update(categories_to_dict(style))
+        # Go through sub styles and add those
+        for sub_style in sub_styles:
+            converted.update(categories_to_dict(sub_style))
+
+    with open("../styleguide.json","w") as f:
+        json.dump(converted, f)
+
+if __name__ == "__main__":
+    main()
