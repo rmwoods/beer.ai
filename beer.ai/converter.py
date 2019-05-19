@@ -21,6 +21,16 @@ RECIPES_DIR = "test_recipes"
 MODIFIER_RE = re.compile("\([\w ]*\)")
 LEAF_STR = "leaf"
 
+
+UNIT_RE = re.compile("(?P<amount>\d*\.?\d*) (?P<unit>[^a-z]g|kg|oz|lb)")
+TO_KG = {
+    "kg": 1,
+    "g": 0.001,
+    "oz": 0.0283495,
+    "lb": 0.453592,
+}
+EPS = 1e-7
+
 # Number of processors to use. -1 = all
 N_CPUS = -1
 
@@ -73,13 +83,12 @@ def safe_float(arg):
         return np.nan
 
 
-def add_to_dicts(to_df, key, value, dtype_dict):
-    """set to_df[key] = value, infer type of value, and set type[key] = type."""
-    to_df[key] = value
-    if isinstance(value, str):
-        dtype_dict[key] = "string"
-    else:
-        dtype_dict[key] = "float32"
+def extract_amount_unit(text):
+    if text is not None:
+        m = re.search(UNIT_RE, text)
+        if m is not None:
+            return float(m.group("amount")), m.group("unit").lower()
+    return None, None
 
 
 def fill_ferm(d, ferm, core_vals):
@@ -93,6 +102,10 @@ def fill_ferm(d, ferm, core_vals):
             d["ferm_origin"] = clean_text(getattr(ferm, "origin", None))
         d["ferm_amount"] = safe_float(getattr(ferm, "amount", None))
         d["ferm_display_amount"] = clean_text(getattr(ferm, "display_amount", None))
+        amount, unit = extract_amount_unit(getattr(ferm, "display_amount", None))
+        if amount is not None and unit is not None and \
+                (amount*TO_KG.get(unit, 1) - d["ferm_amount"]) > EPS:
+            d["ferm_amount"] = amount*TO_KG.get(unit, 1)
         d["ferm_yield"] = safe_float(getattr(ferm, "_yield", None))*0.01
         d["ferm_color"] = safe_float(getattr(ferm, "color", None))
         d["ferm_potential"] = safe_float(getattr(ferm, "potential", None))
@@ -113,6 +126,10 @@ def fill_hop(d, hop, core_vals):
             d["hop_origin"] = clean_text(getattr(hop, "origin", None))
         d["hop_amount"] = safe_float(getattr(hop, "amount", None))
         d["hop_display_amount"] = clean_text(getattr(hop, "display_amount", None))
+        amount, unit = extract_amount_unit(getattr(hop, "display_amount", None))
+        if amount is not None and unit is not None and \
+                (amount*TO_KG.get(unit, 1) - d["hop_amount"]) > EPS:
+            d["hop_amount"] = amount*TO_KG.get(unit, 1)
         d["hop_alpha"] = safe_float(getattr(hop, "alpha", None))
         if d["hop_alpha"] is not None:
             d["hop_alpha"] /= 100.
@@ -238,6 +255,7 @@ def convert_runner(fname, origin, recipe_id):
     except Exception as e:
         print(f"Failed {fname}:", file=sys.stderr)
         print(e, file=sys.stderr)
+        raise(e)
         core_vals, ingredients = {}, []
     return (core_vals, ingredients)
 
