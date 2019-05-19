@@ -255,7 +255,6 @@ def convert_runner(fname, origin, recipe_id):
     except Exception as e:
         print(f"Failed {fname}:", file=sys.stderr)
         print(e, file=sys.stderr)
-        raise(e)
         core_vals, ingredients = {}, []
     return (core_vals, ingredients)
 
