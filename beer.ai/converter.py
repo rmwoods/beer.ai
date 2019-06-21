@@ -22,7 +22,7 @@ MODIFIER_RE = re.compile("\([\w ]*\)")
 LEAF_STR = "leaf"
 
 
-UNIT_RE = re.compile("(?P<amount>\d*\.?\d*) (?P<unit>[^a-z]g|kg|oz|lb)")
+UNIT_RE = re.compile("(?P<amount>\d*\.?\d*) *(?P<unit>g|kg|oz|lb)")
 TO_KG = {
     "kg": 1,
     "g": 0.001,
@@ -104,7 +104,7 @@ def fill_ferm(d, ferm, core_vals):
         d["ferm_display_amount"] = clean_text(getattr(ferm, "display_amount", None))
         amount, unit = extract_amount_unit(getattr(ferm, "display_amount", None))
         if amount is not None and unit is not None and \
-                (amount*TO_KG.get(unit, 1) - d["ferm_amount"]) > EPS:
+                abs(amount*TO_KG.get(unit, 1) - d["ferm_amount"]) > EPS:
             d["ferm_amount"] = amount*TO_KG.get(unit, 1)
         d["ferm_yield"] = safe_float(getattr(ferm, "_yield", None))*0.01
         d["ferm_color"] = safe_float(getattr(ferm, "color", None))
@@ -128,7 +128,7 @@ def fill_hop(d, hop, core_vals):
         d["hop_display_amount"] = clean_text(getattr(hop, "display_amount", None))
         amount, unit = extract_amount_unit(getattr(hop, "display_amount", None))
         if amount is not None and unit is not None and \
-                (amount*TO_KG.get(unit, 1) - d["hop_amount"]) > EPS:
+                abs(amount*TO_KG.get(unit, 1) - d["hop_amount"]) > EPS:
             d["hop_amount"] = amount*TO_KG.get(unit, 1)
         d["hop_alpha"] = safe_float(getattr(hop, "alpha", None))
         if d["hop_alpha"] is not None:
