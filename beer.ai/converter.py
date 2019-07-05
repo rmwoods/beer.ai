@@ -110,10 +110,6 @@ def fill_ferm(d, ferm, core_vals):
         d["ferm_color"] = safe_float(getattr(ferm, "color", None))
         d["ferm_potential"] = safe_float(getattr(ferm, "potential", None))
 
-        # malt_scaled = <amount> * <yield> * <efficiency> / <boil_size>
-        d["ferm_scaled"] = d["ferm_amount"] * d["ferm_yield"]\
-                                * core_vals["efficiency"] / core_vals["boil_size"]
-
 
 def fill_hop(d, hop, core_vals):
     """Given a hop class, add the appropriate fields to the dict d."""
@@ -139,14 +135,6 @@ def fill_hop(d, hop, core_vals):
         # ['boil', 'dry hop', 'first wort', 'whirlpool', 'mash', 'aroma']
         d["hop_use"] = clean_text(getattr(hop, "use", None))
         d["hop_time"] = safe_float(getattr(hop, "time", None))
-        if d["hop_use"] in ["dry hop"]:
-            # dry_hop_scaled = <amount> / <batch_size>
-            d["hop_scaled"] = d["hop_amount"] / core_vals["batch_size"]
-        else:
-            # hop_scaled  = <amount>*0.01*<alpha>*[1 - 0.1 * (leaf)]/<boil_size>
-            d["hop_scaled"] = (d["hop_amount"]
-                               * d["hop_alpha"] * (1 - 0.1 * is_leaf))\
-                               / core_vals["boil_size"]
 
 
 def fill_yeast(d, yeast):
