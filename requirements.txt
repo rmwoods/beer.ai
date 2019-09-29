@@ -2,6 +2,7 @@ bs4
 joblib
 jupyter
 lxml
+matplotlib
 pandas
 pybeerxml
 requests

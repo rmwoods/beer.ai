@@ -94,18 +94,26 @@ class Cleaner(Cmd):
             print(f"Can't find {arg}.")
 
     def do_remain(self, arg):
-        """Print the remaining ingreds_names_similar or ingreds_to_clean"""
+        """Print the remaining ingreds_names_similar or ingreds_to_clean that contains the substring specified in the argument"""
         if self.active:
-            print(f"    Ingredient names left to compare: {self.ingred_names_to_compare}")
+            remain_list = [ele for ele in self.ingred_names_to_compare if arg in ele]
+            if arg:
+                print(f"Ingreds left to compare that contain {arg}: \n")
+            else:
+                print("Ingreds left to compare: \n")
+                
+            for ingred_name in remain_list:
+                print(f"{ingred_name}")
+            print("\n")
         else:
             unique = self.ingred_names_to_clean.value_counts()
             print(f"    {len(unique)} unique ingredient names left to clean.")
             print(f"Next 3 to clean (name, count):")
             print(f"{unique.head(3)}")
-
+                        
     def help_remain(self, arg):
-        print("Print the remaining ingreds_names_similar or ingreds_to_map")
-        
+        print("Print the remaining ingreds_names_similar or ingreds_to_map that contain the substring arg")
+    
     def do_impact(self, arg):
         """Print the number of times the current ingredient appears in the ingredients to clean.
         This is the number of records affected by the current mapping decision."""
@@ -159,6 +167,26 @@ class Cleaner(Cmd):
     def help_map(self):
         print("Begin the process of finding similar strings to the top unmapped ingredient.")
 
+    def do_remove_ingreds(self, arg):
+        """Remove entries in the ingred_map dictionary whose values are arg."""
+        if not self.category:
+            print("No category set. Set a category before removing ingreds.")
+            return
+        if not arg: 
+            print("No argument set. Specify a substring!")
+            return
+        if self.active:
+            print("Mapping is still active. Stop mapping before removing entries.")
+        if not self.active:
+            del_key_list = [k for k in self.ingred_map.keys() if self.ingred_map[k] == arg]
+            for i in del_key_list:
+                print(f"Removing ingred map entry: {i} -> {self.ingred_map[i]}")
+                del self.ingred_map[i]
+            save_map(self.map_name, self.ingred_map)
+    
+    def help_remove_ingreds(self):
+        print("Remove entries in the ingred_map dictionary whose values are arg.")
+        
     def do_y(self, arg):
         """Approve cur_ingred_compare to map to cur_ingred_target and advance
         to the next target ingredient."""
@@ -325,7 +353,7 @@ class Cleaner(Cmd):
     def set_prompt_compare(self):
         """Set the prompt according to the current ingred_name and
         ingred_compare"""
-        self.prompt = self.cur_ingred_target + " == " + self.cur_ingred_compare
+        self.prompt = self.cur_ingred_target + " == " + self.cur_ingred_compare + " (" + str(self.ingred_names_to_clean.value_counts()[self.cur_ingred_compare]) + ")"
         self.prompt += PROMPT_SUFFIX
 
     def set_cur_ingred_target(self):
