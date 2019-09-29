@@ -3,6 +3,11 @@ Given a recipe (or recipes), convert the recipe to a vector for use in training
 a model.
 """
 
+import numpy as np
+import pandas as pd
+import pickle
+
+
 CORE_COLS = ["batch_size", "boil_size", "boil_time", "efficiency"]
 ING_COLS = [
     "ferm_name",
@@ -11,6 +16,7 @@ ING_COLS = [
     "hop_name",
     "hop_amount",
     "hop_form",
+    "hop_alpha",
     "hop_use",
     "hop_time",
     "misc_name",
@@ -24,6 +30,7 @@ CATEGORIES = ["ferm", "hop", "yeast", "misc"]
 
 def recipe2vec(recipe):
     """Given a vocabulary and a recipe, convert that recipe to a vector."""
+    vec = pd.DataFrame(data=[], columns=["amt", "time"])
     pass
 
 
@@ -42,7 +49,8 @@ def scale_ferm(df):
     Replace ferm_scaled with the gravity contribution of the fermentable:
         g/L extract in the boil kettle.
     """
-    df['ferm_amount'] = df['ferm_amount'] * df['ferm_yield'] * df['efficiency'] / df['boil_size']
+    df["ferm_amount"] = df["ferm_amount"] * df["ferm_yield"] * df["efficiency"] / df["boil_size"]
+    df["ferm_amount"] = df["ferm_amount"].replace([np.inf, -np.inf], np.nan)
     return df
 
 
@@ -67,8 +75,9 @@ def scale_hop(df):
     df.loc[bh_cond, "hop_amount"]  =\
         df.loc[bh_cond, "hop_amount"] \
         * df.loc[bh_cond, "hop_alpha"] \
-        * (1 - 0.1 * int(df.loc[bh_cond, "hop_form"] == "leaf")) \
+        * (1 - 0.1 * (df.loc[bh_cond, "hop_form"] == "leaf").astype(int)) \
          / df.loc[bh_cond, "boil_size"]
+    df["hop_amount"] = df["hop_amount"].replace([np.inf, -np.inf], np.nan)
     return df
 
 
@@ -81,13 +90,16 @@ def scale_misc(df):
     Return a scaled misc quantity.
     """
     df['misc_amount'] = df['misc_amount'] / df['batch_size']
+    df["misc_amount"] = df["misc_amount"].replace([np.inf, -np.inf], np.nan)
+    return df
 
 
 def scale_quantities(df):
     """ Compute scaled ingredient quantities. """
     df = scale_ferm(df)
-    df = scale_hops(df)
+    df = scale_hop(df)
     df = scale_misc(df)
+    df = df.dropna(how="any", subset=["ferm_amount", "hop_amount", "misc_amount"])
     return df
 
 
@@ -126,11 +138,12 @@ def load_prepare_data(path):
 
 
 def main():
-    for df in load_data():
-        recipes = map_data()
-        recipe_vecs = recipes2vec(recipes)
-        return recipe_vecs
+    recipes = []
+    for df in load_prepare_data("all_recipes.h5"):
+        recipes.append(recipes2vec(df))
+    vecs = pd.concat(recipes)
+    vecs.to_hdf("recipe_vecs.h5","vecs")
 
 
 if __name__ == "__main__":
-    # main()
+    main()
