@@ -21,9 +21,24 @@ RECIPES_DIR = "test_recipes"
 MODIFIER_RE = re.compile("\([\w ]*\)")
 LEAF_STR = "leaf"
 
+
+UNIT_RE = re.compile("(?P<amount>\d*\.?\d*) *(?P<unit>g|kg|oz|lb)")
+TO_KG = {
+    "kg": 1,
+    "g": 0.001,
+    "oz": 0.0283495,
+    "lb": 0.453592,
+}
+EPS = 1e-7
+
 # Number of processors to use. -1 = all
 N_CPUS = -1
 
+CLEAN_STEPS = {
+    "style_category": {"type": str},
+    "misc_amount_is_weight": {"type": bool, "fill": False},
+    "yeast_product_id": {"type": str, "fill": np.nan}
+}
 
 def clean_text(text):
     """Standard method for cleaning text in our recipes. Any changes to parsing
@@ -68,13 +83,12 @@ def safe_float(arg):
         return np.nan
 
 
-def add_to_dicts(to_df, key, value, dtype_dict):
-    """set to_df[key] = value, infer type of value, and set type[key] = type."""
-    to_df[key] = value
-    if isinstance(value, str):
-        dtype_dict[key] = "string"
-    else:
-        dtype_dict[key] = "float32"
+def extract_amount_unit(text):
+    if text is not None:
+        m = re.search(UNIT_RE, text)
+        if m is not None:
+            return float(m.group("amount")), m.group("unit").lower()
+    return None, None
 
 
 def fill_ferm(d, ferm, core_vals):
@@ -88,13 +102,13 @@ def fill_ferm(d, ferm, core_vals):
             d["ferm_origin"] = clean_text(getattr(ferm, "origin", None))
         d["ferm_amount"] = safe_float(getattr(ferm, "amount", None))
         d["ferm_display_amount"] = clean_text(getattr(ferm, "display_amount", None))
+        amount, unit = extract_amount_unit(getattr(ferm, "display_amount", None))
+        if amount is not None and unit is not None and \
+                abs(amount*TO_KG.get(unit, 1) - d["ferm_amount"]) > EPS:
+            d["ferm_amount"] = amount*TO_KG.get(unit, 1)
         d["ferm_yield"] = safe_float(getattr(ferm, "_yield", None))*0.01
         d["ferm_color"] = safe_float(getattr(ferm, "color", None))
         d["ferm_potential"] = safe_float(getattr(ferm, "potential", None))
-
-        # malt_scaled = <amount> * <yield> * <efficiency> / <boil_size>
-        d["ferm_scaled"] = d["ferm_amount"] * d["ferm_yield"]\
-                                * core_vals["efficiency"] / core_vals["boil_size"]
 
 
 def fill_hop(d, hop, core_vals):
@@ -108,20 +122,19 @@ def fill_hop(d, hop, core_vals):
             d["hop_origin"] = clean_text(getattr(hop, "origin", None))
         d["hop_amount"] = safe_float(getattr(hop, "amount", None))
         d["hop_display_amount"] = clean_text(getattr(hop, "display_amount", None))
+        amount, unit = extract_amount_unit(getattr(hop, "display_amount", None))
+        if amount is not None and unit is not None and \
+                abs(amount*TO_KG.get(unit, 1) - d["hop_amount"]) > EPS:
+            d["hop_amount"] = amount*TO_KG.get(unit, 1)
         d["hop_alpha"] = safe_float(getattr(hop, "alpha", None))
         if d["hop_alpha"] is not None:
             d["hop_alpha"] /= 100.
         d["hop_form"] = clean_text(getattr(hop, "form", None))
         is_leaf = int(d["hop_form"] == LEAF_STR)
+        # From brewerstoad:
+        # ['boil', 'dry hop', 'first wort', 'whirlpool', 'mash', 'aroma']
+        d["hop_use"] = clean_text(getattr(hop, "use", None))
         d["hop_time"] = safe_float(getattr(hop, "time", None))
-        if d["hop_time"] > 0:
-            # hop_scaled  = <amount>*0.01*<alpha>*[1 - 0.1 * (leaf)]/<boil_size>
-            d["hop_scaled"] = (d["hop_amount"]
-                               * d["hop_alpha"] * (1 - 0.1 * is_leaf))\
-                               / core_vals["boil_size"]
-        else:
-            # dry_hop_scaled = <amount> / <batch_size>
-            d["hop_scaled"] = d["hop_amount"] / core_vals["batch_size"]
 
 
 def fill_yeast(d, yeast):
@@ -214,7 +227,6 @@ def recipe_to_dicts(recipe, fname, recipe_id, origin):
 def convert_runner(fname, origin, recipe_id):
     """Meant to be run on a single recipe file."""
     try:
-        fname = path.join("recipes", origin, fname)
         parser = Parser()
         recipes = parser.parse(fname)
     except ParseError as e:
@@ -232,13 +244,21 @@ def convert_runner(fname, origin, recipe_id):
         print(f"Failed {fname}:", file=sys.stderr)
         print(e, file=sys.stderr)
         core_vals, ingredients = {}, []
-    eeturn core_vals, ingredients)
+    return (core_vals, ingredients)
 
 
 def clean_cols(df):
-    """For certain columns, fill in values to make writing succeed."""
-    if "misc_amount_is_weight" in df.columns:
-        df["misc_amount_is_weight"] = df["misc_amount_is_weight"].fillna(False)
+    """For any special case columns, clean the column to make sure NaNs and
+    dtypes are consistent from chunk to chunk.
+    """
+    for col in df.columns:
+        if col in CLEAN_STEPS.keys():
+            steps = CLEAN_STEPS[col]
+            step_keys = steps.keys()
+            if "fill" in step_keys:
+                df[col] = df[col].fillna(value=steps["fill"])
+            if "type" in step_keys:
+                df[col] = df[col].astype(steps["type"])
 
 
 def convert_a_bunch(filenames, n, jobs=N_CPUS):
@@ -254,7 +274,8 @@ def convert_a_bunch(filenames, n, jobs=N_CPUS):
             for f in filenames:
                 if f.endswith("xml"):
                     origin = dirpath.split("/")[-1]
-                    recipe_files.append((origin, f))
+                    fpath = path.join(dirpath, f)
+                    recipe_files.append((origin, fpath))
     if n != -1:
         samples = random.sample(recipe_files, n)
     else:
