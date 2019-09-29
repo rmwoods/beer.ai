@@ -33,22 +33,62 @@ def recipes2vec(recipes):
         recipe2vec(rec)
 
 
-def scale_ferm():
-    pass
+def scale_ferm(df):
+    """
+    (DataFrame) -> float
+    Compute the scaled fermentable quantity.
+
+    Take as input a subset of the ing DataFrame, joined to the core DataFrame.
+    Replace ferm_scaled with the gravity contribution of the fermentable:
+        g/L extract in the boil kettle.
+    """
+    df['ferm_amount'] = df['ferm_amount'] * df['ferm_yield'] * df['efficiency'] / df['boil_size']
+    return df
 
 
-def scale_misc():
-    pass
+def scale_hop(df):
+    """
+    (DataFrame) -> float
+    Compute the scaled hop quantity.
+
+    Take as input a subset of the ing DataFrame, joined to the core DataFrame.
+    Return a different quantity depending on the use:
+        Dry hops:  dry hopping rate
+            grams of dry hops per litre in the batch
+        Boil hops: AUU
+            grams of alpha acids per litre in the boil kettle
+    """
+    # Dry hops
+    dh_cond = (df["hop_use"] == "dry hop")
+    df.loc[dh_cond, "hop_amount"] = df.loc[dh_cond, "hop_amount"] / df.loc[dh_cond, "batch_size"]
+
+    # Every other hop use
+    bh_cond = (df["hop_use"] != "dry hop")
+    df.loc[bh_cond, "hop_amount"]  =\
+        df.loc[bh_cond, "hop_amount"] \
+        * df.loc[bh_cond, "hop_alpha"] \
+        * (1 - 0.1 * int(df.loc[bh_cond, "hop_form"] == "leaf")) \
+         / df.loc[bh_cond, "boil_size"]
+    return df
 
 
-def scale_hop(style):
-    pass
+def scale_misc(df):
+    """
+    (DataFrame) -> float
+    Compute the scaled misc quantity.
+
+    Take as input a subset of the ing DataFrame, joined to the core DataFrame.
+    Return a scaled misc quantity.
+    """
+    df['misc_amount'] = df['misc_amount'] / df['batch_size']
 
 
 def scale_quantities(df):
-    scale_ferm(df)
-    scale_hops(df)
-    scale_misc(df)
+    """ Compute scaled ingredient quantities. """
+    df = scale_ferm(df)
+    df = scale_hops(df)
+    df = scale_misc(df)
+    return df
 
 
 def apply_map(df):
@@ -93,4 +133,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    # main()
