@@ -25,19 +25,26 @@ ING_COLS = [
     "yeast_name",
 ]
 CATEGORIES = ["ferm", "hop", "yeast", "misc"]
+VOCAB_FILE = "vocab.pickle"
+# Number of extra features to add to vector representing non-ingredients, e.g. boil_time
+N_EXTRA_FEATURES = 1
 
-
-
-def recipe2vec(recipe):
-    """Given a vocabulary and a recipe, convert that recipe to a vector."""
-    vec = pd.DataFrame(data=[], columns=["amt", "time"])
-    pass
+with open(VOCAB_FILE, "rb") as f:
+    ING2INT = pickle.load(f)
+    INT2ING = {v:k for k,v in ING2INT.items()}
 
 
 def recipes2vec(recipes):
     """Given a list of recipes, convert them all to vectors."""
-    for rec in recipes:
-        recipe2vec(rec)
+    data = np.zeros((len(recipes), len(ING2INT) + N_EXTRA_FEATURES))
+    #vec = pd.DataFrame(data=data, columns=range(len(ing2int)) + N_EXTRA_FEATURES, index=range(len(recipes)))
+    name_cols = [cat + "_name" for cat in CATEGORIES]
+    recipes[name_cols] = recipes[name_cols].replace(ING2INT)
+    inds = recipes[name_cols].T.values
+    # 1. set rows/cols to 1 based on above
+    # 2. multiply these values by amount
+    # 3. Add 1 to hop columns
+    # 4. Multiply hop columns by hop_time
 
 
 def scale_ferm(df):
@@ -99,6 +106,7 @@ def scale_quantities(df):
     df = scale_ferm(df)
     df = scale_hop(df)
     df = scale_misc(df)
+    # XXX - check here that we're not dropping ALL rows after the first
     df = df.dropna(how="any", subset=["ferm_amount", "hop_amount", "misc_amount"])
     return df
 
@@ -118,6 +126,20 @@ def apply_map(df):
     return good
 
 
+def finalize_names(df):
+    """For each ingredient category, change the names to the style that is used
+    inside of the vocabulary."""
+
+    for category in CATEGORIES:
+        col = f"{category}_name"
+        prepend = category + "_"
+        df[col] = prepend + df[col].astype(str)
+        if category == "hop":
+            append = df["hop_use"] == "dry hop" 
+            df.loc[append, col] = df.loc[append, col].astype(str) + "_dry"
+    return df
+
+
 def load_prepare_data(path):
     """Given a path to the all_recipes HDF, load in the data, replace the
     ingredient names with standard names from the ingredient maps and then
@@ -134,6 +156,7 @@ def load_prepare_data(path):
             df = core.join(ings)
             df = apply_map(df)
             df = scale_quantities(df)
+            df = finalize_names(df)
             yield df
 
 
