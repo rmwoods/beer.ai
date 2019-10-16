@@ -107,7 +107,7 @@ def scale_quantities(df):
     df = scale_hop(df)
     df = scale_misc(df)
     # XXX - check here that we're not dropping ALL rows after the first
-    df = df.dropna(how="any", subset=["ferm_amount", "hop_amount", "misc_amount"])
+    df = df.dropna(how="all", subset=["ferm_amount", "hop_amount", "misc_amount"])
     return df
 
 
@@ -116,14 +116,14 @@ def apply_map(df):
     and ING_COLS), use the ingredient maps to replace names with standard names
     for use in recipe2vec.
     """
-    good = df
     for category in CATEGORIES:
         map_file = f"{category}map.pickle"
         with open(map_file, "rb") as f:
             ing_map = pickle.load(f)
-        good = good[good[f"{category}_name"].isin(ing_map.keys())]
-        good[f"{category}_name"] = good[f"{category}_name"].replace(ing_map)
-    return good
+        in_map = df[f"{category}_name"].isin(ing_map.keys())
+        df.loc[~in_map, f"{category}_name"] = np.nan
+        df.loc[in_map, f"{category}_name"] = df.loc[in_map, f"{category}_name"].replace(ing_map)
+    return df
 
 
 def finalize_names(df):
