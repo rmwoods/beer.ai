@@ -40,7 +40,10 @@ def recipes2vec(recipes):
     #vec = pd.DataFrame(data=data, columns=range(len(ing2int)) + N_EXTRA_FEATURES, index=range(len(recipes)))
     name_cols = [cat + "_name" for cat in CATEGORIES]
     recipes[name_cols] = recipes[name_cols].replace(ING2INT)
-    inds = recipes[name_cols].T.values
+    gb = recipes[name_cols].groupby(recipes.index)
+    # inds = recipes[name_cols].groupby(recipes.index).apply(lambda group: group.values.flatten())
+    # OR gb.apply(lambda x: pd.Series(x.values.flatten()).dropna().astype(int).values)
+    # data[0,inds[0]] = 1
     # 1. set rows/cols to 1 based on above
     # 2. multiply these values by amount
     # 3. Add 1 to hop columns
@@ -133,9 +136,10 @@ def finalize_names(df):
     for category in CATEGORIES:
         col = f"{category}_name"
         prepend = category + "_"
-        df[col] = prepend + df[col].astype(str)
+        nans = df[col].isna()
+        df.loc[~nans, col] = prepend + df.loc[~nans, col].astype(str)
         if category == "hop":
-            append = df["hop_use"] == "dry hop" 
+            append = (df["hop_use"] == "dry hop")&(~df["hop_name"].isna())
             df.loc[append, col] = df.loc[append, col].astype(str) + "_dry"
     return df
 
