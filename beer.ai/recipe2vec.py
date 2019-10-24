@@ -40,10 +40,28 @@ def recipes2vec(recipes):
     #vec = pd.DataFrame(data=data, columns=range(len(ing2int)) + N_EXTRA_FEATURES, index=range(len(recipes)))
     name_cols = [cat + "_name" for cat in CATEGORIES]
     recipes[name_cols] = recipes[name_cols].replace(ING2INT)
-    gb = recipes[name_cols].groupby(recipes.index)
-    # inds = recipes[name_cols].groupby(recipes.index).apply(lambda group: group.values.flatten())
+    # Separate each column into an Series in a list
+    list_of_cols = []
+    for col in name_cols:
+        list_of_cols.append(recipes[col])
+
+    # Concatenate the columns together and drop NaNs
+    rec_concat = pd.concat(list_of_cols)
+    rec_concat = rec_concat.dropna()
+
+    # Set values in the numpy array to 1 depending on the [index, value] pairs in rec_concat
+    data_row_ind = rec_concat.index.astype(int) 
+    data_col_ind = rec_concat.values.astype(int)
+    data[data_row_ind, data_col_ind] = 1
+
+    # TODO: Don't forget to address boil time as the N_EXTRA_FEATURE
+    # gb = recipes[name_cols].groupby(recipes.index)
+    # inds = gb.apply(lambda g: g.values.flatten()[~np.isnan(g.values.flatten())])
+    
+    print('Hello!')
     # OR gb.apply(lambda x: pd.Series(x.values.flatten()).dropna().astype(int).values)
     # data[0,inds[0]] = 1
+
     # 1. set rows/cols to 1 based on above
     # 2. multiply these values by amount
     # 3. Add 1 to hop columns
