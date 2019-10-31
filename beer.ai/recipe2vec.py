@@ -39,20 +39,31 @@ def recipes2vec(recipes):
     data = np.zeros((len(recipes), len(ING2INT) + N_EXTRA_FEATURES))
     #vec = pd.DataFrame(data=data, columns=range(len(ing2int)) + N_EXTRA_FEATURES, index=range(len(recipes)))
     name_cols = [cat + "_name" for cat in CATEGORIES]
+    amount_cols = [cat + "_amount" for cat in CATEGORIES]
+
     recipes[name_cols] = recipes[name_cols].replace(ING2INT)
     # Separate each column into an Series in a list
-    list_of_cols = []
-    for col in name_cols:
-        list_of_cols.append(recipes[col])
+    list_of_name_cols = []
+    list_of_amount_cols = []
+    for name_col, amount_col in zip(name_cols, amount_cols):
+        # Make amount NaN when name is NaN
+        recipes[amount_col] *= (~recipes[name_col].isna()).astype(float)
+        # Captures the cases where:
+        #    The amount is 0 in the orignal recipe
+        #    The name is not in the map (from the previous line)
+        recipes.loc[recipes[amount_col] == 0, [name_col, amount_col]] = np.nan
+        
+        list_of_name_cols.append(recipes[name_col].dropna().astype(int))
+        list_of_amount_cols.append(recipes[amount_col].dropna())
 
     # Concatenate the columns together and drop NaNs
-    rec_concat = pd.concat(list_of_cols)
-    rec_concat = rec_concat.dropna()
+    name_concat = pd.concat(list_of_name_cols)
+    amount_concat = pd.concat(list_of_amount_cols)
 
+    # TODO: Currently this fails! Need to track down which ingredient record leads name_concat and amount_concat to differ 
+    assert len(name_concat) == len(amount_concat), "Different number of names and amounts of ingredients"
     # Set values in the numpy array to 1 depending on the [index, value] pairs in rec_concat
-    data_row_ind = rec_concat.index.astype(int) 
-    data_col_ind = rec_concat.values.astype(int)
-    data[data_row_ind, data_col_ind] = 1
+    data[name_concat.index, name_concat.values] = amount_concat.values
 
     # TODO: Don't forget to address boil time as the N_EXTRA_FEATURE
     # gb = recipes[name_cols].groupby(recipes.index)
@@ -122,11 +133,21 @@ def scale_misc(df):
     return df
 
 
+def scale_yeast(df): 
+    """
+    (DataFrame) -> DataFrame
+    Return a DataFrame with a new column yeast_amount = 1
+    """
+    df.loc[~df['yeast_name'].isna(), 'yeast_amount'] = 1
+    return df
+
+
 def scale_quantities(df):
     """ Compute scaled ingredient quantities. """
     df = scale_ferm(df)
     df = scale_hop(df)
     df = scale_misc(df)
+    df = scale_yeast(df)
     # XXX - check here that we're not dropping ALL rows after the first
     df = df.dropna(how="all", subset=["ferm_amount", "hop_amount", "misc_amount"])
     return df
