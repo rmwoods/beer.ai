@@ -40,6 +40,7 @@ def recipes2vec(recipes):
     name_cols = [cat + "_name" for cat in CATEGORIES]
     amount_cols = [cat + "_amount" for cat in CATEGORIES]
 
+    # Turn mapped ingredients to their integer labels
     recipes[name_cols] = recipes[name_cols].replace(ING2INT)
     # Separate each column into a Series, so we can concat them all into a vectpr
     list_of_name_cols = []
@@ -65,7 +66,11 @@ def recipes2vec(recipes):
     # Form our vectors!
     data[name_concat.index.astype(int), name_concat.values.astype(int)] = amount_concat.values
 
-    # TODO: Don't forget to address boil time as the N_EXTRA_FEATURE
+    # Add the last column: boil time
+    boil_times = recipes['boil_time']
+    boil_times = boil_times.loc[~boil_times.index.duplicated(keep='first')]
+    data[boil_times.index.astype(int), -1] = boil_times.values
+
     return data
 
 
