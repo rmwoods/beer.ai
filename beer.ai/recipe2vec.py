@@ -37,32 +37,33 @@ with open(VOCAB_FILE, "rb") as f:
 def recipes2vec(recipes):
     """Given a list of recipes, convert them all to vectors."""
     data = np.zeros((len(recipes), len(ING2INT) + N_EXTRA_FEATURES))
-    #vec = pd.DataFrame(data=data, columns=range(len(ing2int)) + N_EXTRA_FEATURES, index=range(len(recipes)))
     name_cols = [cat + "_name" for cat in CATEGORIES]
     amount_cols = [cat + "_amount" for cat in CATEGORIES]
 
     recipes[name_cols] = recipes[name_cols].replace(ING2INT)
-    # Separate each column into an Series in a list
+    # Separate each column into a Series, so we can concat them all into a vectpr
     list_of_name_cols = []
     list_of_amount_cols = []
+    # Drop ingredients that are unmapped, or have no amount
     for name_col, amount_col in zip(name_cols, amount_cols):
-        # Make amount NaN when name is NaN
+        # Make sure both name and amount are NaN when:
+        #   The amount is NaN
+        #   The name is NaN
+        #   The amount is 0 
         recipes.loc[recipes[amount_col].isna(), name_col] = np.nan
-        recipes[amount_col] *= (~recipes[name_col].isna()).astype(float)
-        # Captures the cases where:
-        #    The amount is 0 in the orignal recipe
-        #    The name is not in the map (from the previous line)
+        recipes.loc[recipes[name_col].isna(), amount_col] = np.nan
         recipes.loc[recipes[amount_col] == 0, [name_col, amount_col]] = np.nan
         
-        list_of_name_cols.append(recipes[name_col].dropna().astype(int))
+        list_of_name_cols.append(recipes[name_col].dropna())
         list_of_amount_cols.append(recipes[amount_col].dropna())
 
-    # Concatenate the columns together and drop NaNs
+    # Concatenate the columns together 
     name_concat = pd.concat(list_of_name_cols)
     amount_concat = pd.concat(list_of_amount_cols)
 
     assert len(name_concat) == len(amount_concat), "Different number of names and amounts of ingredients"
-    data[name_concat.index.astype(int), name_concat.values] = amount_concat.values
+    # Form our vectors!
+    data[name_concat.index.astype(int), name_concat.values.astype(int)] = amount_concat.values
 
     # TODO: Don't forget to address boil time as the N_EXTRA_FEATURE
     return data
