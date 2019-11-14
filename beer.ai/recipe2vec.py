@@ -47,6 +47,7 @@ def recipes2vec(recipes):
     list_of_amount_cols = []
     for name_col, amount_col in zip(name_cols, amount_cols):
         # Make amount NaN when name is NaN
+        recipes.loc[recipes[amount_col].isna(), name_col] = np.nan
         recipes[amount_col] *= (~recipes[name_col].isna()).astype(float)
         # Captures the cases where:
         #    The amount is 0 in the orignal recipe
@@ -60,23 +61,11 @@ def recipes2vec(recipes):
     name_concat = pd.concat(list_of_name_cols)
     amount_concat = pd.concat(list_of_amount_cols)
 
-    # TODO: Currently this fails! Need to track down which ingredient record leads name_concat and amount_concat to differ 
     assert len(name_concat) == len(amount_concat), "Different number of names and amounts of ingredients"
-    # Set values in the numpy array to 1 depending on the [index, value] pairs in rec_concat
-    data[name_concat.index, name_concat.values] = amount_concat.values
+    data[name_concat.index.astype(int), name_concat.values] = amount_concat.values
 
     # TODO: Don't forget to address boil time as the N_EXTRA_FEATURE
-    # gb = recipes[name_cols].groupby(recipes.index)
-    # inds = gb.apply(lambda g: g.values.flatten()[~np.isnan(g.values.flatten())])
-    
-    print('Hello!')
-    # OR gb.apply(lambda x: pd.Series(x.values.flatten()).dropna().astype(int).values)
-    # data[0,inds[0]] = 1
-
-    # 1. set rows/cols to 1 based on above
-    # 2. multiply these values by amount
-    # 3. Add 1 to hop columns
-    # 4. Multiply hop columns by hop_time
+    return data
 
 
 def scale_ferm(df):
