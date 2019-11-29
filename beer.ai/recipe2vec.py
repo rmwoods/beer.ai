@@ -7,6 +7,12 @@ import numpy as np
 import pandas as pd
 import pickle
 
+# TO DO:
+#   - Change recipe2vec to work with dataframes (why did we use numpy again?)
+#   - Make sure recipe id is preserved with each row (as the index)
+#   - Fix crash: "index 5416 is out of bounds for axis 0 with size 5416"
+#   - Ensure boil times are matched up properly with its recipe
+
 
 CORE_COLS = ["batch_size", "boil_size", "boil_time", "efficiency"]
 ING_COLS = [
@@ -199,11 +205,11 @@ def load_prepare_data(path):
 
 
 def main():
-    recipes = []
-    for df in load_prepare_data("all_recipes.h5"):
-        recipes.append(recipes2vec(df))
-    vecs = pd.concat(recipes)
-    vecs.to_hdf("recipe_vecs.h5","vecs")
+
+    with pd.HDFStore("recipe_vecs.h5","w") as store:
+        for df in load_prepare_data("all_recipes.h5"):
+            recipes = pd.DataFrame(recipes2vec(df))
+            store.append("/vecs", recipes, format="table")
 
 
 if __name__ == "__main__":
