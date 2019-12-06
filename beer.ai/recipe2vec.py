@@ -164,7 +164,7 @@ def apply_map(df):
         with open(map_file, "rb") as f:
             ing_map = pickle.load(f)
         in_map = df[f"{category}_name"].isin(ing_map.keys())
-        df.loc[~in_map, f"{category}_name"] = np.nan
+        df = df.drop(df.loc[~in_map].index, axis=0)
         df.loc[in_map, f"{category}_name"] = df.loc[in_map, f"{category}_name"].replace(ing_map)
     return df
 
