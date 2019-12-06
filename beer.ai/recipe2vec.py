@@ -8,10 +8,7 @@ import pandas as pd
 import pickle
 
 # TO DO:
-#   - Change recipe2vec to work with dataframes (why did we use numpy again?)
-#   - Make sure recipe id is preserved with each row (as the index)
-#   - Fix crash: "index 5416 is out of bounds for axis 0 with size 5416"
-#   - Ensure boil times are matched up properly with its recipe
+#   - fix boil time value set
 
 
 CORE_COLS = ["batch_size", "boil_size", "boil_time", "efficiency"]
@@ -42,46 +39,48 @@ with open(VOCAB_FILE, "rb") as f:
 
 def recipes2vec(recipes):
     """Given a list of recipes, convert them all to vectors."""
-    data = np.zeros((len(recipes), len(ING2INT) + N_EXTRA_FEATURES))
-    name_cols = [cat + "_name" for cat in CATEGORIES]
-    amount_cols = [cat + "_amount" for cat in CATEGORIES]
+
+    name_cols = ["recipe_id"] + [cat + "_name" for cat in CATEGORIES]
+    amount_cols = ["recipe_id"] + [cat + "_amount" for cat in CATEGORIES]
 
     # Turn mapped ingredients to their integer labels
     recipes[name_cols] = recipes[name_cols].replace(ING2INT)
-    # Separate each column into a Series, so we can concat them all into a vectpr
-    list_of_name_cols = []
-    list_of_amount_cols = []
-    # Drop ingredients that are unmapped, or have no amount
-    for name_col, amount_col in zip(name_cols, amount_cols):
-        # Make sure both name and amount are NaN when:
-        #   The amount is NaN
-        #   The name is NaN
-        #   The amount is 0
-        recipes.loc[recipes[amount_col].isna(), name_col] = np.nan
-        recipes.loc[recipes[name_col].isna(), amount_col] = np.nan
-        recipes.loc[recipes[amount_col] == 0, [name_col, amount_col]] = np.nan
 
-        list_of_name_cols.append(recipes[name_col].dropna())
-        list_of_amount_cols.append(recipes[amount_col].dropna())
+    flat_names = (
+        recipes[name_cols]
+        .melt("recipe_id")
+        .drop("variable", axis=1)
+        .rename({"value": "name"}, axis=1)
+    )
+    flat_amounts = (
+        recipes[amount_cols]
+        .melt("recipe_id")
+        .drop("variable", axis=1)
+        .rename({"value": "amount"}, axis=1)
+    )
+    flat_recipes = flat_names.merge(
+        flat_amounts, on="recipe_id", left_index=True, right_index=True
+    )
+    # This avoids multiple additions of the same ingredient, which this
+    # simple model can't handle
+    flat_recipes = flat_recipes.groupby(["recipe_id", "name"]).sum().reset_index()
+    recipes_vec = flat_recipes.pivot(index="recipe_id", columns="name", values="amount")
 
-    # Concatenate the columns together
-    name_concat = pd.concat(list_of_name_cols)
-    amount_concat = pd.concat(list_of_amount_cols)
-
-    assert len(name_concat) == len(
-        amount_concat
-    ), "Different number of names and amounts of ingredients"
-    # Form our vectors!
-    data[
-        name_concat.index.astype(int), name_concat.values.astype(int)
-    ] = amount_concat.values
+    # ensure we have all columns
+    cols = set(INT2ING.keys())
+    missing = list(cols.difference(recipes_vec.columns))
+    recipes_vec = recipes_vec.reindex(
+        columns=sorted(recipes_vec.columns.tolist() + missing)
+    ).fillna(0)
 
     # Add the last column: boil time
-    boil_times = recipes["boil_time"]
-    boil_times = boil_times.loc[~boil_times.index.duplicated(keep="first")]
-    data[boil_times.index.astype(int), -1] = boil_times.values
+    recipes_vec["boil_time"] = 0
 
-    return data
+    recipes_vec.loc["boil_time"] = recipes[
+        ~recipes[recipes_vec.index].index.duplicated(), "boil_time"
+    ]
+
+    return recipes_vec
 
 
 def scale_ferm(df):
@@ -158,7 +157,6 @@ def scale_quantities(df):
     df = scale_hop(df)
     df = scale_misc(df)
     df = scale_yeast(df)
-    # XXX - check here that we're not dropping ALL rows after the first
     df = df.dropna(how="all", subset=["ferm_amount", "hop_amount", "misc_amount"])
     return df
 
@@ -212,6 +210,7 @@ def load_prepare_data(path):
             df = apply_map(df)
             df = scale_quantities(df)
             df = finalize_names(df)
+            df["recipe_id"] = df.index
             yield df
 
 
