@@ -7,10 +7,6 @@ import numpy as np
 import pandas as pd
 import pickle
 
-# TO DO:
-#   - fix boil time value set
-
-
 CORE_COLS = ["batch_size", "boil_size", "boil_time", "efficiency"]
 ING_COLS = [
     "ferm_name",
@@ -29,8 +25,6 @@ ING_COLS = [
 ]
 CATEGORIES = ["ferm", "hop", "yeast", "misc"]
 VOCAB_FILE = "vocab.pickle"
-# Number of extra features to add to vector representing non-ingredients, e.g. boil_time
-N_EXTRA_FEATURES = 1
 
 with open(VOCAB_FILE, "rb") as f:
     ING2INT = pickle.load(f)
@@ -76,8 +70,8 @@ def recipes2vec(recipes):
     # Add the last column: boil time
     recipes_vec["boil_time"] = 0
 
-    recipes_vec.loc["boil_time"] = recipes[
-        ~recipes[recipes_vec.index].index.duplicated(), "boil_time"
+    recipes_vec["boil_time"] = recipes.loc[
+        ~recipes.loc[recipes_vec.index].index.duplicated(), "boil_time"
     ]
 
     return recipes_vec
