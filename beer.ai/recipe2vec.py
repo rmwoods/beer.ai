@@ -6,6 +6,7 @@ a model.
 import numpy as np
 import pandas as pd
 import pickle
+from tqdm import tqdm
 
 CORE_COLS = ["batch_size", "boil_size", "boil_time", "efficiency"]
 ING_COLS = [
@@ -23,8 +24,13 @@ ING_COLS = [
     "misc_amount",
     "yeast_name",
 ]
+RECIPE_FILE = "all_recipes.h5"
+CORE_TABLE = "/core"
+ING_TABLE = "/ingredients"
+VECTOR_FILE = "recipe_vecs.h5"
 CATEGORIES = ["ferm", "hop", "yeast", "misc"]
 VOCAB_FILE = "vocab.pickle"
+CHUNK_SIZE = 10000
 
 with open(VOCAB_FILE, "rb") as f:
     ING2INT = pickle.load(f)
@@ -192,11 +198,11 @@ def load_prepare_data(path):
     ingredient names with standard names from the ingredient maps and then
     scale quantities to boil/batch sizes as appropriate."""
     with pd.HDFStore(path, "r") as store:
-        for core in store.select("/core", columns=CORE_COLS, chunksize=1000):
+        for core in store.select(CORE_TABLE, columns=CORE_COLS, chunksize=CHUNK_SIZE):
             i_start = core.index[0]
             i_end = core.index[-1]
             ings = store.select(
-                "ingredients",
+                ING_TABLE,
                 columns=ING_COLS,
                 where=f"index >= {i_start} and index <= {i_end}",
             )
@@ -208,10 +214,24 @@ def load_prepare_data(path):
             yield df
 
 
+def get_number_lines(path, table):
+    """Return the number of lines in the HDF to process."""
+    with pd.HDFStore(path, "r") as store:
+        storer = store.get_storer(table)
+        nrows = storer.nrows
+    return nrows
+
+
 def main():
 
-    with pd.HDFStore("recipe_vecs.h5", "w") as store:
-        for df in load_prepare_data("all_recipes.h5"):
+    with pd.HDFStore(VECTOR_FILE, "w", complevel=5, complib="blosc") as store:
+        nrows = get_number_lines(RECIPE_FILE, CORE_TABLE)
+        for df in tqdm(
+            load_prepare_data(RECIPE_FILE),
+            desc="Chunk",
+            total=nrows / CHUNK_SIZE,
+            disable=None,
+        ):
             recipes = pd.DataFrame(recipes2vec(df))
             store.append("/vecs", recipes, format="table")
 
