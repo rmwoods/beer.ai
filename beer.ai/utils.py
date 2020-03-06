@@ -1,6 +1,7 @@
 import json
 import pandas as pd
 
+
 def get_style_guide():
     with open("styleguide.json") as f:
         style_guide = json.load(f)
@@ -75,10 +76,19 @@ def scale_yeast(df):
 
 
 def ibu(df):
-    """Return an estimated IBU (International Bitterness Unit) given a beer
-    recipe. This is calculated with the following equation:
+    """Return IBU (International Bitterness Units), a measure of bitterness, for a 
+    recipe.
+    Use the Tinseth formula:
+    (Source: https://realbeer.com/hops/research.html, Glenn Tinseth)
 
-        FILL IN HERE
+        IBUs = utilization * mg/L alpha acids
+        utilization = bigness factor * boil time factor
+        bigness factor = 1.65 * 0.000125^(wort gravity - 1) 
+        boil time factor = (1 - e^(-0.04 * time)) / 4.15 
+
+        Where:
+            wort gravity is in SG (eg. 1.051)
+            time is in minutes  
 
     Parameters:
     ===========
@@ -103,10 +113,18 @@ def gravity_kettle():
 
 
 def srm(df):
-    """Return the SRM (Standard Reference Method), also known as color, for the
-    given recipes. This is calculated using the following formula:
+    """Return SRM (Standard Reference Method units), a measure of colour, for a
+    recipe. 
+    Use the Morey formula:
+    (Source: https://web.archive.org/web/20100402141609/http://www.brewingtechniques.com/brewingtechniques/beerslaw/morey.html)
 
-        FILL IN HERE
+        SRM = 1.4922 * (sum of MCU over the grain bill) ^ 0.6859 
+        MCU =  grain color * grain weight / kettle volume
+
+        Where:
+            grain color is in L
+            grain weight is in lbs
+            kettle volume is in gallons
 
     Parameters:
     ===========
@@ -123,15 +141,25 @@ def srm(df):
 
 
 def color(*args, **kwargs):
-    #self.__doc__ = srm.__doc__??
+    # self.__doc__ = srm.__doc__??
     return srm(*args, **kwargs)
 
 
 def abv(df):
-    """Return the ABV (Alcohol By Volume) for the given recipes. This is
-    calculated using the following formula:
+    """Return ABV (Alcohol By Volume) for a recipe. 
+    Use the following formulae:
+    (Source: "Brewing Calculations" by Jim Helmke, D.G. Yuengling & Son 
+    MBAA Brewing and Malting Science Course, Fall 2016, Madison)
 
-        FILL IN HERE
+        ABV = 1.25 * ABW
+        ABW = 0.42 * (OE - attenuation * OE)
+        OE is determined by solving the quadratic:
+            extract = OE * (1 + 0.004 * OE)
+
+        Where:
+            OE is in degrees Plato 
+            attenuation is a %
+            extract is in kg/hL = 0.01 * (kg/L)
 
     Parameters:
     ===========
