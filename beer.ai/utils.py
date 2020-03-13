@@ -1,6 +1,7 @@
 import json
 import pandas as pd
 import numpy as np
+import math
 
 def get_style_guide():
     with open("styleguide.json") as f:
@@ -31,9 +32,9 @@ def scale_hop(df):
     Take as input a subset of the ing DataFrame, joined to the core DataFrame.
     Return a different quantity depending on the use:
         Dry hops:  dry hopping rate
-            grams of dry hops per litre in the batch
+            kilograms of dry hops per litre in the batch
         Boil hops: AUU
-            grams of alpha acids per litre in the boil kettle
+            kilograms of alpha acids per litre in the boil kettle
     """
     # Dry hops
     dh_cond = df["hop_use"] == "dry hop"
@@ -102,7 +103,19 @@ def ibu(df):
     IBU: float
         Estimate of IBU for the given recipes.
     """
-    pass
+    # Get rid of dry hops
+    df = df[df["hop_use"] != "dry hop"]
+    # scale_hop returns g/L alpha acids in the kettle
+    df_scaled = scale_hop(df.copy())
+    # Turn kg/L to mg/L
+    df_scaled["hop_amount"] = df_scaled["hop_amount"] * 1000 * 1000 
+
+    df_scaled["boil_time_factor"] = (1 - math.e ** (-0.04 * df_scaled["hop_time"])) / 4.15
+    bigness_factor = 1.65 * 0.000125 ** (gravity_kettle_sg(df.copy())- 1)
+    df_scaled["utilization"] = df_scaled["boil_time_factor"] * bigness_factor
+    df_scaled["ibu"] = df_scaled["utilization"] * df_scaled["hop_amount"]
+
+    return df_scaled["ibu"].sum() 
 
 
 def gravity_kettle_sg(df):
@@ -111,7 +124,9 @@ def gravity_kettle_sg(df):
     Take the ingredient DataFrame joined to the core DataFrame for a recipe.
     Return the kettle full gravity of the recipe, in SG (eg. 1.050).
     """
-    # scale_ferm turns ferm_amount to the gravity contribution, in g/L, per fermentable
+    # scale_ferm replaces ferm_amount 
+    # from amount of grain in kg
+    # to the gravity contribution, in g/L, per fermentable
     return 1 + 0.10 * 4 * scale_ferm(df.copy())["ferm_amount"].sum()  
 
 
