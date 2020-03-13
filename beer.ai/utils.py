@@ -1,6 +1,6 @@
 import json
 import pandas as pd
-
+import numpy as np
 
 def get_style_guide():
     with open("styleguide.json") as f:
@@ -102,6 +102,16 @@ def ibu(df):
         Estimate of IBU for the given recipes.
     """
     pass
+
+
+def gravity_kettle_sg(df):
+    """
+    (DataFrame) -> float
+    Take the ingredient DataFrame joined to the core DataFrame for a recipe.
+    Return the kettle full gravity of the recipe, in SG (eg. 1.050).
+    """
+    # scale_ferm turns ferm_amount to the gravity contribution, in g/L, per fermentable
+    return 1 + 0.10 * 4 * scale_ferm(df.copy())["ferm_amount"].sum()  
 
 
 def srm(df):
