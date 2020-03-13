@@ -8,26 +8,29 @@ def get_style_guide():
         style_guide = json.load(f)
 
 
-def scale_ferm(df):
+def scale_ferm(df, new_col="ferm_amount"):
     """
     (DataFrame) -> float
     Compute the scaled fermentable quantity.
+
+    XXX - update to describe parameters, expected columns in df.
 
     Take as input a subset of the ing DataFrame, joined to the core DataFrame.
     Replace ferm_amount with the gravity contribution of the fermentable:
         g/L extract in the boil kettle.
     """
-    df["ferm_amount"] = (
+    df[new_col] = (
         df["ferm_amount"] * df["ferm_yield"] * df["efficiency"] / df["boil_size"]
     )
-    df["ferm_amount"] = df["ferm_amount"].replace([np.inf, -np.inf], np.nan)
-    return df
+    df[new_col] = df[new_col].replace([np.inf, -np.inf], np.nan)
 
 
-def scale_hop(df):
+def scale_hop(df, new_col="hop_amount"):
     """
     (DataFrame) -> float
     Compute the scaled hop quantity.
+
+    XXX - update to describe parameters, expected columns in df.
 
     Take as input a subset of the ing DataFrame, joined to the core DataFrame.
     Return a different quantity depending on the use:
@@ -38,42 +41,41 @@ def scale_hop(df):
     """
     # Dry hops
     dh_cond = df["hop_use"] == "dry hop"
-    df.loc[dh_cond, "hop_amount"] = (
+    df.loc[dh_cond, new_col] = (
         df.loc[dh_cond, "hop_amount"] / df.loc[dh_cond, "batch_size"]
     )
 
     # Every other hop use
     bh_cond = df["hop_use"] != "dry hop"
-    df.loc[bh_cond, "hop_amount"] = (
+    df.loc[bh_cond, new_col] = (
         df.loc[bh_cond, "hop_amount"]
         * df.loc[bh_cond, "hop_alpha"]
         * (1 - 0.1 * (df.loc[bh_cond, "hop_form"] == "leaf").astype(int))
         / df.loc[bh_cond, "boil_size"]
     )
-    df["hop_amount"] = df["hop_amount"].replace([np.inf, -np.inf], np.nan)
-    return df
+    df[new_col] = df[new_col].replace([np.inf, -np.inf], np.nan)
 
 
-def scale_misc(df):
+def scale_misc(df, new_col="misc_amount"):
     """
     (DataFrame) -> float
     Compute the scaled misc quantity.
 
+    XXX - update to describe parameters, expected columns in df.
+
     Take as input a subset of the ing DataFrame, joined to the core DataFrame.
     Return a scaled misc quantity.
     """
-    df["misc_amount"] = df["misc_amount"] / df["batch_size"]
-    df["misc_amount"] = df["misc_amount"].replace([np.inf, -np.inf], np.nan)
-    return df
+    df[new_col] = df["misc_amount"] / df["batch_size"]
+    df[new_col] = df[new_col].replace([np.inf, -np.inf], np.nan)
 
 
-def scale_yeast(df):
+def scale_yeast(df, new_col="yeast_amount"):
     """
     (DataFrame) -> DataFrame
     Return a DataFrame with a new column yeast_amount = 1
     """
-    df.loc[~df["yeast_name"].isna(), "yeast_amount"] = 1
-    return df
+    df.loc[~df["yeast_name"].isna(), new_col] = 1
 
 
 def ibu(df):
