@@ -31,7 +31,25 @@ There are a number of files containing useful data available for this project. T
 
 * `all_recipes.h5` - Raw recipe data in HDF5 format. Contains every recipe entry that has been parsed from beer xml files. The recipes are split into 2 tables:
   * `core` - A table containing the core information about a recipe. The index of this table is a unique identifier for the recipe, and matches with the `ingredients` table entries.
-    * The contained columns are `batch_size`, `boil_size`, `boil_time`, `brewer`, `efficiency`, `fg`, `ibu`, `name`, `og`, `origin`, `recipe_file`, `style_category`, `style_guide`, `style_name`, `style_version`.
+  * Fields:
+
+Name | Description | Unit | Data type | Typical values
+--- | --- | --- | --- | ---
+`batch_size` | The volume in the fermenter, pre-fermentation. Or the volume in the package (bottle/keg). Depending on who you ask :) | litres | float64 | 19.684141256, 18.927059, 22.712471  
+`boil_size` | | | | 
+`boil_time` | | | | 
+`brewer` | | | | 
+`efficiency` | | | | 
+`fg` | | | | 
+`ibu` | | | | 
+`name` | | | | 
+`og` | | | | 
+`origin` | | | | 
+`recipe_file` | | | | 
+`style_category` | | | | 
+`style_name` | | | | 
+`style_version` | | | | 
+
   * `ingredients` - A table containing the actual ingredients for each recipe. The index of this table matches with the index from the `core` table. Note that a given recipe can (and usually does) span multiple rows since a given row holds only one of each type of ingredient (see below) and there will usually be multiples of each type of ingredient.
     * `ferm_amount`, `ferm_color`, `ferm_display_amount`, `ferm_name`, `ferm_origin`, `ferm_potential`, `ferm_yield`.
     * `hop_alpha`, `hop_amount`, `hop_display_amount`, `hop_form`, `hop_name`, `hop_origin`, `hop_time`, `hop_use`.
