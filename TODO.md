@@ -37,4 +37,4 @@ Generate a recipe that is:
 * Add fields to validate util function calculations (from brewersfriend recipes)
   * `EST_ABV`
   * `EST_COLOR`
-
+  * Fix `ibu`, `og`, `fg` in `converter.py`
