@@ -35,15 +35,15 @@ There are a number of files containing useful data available for this project. T
 
 Name | Description | Unit | Data type | Typical values
 --- | --- | --- | --- | ---
-`batch_size` | The volume in the fermenter, pre-fermentation. Or the volume in the package (bottle/keg). Depending on who you ask :) | litres | float64 | 19.684141256, 18.927059, 22.712471  
-`boil_size` | | | | 
-`boil_time` | | | | 
-`brewer` | | | | 
-`efficiency` | | | | 
-`fg` | | | | 
-`ibu` | | | | 
-`name` | | | | 
-`og` | | | | 
+`batch_size` | The volume in the fermenter, pre-fermentation. Or the volume in the package (bottle or keg). | L | float64 | 19.684141256, 18.927059, 22.712471  
+`boil_size` | The volume in the kettle, pre-boil. | L | float64 | 23.658823625, 30.283294, 11.356235 
+`boil_time` | The duration of the boil. | minutes | float64 | 60, 90, 120 
+`brewer` | The username of the recipe author. | - | str | anonymous, capitalcityhomebrewsupply, bitter & esters 
+`efficiency` | The ratio of extract in the wort (kg) to grain in the mash (kg). | % | float64 | 0.75, 0.80, 0.35
+`fg` | The final gravity of the beer. (brewersfriend only) | SG | float64 | 1.010, 1.002, 1.031 
+`ibu` | The bitterness of the beer. (brewersfriend only) | IBU | float64 | 99, 55.0, 1 
+`name` | The name of the recipe. | - | str | untitled specialty beer, ipa, continental drift wheat 
+`og` | The original gravity of the beer. (brewersfriend only) | SG | float64 | 1.054, 1.072, 1.031 
 `origin` | | | | 
 `recipe_file` | | | | 
 `style_category` | | | | 
