@@ -1,11 +1,10 @@
 import json
-import pandas as pd
 import numpy as np
-import math
+
 
 def get_style_guide():
     with open("styleguide.json") as f:
-        style_guide = json.load(f)
+        return json.load(f)
 
 
 def scale_ferm(df, new_col="ferm_amount"):
@@ -78,71 +77,84 @@ def scale_yeast(df, new_col="yeast_amount"):
     df.loc[~df["yeast_name"].isna(), new_col] = 1
 
 
-def ibu(df):
-    """Return IBU (International Bitterness Units), a measure of bitterness, for a 
+def ibu(df, hop_col="hop_amount"):
+    """Return IBU (International Bitterness Units), a measure of bitterness, for a
     recipe.
     Use the Tinseth formula:
     (Source: https://realbeer.com/hops/research.html, Glenn Tinseth)
 
         IBUs = utilization * mg/L alpha acids
         utilization = bigness factor * boil time factor
-        bigness factor = 1.65 * 0.000125^(wort gravity - 1) 
-        boil time factor = (1 - e^(-0.04 * time)) / 4.15 
+        bigness factor = 1.65 * 0.000125^(wort gravity - 1)
+        boil time factor = (1 - e^(-0.04 * time)) / 4.15
 
         Where:
             wort gravity is in SG (eg. 1.051)
-            time is in minutes  
+            time is in minutes
 
     Parameters:
     ===========
     df: Panadas DataFrame
         Dataframe containing scaled hop quantities and addition times.
-        Assumed columns are:
-            "hop_scaled" - concentration of alpha acids in the kettle (g/L)
-            "hop_time" - duration of boil following hop addition (minutes)
+        Dataframe assumed to have "hop_time" as a column, which represents the
+        duration of boil following hop addition in minutes.
+    hop_col: str, default "hop_amount"
+        Name of column containing **scaled** hop quantities.
+
     Return:
     =======
-    IBU: float
+    Dataframe with "ibu" column added to passed in Dataframe
         Estimate of IBU for the given recipes.
     """
+    # if hops_col not in df.columns:
+    #    scale_hop(df, hop_col)
     # Get rid of dry hops
-    df = df[df["hop_use"] != "dry hop"]
-    # scale_hop returns g/L alpha acids in the kettle
-    df_scaled = scale_hop(df.copy())
+    sub_df = df.loc[:, df["hop_use"] != "dry hop"]
     # Turn kg/L to mg/L
-    df_scaled["hop_amount"] = df_scaled["hop_amount"] * 1000 * 1000 
+    hop_amount = sub_df[hop_col] * 1000 * 1000
 
-    df_scaled["boil_time_factor"] = (1 - math.e ** (-0.04 * df_scaled["hop_time"])) / 4.15
-    bigness_factor = 1.65 * 0.000125 ** (gravity_kettle_sg(df.copy())- 1)
-    df_scaled["utilization"] = df_scaled["boil_time_factor"] * bigness_factor
-    df_scaled["ibu"] = df_scaled["utilization"] * df_scaled["hop_amount"]
+    boil_time_factor = (1 - np.exp(-0.04 * sub_df["hop_time"])) / 4.15
+    bigness_factor = 1.65 * 0.000125 ** (gravity_kettle_sg(sub_df["ferm_amount"]) - 1)
+    utilization = boil_time_factor * bigness_factor
+    ibu = (utilization * hop_amount).sum()
+    ibu.name = "ibu"
+    return df.merge(ibu, left_index=True, right_index=True, how="left")
 
-    return df_scaled["ibu"].sum() 
+
+def gravity_kettle_sg(s):
+    """Take a series containing scaled fermentables and calculate the kettle
+    full gravity of the recipe, in SG (eg. 1.050).
 
 
-def gravity_kettle_sg(df):
+    XXX - Add formula in doc, source for it
+
+    Parameters
+    ==========
+    s: Series
+        Series of fermentable amounts
+
+    Return
+    ======
+    Series
+        Series representing full grabity for recipes.
     """
-    (DataFrame) -> float
-    Take the ingredient DataFrame joined to the core DataFrame for a recipe.
-    Return the kettle full gravity of the recipe, in SG (eg. 1.050).
-    """
-    # scale_ferm replaces ferm_amount 
-    # from amount of grain in kg
-    # to the gravity contribution, in g/L, per fermentable
-    return 1 + 0.10 * 4 * scale_ferm(df.copy())["ferm_amount"].sum()  
+    # XXX - I think this is supposed to sum per recipe, but we're currently
+    # just summing all the recipes into a single number.
+
+    return 1 + 0.10 * 4 * s.groupby(s.index).sum()
 
 
-def srm(df):
+def srm(df, ferm_col="ferm_amount", srm_name="srm"):
     """Return SRM (Standard Reference Method units), a measure of colour, for a
-    recipe. 
+    recipe.
     Use the Morey formula:
     (Source: https://web.archive.org/web/20100402141609/http://www.brewingtechniques.com/brewingtechniques/beerslaw/morey.html)
 
-        SRM = 1.4922 * (sum of MCU over the grain bill) ^ 0.6859 
+        SRM = 1.4922 * (sum of MCU over the grain bill) ^ 0.6859
         MCU =  grain color * grain weight / kettle volume
 
         Where:
-            grain color is in L
+            grain color is in °L (degrees Lovabond)
             grain weight is in lbs
             kettle volume is in gallons
 
@@ -150,25 +162,41 @@ def srm(df):
     ===========
     df: Pandas DataFrame
         DataFrame containing scaled fermentable quantities and fermentable
-        colors. Assumed columns are "ferm_scaled" and "ferm_color"
+        colors. Assumed column is "ferm_color".
+    ferm_col: str, default "ferm_amount"
+        Name of column containing **scaled** fermentables
+    srm_name: str, default "srm"
+        Name of column that will contain SRM estimate.
 
     Return:
     =======
-    srm: float
-        Estimate of the SRM for the given recipes.
+    Dataframe with new column `color_name` which is an estimate of the SRM for
+    the given recipes.
     """
-    pass
+    # ferm_amount in kg, boil_size in kg
+    kg_to_lb = 0.453592
+    l_to_gal = 0.264172
+    mcu = df["ferm_color"] * df[ferm_col] * kg_to_lb / (df["boil_size"] * l_to_gal)
+    srm = 1.4922 * mcu.groupby(mcu.index).sum() ** 0.6859
+    srm.name = "srm"
+    return df.merge(srm, left_index=True, right_index=True, how="left")
 
 
 def color(*args, **kwargs):
-    # self.__doc__ = srm.__doc__??
+    """This is a convenience function, see `srm` for documentation.
+
+    NOTE: This function passes `srm_name = "color"` to `srm` unless it has
+    already been specified.
+    """
+    if "srm_name" not in kwargs.keys():
+        kwargs.update({"srm_name": "color"})
     return srm(*args, **kwargs)
 
 
 def abv(df):
-    """Return ABV (Alcohol By Volume) for a recipe. 
+    """Return ABV (Alcohol By Volume) for a recipe.
     Use the following formulae:
-    (Source: "Brewing Calculations" by Jim Helmke, D.G. Yuengling & Son 
+    (Source: "Brewing Calculations" by Jim Helmke, D.G. Yuengling & Son
     MBAA Brewing and Malting Science Course, Fall 2016, Madison)
 
         ABV = 1.25 * ABW
@@ -177,7 +205,7 @@ def abv(df):
             extract = OE * (1 + 0.004 * OE)
 
         Where:
-            OE is in degrees Plato 
+            OE is in degrees Plato
             attenuation is a %
             extract is in kg/hL = 0.01 * (kg/L)
 
