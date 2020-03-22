@@ -30,10 +30,6 @@ Generate a recipe that is:
 * Add super high level overview of data pipeline
   * .xml ---(converter.py)---> .h5 ---(recipe2vec)---> .h5   
 ## Util functions
-* Write 
-  * IBU
-  * ABV
-  * SRM
 * Add fields to validate util function calculations (from brewersfriend recipes)
   * `EST_ABV`
   * `EST_COLOR`
