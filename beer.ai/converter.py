@@ -186,8 +186,10 @@ def fill_core(d, recipe):
 
         #estimated quantities
         d["ibu"] = safe_float(getattr(recipe, "ibu", None))
-        d["og"] = safe_float(getattr(recipe, "ibu", None))
-        d["fg"] = safe_float(getattr(recipe, "ibu", None))
+        d["og"] = safe_float(getattr(recipe, "og", None))
+        d["fg"] = safe_float(getattr(recipe, "fg", None))
+        d["est_abv"] = safe_float(getattr(recipe, "EST_ABV", None))
+        d["est_color"] = safe_float(getattr(recipe, "EST_COLOR", None))
 
         d["style_name"] = clean_text(getattr(recipe.style, "name", None))
         d["style_guide"] = clean_text(getattr(recipe.style, "style_guide", None))
