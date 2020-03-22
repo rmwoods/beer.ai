@@ -59,7 +59,7 @@ def scale_hop(df, new_col="hop_amount"):
     =======
     None:
         Add `new_col` to the given dataframe containing the scaled
-        hops in units of g/L extract in the boil kettle.
+        hops in units of kg/L extract in the boil kettle.
     
     
     NOTE:
@@ -272,7 +272,8 @@ def abv(df, ferm_col="ferm_amount"):
     df: Pandas DataFrame
         DataFrame containing scaled fermentable quantities and yeast
         attenuations. Assumed to have "yeast_attenuation" column as well as
-        `ferm_col` column.
+        `ferm_col` column. The `ferm_col` is the **scaled** fermentable
+        quantities.
 
     Return:
     =======
@@ -281,13 +282,8 @@ def abv(df, ferm_col="ferm_amount"):
         recipes.
     """
 
-    #ferm_amount', 'ferm_color', 'ferm_display_amount', 'ferm_name',
-    #   'ferm_origin', 'ferm_potential', 'ferm_yield'
-
-    # Does this need yield?
     gb = df.groupby(df.index)
     OE = np.roots([0.004, 1, -gb[ferm_col].sum().values])
-    # XXX - how do we deal with multiple yeasts in a recipe? Add up? Average?
-    ABW = 0.42 * (OE - gb["yeast_attentuation"].sum()*OE)
+    ABW = 0.42 * (OE - gb["yeast_attentuation"].mean()*OE)
     ABV = pd.Series(1.25 * ABW, index=ABW.index, name="abv")
     return df.merge(ABV, left_index=True, right_index=True, how="left")
