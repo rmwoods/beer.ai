@@ -9,14 +9,25 @@ def get_style_guide():
 
 def scale_ferm(df, new_col="ferm_amount"):
     """
-    (DataFrame) -> float
-    Compute the scaled fermentable quantity.
+    Scale the fermentables by the boil size (accounting for yield). Add the
+    results as the column `new_col`.
+    
+        scaled = `ferm_amount` * `efficiency` / `boil_size`
 
-    XXX - update to describe parameters, expected columns in df.
-
-    Take as input a subset of the ing DataFrame, joined to the core DataFrame.
-    Replace ferm_amount with the gravity contribution of the fermentable:
-        g/L extract in the boil kettle.
+    Parameters
+    ==========
+    df: DataFrame
+        A dataframe containing, at minimum, "ferm_amount", "efficiency", and
+        "boil_size".
+    new_col: str, default "ferm_amount"
+        Name of the new column to add to the given dataframe to contain the
+        scaled fermentable. 
+    
+    Return:
+    =======
+    None:
+        Add `new_col` to the given dataframe containing the scaled
+        fermentables in units of kg/L extract in the boil kettle.
     """
     df[new_col] = (
         df["ferm_amount"] * df["ferm_yield"] * df["efficiency"] / df["boil_size"]
@@ -26,17 +37,41 @@ def scale_ferm(df, new_col="ferm_amount"):
 
 def scale_hop(df, new_col="hop_amount"):
     """
-    (DataFrame) -> float
-    Compute the scaled hop quantity.
+    Compute the scaled hop quantities. Add the results as the column `new_col`.
+    Use the following equations.
 
-    XXX - update to describe parameters, expected columns in df.
+        Dry hopping:
+            scaled = hop_amount / batch_size
 
-    Take as input a subset of the ing DataFrame, joined to the core DataFrame.
-    Return a different quantity depending on the use:
-        Dry hops:  dry hopping rate
-            kilograms of dry hops per litre in the batch
-        Boil hops: AUU
-            kilograms of alpha acids per litre in the boil kettle
+        All other (most commonly boil):
+            scaled = hop_amount * hop_alpha * (1 - 0.1 * (hop_form == "leaf")) / boil_size
+
+    Parameters
+    ==========
+    df: DataFrame
+        A dataframe containing, at minimum, `hop_amount`, `hop_use`,
+        `hop_alpha`, `hop_form`, `boil_size`, and `batch_size`.
+    new_col: str, default "hop_amount"
+        Name of the new column to add to the given dataframe to contain the
+        scaled hops. 
+    
+    Return:
+    =======
+    None:
+        Add `new_col` to the given dataframe containing the scaled
+        hops in units of g/L extract in the boil kettle.
+    
+    
+    NOTE:
+        The scaled hop quantities will differ depending on the `hop_use`
+        column.
+        `hop_use` == "dry hop"
+            Calculate scaled hops as the kilograms of dry hops per liter by
+            dividing by `batch_size`.
+        `hop_use` != "dry hop" (all other categories)
+            Calculate scaled hops as the kilograms of alpha acids per liter in
+            the boil kettle. This calculation differentiates between
+            `hop_form` == "leaf" and `hop_form` != "leaf".
     """
     # Dry hops
     dh_cond = df["hop_use"] == "dry hop"
@@ -57,13 +92,24 @@ def scale_hop(df, new_col="hop_amount"):
 
 def scale_misc(df, new_col="misc_amount"):
     """
-    (DataFrame) -> float
-    Compute the scaled misc quantity.
+    Scale the miscellaneous quantities by the batch size. Add the results as
+    the column `new_col`.
+    
+        scaled = `misc_amount` / `batch_size`
 
-    XXX - update to describe parameters, expected columns in df.
-
-    Take as input a subset of the ing DataFrame, joined to the core DataFrame.
-    Return a scaled misc quantity.
+    Parameters
+    ==========
+    df: DataFrame
+        A dataframe containing, at minimum, "misc_amount" and "batch_size".
+    new_col: str, default "misc_amount"
+        Name of the new column to add to the given dataframe to contain the
+        scaled misc ingredients. 
+    
+    Return:
+    =======
+    None:
+        Add `new_col` to the given dataframe containing the scaled
+        miscellaneous ingredients in units of kg/L in the batch kettle.
     """
     df[new_col] = df["misc_amount"] / df["batch_size"]
     df[new_col] = df[new_col].replace([np.inf, -np.inf], np.nan)
@@ -71,8 +117,22 @@ def scale_misc(df, new_col="misc_amount"):
 
 def scale_yeast(df, new_col="yeast_amount"):
     """
-    (DataFrame) -> DataFrame
-    Return a DataFrame with a new column yeast_amount = 1
+    Return a DataFrame with  `new_col` = 1. This is considered scaled for yeast
+    since `yeast_amount` is not typically given.
+
+    Parameters
+    ==========
+    df: DataFrame
+        A dataframe containing, at minimum, "misc_amount" and "batch_size".
+    new_col: str, default "yeast_amount"
+        Name of the new column to add to the given dataframe to contain the
+        scaled yeast. 
+    
+    Return:
+    =======
+    None:
+        Add `new_col` to the given dataframe containing the scaled
+        yeast. This value has no units.
     """
     df.loc[~df["yeast_name"].isna(), new_col] = 1
 
@@ -138,10 +198,8 @@ def gravity_kettle_sg(s):
     Series
         Series representing full grabity for recipes.
     """
-    # XXX - I think this is supposed to sum per recipe, but we're currently
-    # just summing all the recipes into a single number.
 
-    return 1 + 0.10 * 4 * s.groupby(s.index).sum()
+    return 1 + 0.004 * s.groupby(s.index).sum()
 
 
 def srm(df, ferm_col="ferm_amount", srm_name="srm"):
@@ -193,7 +251,7 @@ def color(*args, **kwargs):
     return srm(*args, **kwargs)
 
 
-def abv(df):
+def abv(df, ferm_col="ferm_amount"):
     """Return ABV (Alcohol By Volume) for a recipe.
     Use the following formulae:
     (Source: "Brewing Calculations" by Jim Helmke, D.G. Yuengling & Son
@@ -205,7 +263,7 @@ def abv(df):
             extract = OE * (1 + 0.004 * OE)
 
         Where:
-            OE is in degrees Plato
+            OE (original extract) is in degrees Plato
             attenuation is a %
             extract is in kg/hL = 0.01 * (kg/L)
 
@@ -213,12 +271,23 @@ def abv(df):
     ===========
     df: Pandas DataFrame
         DataFrame containing scaled fermentable quantities and yeast
-        attenuations. Assumed column names are "ferm_scaled" and
-        "yeast_attenuation".
+        attenuations. Assumed to have "yeast_attenuation" column as well as
+        `ferm_col` column.
 
     Return:
     =======
-    abv: float
-        Estimate of the ABV for the given recipes.
+    DataFrame:
+        New dataframe containing column "abv", an estimate of the ABV for the
+        recipes.
     """
-    pass
+
+    #ferm_amount', 'ferm_color', 'ferm_display_amount', 'ferm_name',
+    #   'ferm_origin', 'ferm_potential', 'ferm_yield'
+
+    # Does this need yield?
+    gb = df.groupby(df.index)
+    OE = np.roots([0.004, 1, -gb[ferm_col].sum().values])
+    # XXX - how do we deal with multiple yeasts in a recipe? Add up? Average?
+    ABW = 0.42 * (OE - gb["yeast_attentuation"].sum()*OE)
+    ABV = pd.Series(1.25 * ABW, index=ABW.index, name="abv")
+    return df.merge(ABV, left_index=True, right_index=True, how="left")
