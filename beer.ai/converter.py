@@ -9,6 +9,7 @@ import pandas as pd
 import random
 import re
 import sys
+import traceback
 
 from itertools import zip_longest
 from joblib import delayed, Parallel
@@ -16,19 +17,16 @@ from pybeerxml import Parser
 from xml.etree.ElementTree import ParseError
 
 # From https://coderwall.com/p/xww5mq/two-letter-country-code-regex
-ORIGIN_RE = re.compile("\((AF|AX|AL|DZ|AS|AD|AO|AI|AQ|AG|AR|AM|AW|AU|AT|AZ|BS|BH|BD|BB|BY|BE|BZ|BJ|BM|BT|BO|BQ|BA|BW|BV|BR|IO|BN|BG|BF|BI|KH|CM|CA|CV|KY|CF|TD|CL|CN|CX|CC|CO|KM|CG|CD|CK|CR|CI|HR|CU|CW|CY|CZ|DK|DJ|DM|DO|EC|EG|SV|GQ|ER|EE|ET|FK|FO|FJ|FI|FR|GF|PF|TF|GA|GM|GE|DE|GH|GI|GR|GL|GD|GP|GU|GT|GG|GN|GW|GY|HT|HM|VA|HN|HK|HU|IS|IN|ID|IR|IQ|IE|IM|IL|IT|JM|JP|JE|JO|KZ|KE|KI|KP|KR|KW|KG|LA|LV|LB|LS|LR|LY|LI|LT|LU|MO|MK|MG|MW|MY|MV|ML|MT|MH|MQ|MR|MU|YT|MX|FM|MD|MC|MN|ME|MS|MA|MZ|MM|NA|NR|NP|NL|NC|NZ|NI|NE|NG|NU|NF|MP|NO|OM|PK|PW|PS|PA|PG|PY|PE|PH|PN|PL|PT|PR|QA|RE|RO|RU|RW|BL|SH|KN|LC|MF|PM|VC|WS|SM|ST|SA|SN|RS|SC|SL|SG|SX|SK|SI|SB|SO|ZA|GS|SS|ES|LK|SD|SR|SJ|SZ|SE|CH|SY|TW|TJ|TZ|TH|TL|TG|TK|TO|TT|TN|TR|TM|TC|TV|UG|UA|AE|GB|UK|US|UM|UY|UZ|VU|VE|VN|VG|VI|WF|EH|YE|ZM|ZW)\)")
+ORIGIN_RE = re.compile(
+    "\((AF|AX|AL|DZ|AS|AD|AO|AI|AQ|AG|AR|AM|AW|AU|AT|AZ|BS|BH|BD|BB|BY|BE|BZ|BJ|BM|BT|BO|BQ|BA|BW|BV|BR|IO|BN|BG|BF|BI|KH|CM|CA|CV|KY|CF|TD|CL|CN|CX|CC|CO|KM|CG|CD|CK|CR|CI|HR|CU|CW|CY|CZ|DK|DJ|DM|DO|EC|EG|SV|GQ|ER|EE|ET|FK|FO|FJ|FI|FR|GF|PF|TF|GA|GM|GE|DE|GH|GI|GR|GL|GD|GP|GU|GT|GG|GN|GW|GY|HT|HM|VA|HN|HK|HU|IS|IN|ID|IR|IQ|IE|IM|IL|IT|JM|JP|JE|JO|KZ|KE|KI|KP|KR|KW|KG|LA|LV|LB|LS|LR|LY|LI|LT|LU|MO|MK|MG|MW|MY|MV|ML|MT|MH|MQ|MR|MU|YT|MX|FM|MD|MC|MN|ME|MS|MA|MZ|MM|NA|NR|NP|NL|NC|NZ|NI|NE|NG|NU|NF|MP|NO|OM|PK|PW|PS|PA|PG|PY|PE|PH|PN|PL|PT|PR|QA|RE|RO|RU|RW|BL|SH|KN|LC|MF|PM|VC|WS|SM|ST|SA|SN|RS|SC|SL|SG|SX|SK|SI|SB|SO|ZA|GS|SS|ES|LK|SD|SR|SJ|SZ|SE|CH|SY|TW|TJ|TZ|TH|TL|TG|TK|TO|TT|TN|TR|TM|TC|TV|UG|UA|AE|GB|UK|US|UM|UY|UZ|VU|VE|VN|VG|VI|WF|EH|YE|ZM|ZW)\)"
+)
 RECIPES_DIR = "test_recipes"
 MODIFIER_RE = re.compile("\([\w ]*\)")
 LEAF_STR = "leaf"
 
 
 UNIT_RE = re.compile("(?P<amount>\d*\.?\d*) *(?P<unit>g|kg|oz|lb)")
-TO_KG = {
-    "kg": 1,
-    "g": 0.001,
-    "oz": 0.0283495,
-    "lb": 0.453592,
-}
+TO_KG = {"kg": 1, "g": 0.001, "oz": 0.0283495, "lb": 0.453592}
 EPS = 1e-7
 
 # Number of processors to use. -1 = all
@@ -37,8 +35,9 @@ N_CPUS = -1
 CLEAN_STEPS = {
     "style_category": {"type": str},
     "misc_amount_is_weight": {"type": bool, "fill": False},
-    "yeast_product_id": {"type": str, "fill": np.nan}
+    "yeast_product_id": {"type": str, "fill": np.nan},
 }
+
 
 def clean_text(text):
     """Standard method for cleaning text in our recipes. Any changes to parsing
@@ -55,7 +54,7 @@ def remove_ingredient_modifiers(text):
         m = re.search(MODIFIER_RE, mod_text)
         if m is not None:
             span = m.span()
-            mod_text = mod_text[:span[0]] + mod_text[span[1]:]
+            mod_text = mod_text[: span[0]] + mod_text[span[1] :]
     return mod_text
 
 
@@ -71,7 +70,7 @@ def check_origin(text):
             span = m.span()
             # strip parens
             origin = m.group()[1:-1]
-            mod_text = mod_text[:span[0]] + mod_text[span[1]:]
+            mod_text = mod_text[: span[0]] + mod_text[span[1] :]
     return mod_text, origin
 
 
@@ -103,10 +102,14 @@ def fill_ferm(d, ferm, core_vals):
         d["ferm_amount"] = safe_float(getattr(ferm, "amount", None))
         d["ferm_display_amount"] = clean_text(getattr(ferm, "display_amount", None))
         amount, unit = extract_amount_unit(getattr(ferm, "display_amount", None))
-        if amount is not None and unit is not None and \
-                abs(amount*TO_KG.get(unit, 1) - d["ferm_amount"]) > EPS:
-            d["ferm_amount"] = amount*TO_KG.get(unit, 1)
-        d["ferm_yield"] = safe_float(getattr(ferm, "_yield", None))*0.01
+        if (
+            amount is not None
+            and unit is not None
+            and d["ferm_amount"] is not None
+            and abs(amount * TO_KG.get(unit, 1) - d["ferm_amount"]) > EPS
+        ):
+            d["ferm_amount"] = amount * TO_KG.get(unit, 1)
+        d["ferm_yield"] = safe_float(getattr(ferm, "_yield", None)) * 0.01
         d["ferm_color"] = safe_float(getattr(ferm, "color", None))
         d["ferm_potential"] = safe_float(getattr(ferm, "potential", None))
 
@@ -123,12 +126,16 @@ def fill_hop(d, hop, core_vals):
         d["hop_amount"] = safe_float(getattr(hop, "amount", None))
         d["hop_display_amount"] = clean_text(getattr(hop, "display_amount", None))
         amount, unit = extract_amount_unit(getattr(hop, "display_amount", None))
-        if amount is not None and unit is not None and \
-                abs(amount*TO_KG.get(unit, 1) - d["hop_amount"]) > EPS:
-            d["hop_amount"] = amount*TO_KG.get(unit, 1)
+        if (
+            amount is not None
+            and unit is not None
+            and d["hop_amount"] is not None
+            and abs(amount * TO_KG.get(unit, 1) - d["hop_amount"]) > EPS
+        ):
+            d["hop_amount"] = amount * TO_KG.get(unit, 1)
         d["hop_alpha"] = safe_float(getattr(hop, "alpha", None))
         if d["hop_alpha"] is not None:
-            d["hop_alpha"] /= 100.
+            d["hop_alpha"] /= 100.0
         d["hop_form"] = clean_text(getattr(hop, "form", None))
         is_leaf = int(d["hop_form"] == LEAF_STR)
         # From brewerstoad:
@@ -142,7 +149,7 @@ def fill_yeast(d, yeast):
     if yeast is not None:
         yeast_name = str(getattr(yeast, "name", None))
         if yeast_name is not None:
-            yeast_name.replace(" yeast","")
+            yeast_name.replace(" yeast", "")
         d["yeast_name"] = clean_text(yeast_name)
         d["yeast_laboratory"] = clean_text(getattr(yeast, "laboratory", None))
         d["yeast_type"] = clean_text(getattr(yeast, "type", None))
@@ -181,20 +188,21 @@ def fill_core(d, recipe):
             d["boil_size"] = 1
         d["efficiency"] = safe_float(getattr(recipe, "efficiency", None))
         if d["efficiency"] is not None:
-            d["efficiency"] /= 100.
+            d["efficiency"] /= 100.0
         d["boil_time"] = safe_float(getattr(recipe, "boil_time", None))
 
-        #estimated quantities
+        # estimated quantities
         d["ibu"] = safe_float(getattr(recipe, "ibu", None))
         d["og"] = safe_float(getattr(recipe, "og", None))
         d["fg"] = safe_float(getattr(recipe, "fg", None))
-        d["est_abv"] = safe_float(getattr(recipe, "EST_ABV", None))
-        d["est_color"] = safe_float(getattr(recipe, "EST_COLOR", None))
+        d["est_abv"] = safe_float(getattr(recipe, "est_abv", None))
+        d["est_color"] = safe_float(getattr(recipe, "est_color", None))
 
         d["style_name"] = clean_text(getattr(recipe.style, "name", None))
         d["style_guide"] = clean_text(getattr(recipe.style, "style_guide", None))
-        d["style_category"] = str(int(safe_float(getattr(recipe.style, "category_number", None))))\
-                + clean_text(getattr(recipe.style, "style_letter", None))
+        d["style_category"] = str(
+            int(safe_float(getattr(recipe.style, "category_number", None)))
+        ) + clean_text(getattr(recipe.style, "style_letter", None))
         d["style_version"] = safe_float(getattr(recipe.style, "version", None))
 
 
@@ -215,7 +223,8 @@ def recipe_to_dicts(recipe, fname, recipe_id, origin):
     fill_core(core_vals, recipe)
 
     for ferm, hop, yeast, misc in zip_longest(
-            recipe.fermentables, recipe.hops, recipe.yeasts, recipe.miscs):
+        recipe.fermentables, recipe.hops, recipe.yeasts, recipe.miscs
+    ):
         tmp = {"id": recipe_id}
         fill_ferm(tmp, ferm, core_vals)
         fill_hop(tmp, hop, core_vals)
@@ -243,9 +252,10 @@ def convert_runner(fname, origin, recipe_id):
     try:
         core_vals, ingredients = recipe_to_dicts(recipe, fname, recipe_id, origin)
     except Exception as e:
-        print(f"Failed {fname}:", file=sys.stderr)
-        print(e, file=sys.stderr)
-        core_vals, ingredients = {}, []
+        raise(e)
+        #print(f"Failed {fname}:", file=sys.stderr)
+        #print(e, file=sys.stderr)
+        #core_vals, ingredients = {}, []
     return (core_vals, ingredients)
 
 
@@ -267,7 +277,7 @@ def convert_a_bunch(filenames, n, jobs=N_CPUS):
     """Convert n randomly chosen recipes. Currently for inspecting the output."""
 
     if filenames is not None:
-        recipe_files = [(f.split("/")[-2], f) for f in filenames]
+        samples = [(f.split("/")[-2], f) for f in filenames]
     else:
         # Note that this is a bit slower than just assuming the source directory
         # has a certain structure of origin/*.xml and letting the OS glob the files
@@ -278,14 +288,15 @@ def convert_a_bunch(filenames, n, jobs=N_CPUS):
                     origin = dirpath.split("/")[-1]
                     fpath = path.join(dirpath, f)
                     recipe_files.append((origin, fpath))
-    if n != -1:
-        samples = random.sample(recipe_files, n)
-    else:
-        samples = recipe_files
+        if n != -1:
+            samples = random.sample(recipe_files, min(len(recipe_files), n))
+        else:
+            samples = recipe_files
 
     results = Parallel(n_jobs=jobs)(
-            delayed(convert_runner)(fname, origin, i)
-            for i, (origin, fname) in enumerate(samples))
+        delayed(convert_runner)(fname, origin, i)
+        for i, (origin, fname) in enumerate(samples)
+    )
 
     core_vals = []
     ingredients = []
@@ -293,22 +304,18 @@ def convert_a_bunch(filenames, n, jobs=N_CPUS):
         if result is not None:
             core_vals.append(result[0])
             ingredients.extend(result[1])
-    
+
     if len(core_vals) == 0:
         print("No recipes parsed. Exiting.")
         return
     df_core = pd.DataFrame(core_vals)
     df_core = df_core.set_index("id")
-    
+
     df_ing = pd.DataFrame(ingredients)
     df_ing = df_ing.set_index("id")
     clean_cols(df_ing)
 
-    write_options = {
-        "complevel": 9,
-        "complib": "blosc",
-        "format": "table",
-    }
+    write_options = {"complevel": 9, "complib": "blosc", "format": "table"}
     if n == -1:
         fname = "all_recipes.h5"
     else:
@@ -322,14 +329,14 @@ def convert_a_bunch(filenames, n, jobs=N_CPUS):
 def _setup_argparser():
     parser = argparse.ArgumentParser(
         description="Program to convert a specific list or a random list of "
-            "recipes to an hdf for inspection."
+        "recipes to an hdf for inspection."
     )
     parser.add_argument(
         "-f",
         "--filename",
         action="append",
         help="Specific recipe filename to parse. Can pass argument multiple "
-            "times to specify multiple recipes to convert."
+        "times to specify multiple recipes to convert.",
     )
     parser.add_argument(
         "-n",
@@ -337,15 +344,11 @@ def _setup_argparser():
         type=int,
         default=20,
         help="If randomly parsing, number of recipes to randomly select for "
-            "conversion. Note that -1 means to convert *all* recipes. Default "
-            "is 20."
+        "conversion. Note that -1 means to convert *all* recipes. Default "
+        "is 20.",
     )
     parser.add_argument(
-        "-j",
-        "--jobs",
-        type=int,
-        default=N_CPUS,
-        help="Number of processors to use."
+        "-j", "--jobs", type=int, default=N_CPUS, help="Number of processors to use."
     )
     return parser
 
