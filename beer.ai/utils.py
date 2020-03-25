@@ -195,12 +195,28 @@ def gravity_kettle_sg(df):
     Return
     ======
     Series
-        Series representing full grabity for recipes.
+        Series representing full gravity for recipes.
     """
 
     # ferm_extract_yield
     fey = df["ferm_amount"] * df["ferm_yield"] * df["efficiency"]
     return 1 + 0.004 * fey.groupby(fey.index).sum()
+
+
+def gravity_original_sg(df):
+    """ XXX write a better docstring
+    Calculate the original gravity of the recipe, in SG."""
+    gravity_kettle = gravity_kettle_sg(df)
+    # The percent of the volume evapourated during the boil, per hour
+    boiloff = 0.10
+    boil_time = df["boil_time"].groupby(df.index).first()
+    return gravity_kettle * (1 - boiloff * boil_time / 60)
+
+
+def gravity_final_sg(df):
+    """ XXX write a better docstring
+    Calculate the final gravity of each recipe, in SG."""
+    pass
 
 
 def srm(df, ferm_col="ferm_amount", srm_name="srm"):
