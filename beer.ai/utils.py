@@ -29,9 +29,7 @@ def scale_ferm(df, new_col="ferm_amount"):
         Add `new_col` to the given dataframe containing the scaled
         fermentables in units of kg/L extract in the boil kettle.
     """
-    df[new_col] = (
-        df["ferm_amount"] * df["ferm_yield"] * df["efficiency"] / df["boil_size"]
-    )
+    df[new_col] = df["ferm_amount"] / df["boil_size"]
     df[new_col] = df[new_col].replace([np.inf, -np.inf], np.nan)
 
 
@@ -137,7 +135,7 @@ def scale_yeast(df, new_col="yeast_amount"):
     df.loc[~df["yeast_name"].isna(), new_col] = 1
 
 
-def ibu(df, hop_col="hop_amount"):
+def ibu(df, hop_col="hop_amount", new_col="ibu"):
     """Return IBU (International Bitterness Units), a measure of bitterness, for a
     recipe.
     Use the Tinseth formula:
@@ -169,19 +167,20 @@ def ibu(df, hop_col="hop_amount"):
     # if hops_col not in df.columns:
     #    scale_hop(df, hop_col)
     # Get rid of dry hops
-    sub_df = df.loc[:, df["hop_use"] != "dry hop"]
+    sub_df = df.loc[df["hop_use"] != "dry hop"]
     # Turn kg/L to mg/L
     hop_amount = sub_df[hop_col] * 1000 * 1000
 
     boil_time_factor = (1 - np.exp(-0.04 * sub_df["hop_time"])) / 4.15
-    bigness_factor = 1.65 * 0.000125 ** (gravity_kettle_sg(sub_df["ferm_amount"]) - 1)
+    bigness_factor = 1.65 * 0.000125 ** (gravity_kettle_sg(df) - 1)
     utilization = boil_time_factor * bigness_factor
-    ibu = (utilization * hop_amount).sum()
-    ibu.name = "ibu"
+    ibu = utilization * hop_amount
+    ibu = ibu.groupby(ibu.index).sum()
+    ibu.name = new_col
     return df.merge(ibu, left_index=True, right_index=True, how="left")
 
 
-def gravity_kettle_sg(s):
+def gravity_kettle_sg(df):
     """Take a series containing scaled fermentables and calculate the kettle
     full gravity of the recipe, in SG (eg. 1.050).
 
@@ -199,7 +198,9 @@ def gravity_kettle_sg(s):
         Series representing full grabity for recipes.
     """
 
-    return 1 + 0.004 * s.groupby(s.index).sum()
+    # ferm_extract_yield
+    fey = df["ferm_amount"] * df["ferm_yield"] * df["efficiency"]
+    return 1 + 0.004 * fey.groupby(fey.index).sum()
 
 
 def srm(df, ferm_col="ferm_amount", srm_name="srm"):
@@ -232,11 +233,14 @@ def srm(df, ferm_col="ferm_amount", srm_name="srm"):
     the given recipes.
     """
     # ferm_amount in kg, boil_size in kg
-    kg_to_lb = 0.453592
+    kg_to_lb = 2.20462
     l_to_gal = 0.264172
-    mcu = df["ferm_color"] * df[ferm_col] * kg_to_lb / (df["boil_size"] * l_to_gal)
+    import pdb
+
+    pdb.set_trace()
+    mcu = df["ferm_color"] * df[ferm_col] * kg_to_lb / l_to_gal
     srm = 1.4922 * mcu.groupby(mcu.index).sum() ** 0.6859
-    srm.name = "srm"
+    srm.name = srm_name
     return df.merge(srm, left_index=True, right_index=True, how="left")
 
 
@@ -282,8 +286,11 @@ def abv(df, ferm_col="ferm_amount"):
         recipes.
     """
 
+    # XXX - come back to this
+    # pybeerxml uses:
+    # ((1.05 * (self.og - self.fg)) / self.fg) / 0.79 * 100.0
     gb = df.groupby(df.index)
     OE = np.roots([0.004, 1, -gb[ferm_col].sum().values])
-    ABW = 0.42 * (OE - gb["yeast_attentuation"].mean()*OE)
+    ABW = 0.42 * (OE - gb["yeast_attentuation"].mean() * OE)
     ABV = pd.Series(1.25 * ABW, index=ABW.index, name="abv")
     return df.merge(ABV, left_index=True, right_index=True, how="left")
