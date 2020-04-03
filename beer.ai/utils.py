@@ -216,7 +216,8 @@ def gravity_original_sg(df):
 def gravity_final_sg(df):
     """ XXX write a better docstring
     Calculate the final gravity of each recipe, in SG."""
-    pass
+    atten = df["yeast_attenuation"].groupby(df.index).mean() + 1
+    return (gravity_original_sg(df) - 1) * atten
 
 
 def srm(df, ferm_col="ferm_amount", srm_name="srm"):
@@ -302,11 +303,14 @@ def abv(df, ferm_col="ferm_amount"):
         recipes.
     """
 
-    # XXX - come back to this
-    # pybeerxml uses:
-    # ((1.05 * (self.og - self.fg)) / self.fg) / 0.79 * 100.0
-    gb = df.groupby(df.index)
-    OE = np.roots([0.004, 1, -gb[ferm_col].sum().values])
-    ABW = 0.42 * (OE - gb["yeast_attentuation"].mean() * OE)
-    ABV = pd.Series(1.25 * ABW, index=ABW.index, name="abv")
-    return df.merge(ABV, left_index=True, right_index=True, how="left")
+    #gb = df.groupby(df.index)
+    #OE = np.roots([0.004, 1, -gb[ferm_col].sum().values])
+    #ABW = 0.42 * (OE - gb["yeast_attentuation"].mean() * OE)
+    #ABV = pd.Series(1.25 * ABW, index=ABW.index, name="abv")
+    #return df.merge(ABV, left_index=True, right_index=True, how="left")
+
+    og = gravity_original_sg(df)
+    fg = gravity_final_sg(df)
+    abv = ((1.05 * (og - fg)) / fg) / 0.79 * 100.0
+    abv.name = "abv"
+    return df.merge(abv, left_index=True, right_index=True, how="left")
