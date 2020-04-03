@@ -181,21 +181,28 @@ def ibu(df, hop_col="hop_amount", new_col="ibu"):
 
 
 def gravity_kettle_sg(df):
-    """Take a series containing scaled fermentables and calculate the kettle
-    full gravity of the recipe, in SG (eg. 1.050).
+    """
+    Return the wort gravity at the beginning of the boil, in S.G.
 
-
-    XXX - Add formula in doc, source for it
+    wort gravity = sum of (gravity contributions of each fermentable)
+    Where, for a fermentable:
+        gravity contribution (ºPlato) = 
+            mass * yield * efficiency / kettle volume 
+    And:
+        S.G. = 1 + 0.004 * ºPlato
 
     Parameters
     ==========
-    s: Series
-        Series of fermentable amounts
+    df: DataFrame
+        A DataFrame containing, at minimum:
+            "ferm_yield", "efficiency", "ferm_amount"
+        Where: 
+            "ferm_amount" is scaled
 
     Return
     ======
     Series
-        Series representing full gravity for recipes.
+        A Series representing wort gravity for each recipe.
     """
 
     # ferm_extract_yield
