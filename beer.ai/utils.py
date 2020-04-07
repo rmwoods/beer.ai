@@ -7,7 +7,7 @@ def get_style_guide():
         return json.load(f)
 
 
-def scale_ferm(df, new_col="ferm_amount"):
+def scale_ferm(df, new_col="ferm_amount", scale_volume="boil_size"):
     """
     Scale the fermentables by the boil size (accounting for yield). Add the
     results as the column `new_col`.
@@ -22,6 +22,8 @@ def scale_ferm(df, new_col="ferm_amount"):
     new_col: str, default "ferm_amount"
         Name of the new column to add to the given dataframe to contain the
         scaled fermentable. 
+    scale_volume: str, default "boil_size"
+        The volume to use to scale the fermentable quantity.
     
     Return:
     =======
@@ -29,20 +31,27 @@ def scale_ferm(df, new_col="ferm_amount"):
         Add `new_col` to the given dataframe containing the scaled
         fermentables in units of kg/L extract in the boil kettle.
     """
-    df[new_col] = df["ferm_amount"] / df["boil_size"]
+    df[new_col] = df["ferm_amount"] / df[scale_volume]
     df[new_col] = df[new_col].replace([np.inf, -np.inf], np.nan)
 
 
-def scale_hop(df, new_col="hop_amount"):
+def scale_hop(
+    df,
+    new_col="hop_amount",
+    scale_volume_dry="batch_size",
+    scale_volume_boil="boil_size",
+):
     """
     Compute the scaled hop quantities. Add the results as the column `new_col`.
     Use the following equations.
 
         Dry hopping:
-            scaled = hop_amount / batch_size
+            scaled = hop_amount / scale_volume 
 
         All other (most commonly boil):
-            scaled = hop_amount * hop_alpha * (1 - 0.1 * (hop_form == "leaf")) / boil_size
+            scaled = hop_amount * hop_alpha * (1 - 0.1 * (hop_form == "leaf")) / scale_volume 
+
+        Where scale_volume can be the volume of the batch or boil.    
 
     Parameters
     ==========
@@ -52,7 +61,11 @@ def scale_hop(df, new_col="hop_amount"):
     new_col: str, default "hop_amount"
         Name of the new column to add to the given dataframe to contain the
         scaled hops. 
-    
+    scale_volume_dry: str, default "batch_size"
+        The volume to use to scale the hop quantity for dry hops.
+    scale_volume_boil: str, default "boil_size"
+        The volume to use to scale the hop quantity for kettle hops.
+
     Return:
     =======
     None:
@@ -74,7 +87,7 @@ def scale_hop(df, new_col="hop_amount"):
     # Dry hops
     dh_cond = df["hop_use"] == "dry hop"
     df.loc[dh_cond, new_col] = (
-        df.loc[dh_cond, "hop_amount"] / df.loc[dh_cond, "batch_size"]
+        df.loc[dh_cond, "hop_amount"] / df.loc[dh_cond, scale_volume_dry]
     )
 
     # Every other hop use
@@ -83,12 +96,12 @@ def scale_hop(df, new_col="hop_amount"):
         df.loc[bh_cond, "hop_amount"]
         * df.loc[bh_cond, "hop_alpha"]
         * (1 - 0.1 * (df.loc[bh_cond, "hop_form"] == "leaf").astype(int))
-        / df.loc[bh_cond, "boil_size"]
+        / df.loc[bh_cond, scale_volume_boil]
     )
     df[new_col] = df[new_col].replace([np.inf, -np.inf], np.nan)
 
 
-def scale_misc(df, new_col="misc_amount"):
+def scale_misc(df, new_col="misc_amount", scale_volume="batch_size"):
     """
     Scale the miscellaneous quantities by the batch size. Add the results as
     the column `new_col`.
@@ -102,6 +115,9 @@ def scale_misc(df, new_col="misc_amount"):
     new_col: str, default "misc_amount"
         Name of the new column to add to the given dataframe to contain the
         scaled misc ingredients. 
+    scale_volume: str, default "batch_size"
+        The volume to use to scale the misc quantity.
+    
     
     Return:
     =======
@@ -109,7 +125,7 @@ def scale_misc(df, new_col="misc_amount"):
         Add `new_col` to the given dataframe containing the scaled
         miscellaneous ingredients in units of kg/L in the batch kettle.
     """
-    df[new_col] = df["misc_amount"] / df["batch_size"]
+    df[new_col] = df["misc_amount"] / df[scale_volume]
     df[new_col] = df[new_col].replace([np.inf, -np.inf], np.nan)
 
 
@@ -180,7 +196,7 @@ def ibu(df, hop_col="hop_amount", new_col="ibu"):
     return df.merge(ibu, left_index=True, right_index=True, how="left")
 
 
-def gravity_kettle_sg(df):
+def gravity_kettle_sg(df, ferm_col="ferm_amount"):
     """
     Return the wort gravity at the beginning of the boil, in S.G.
 
@@ -195,9 +211,11 @@ def gravity_kettle_sg(df):
     ==========
     df: DataFrame
         A DataFrame containing, at minimum:
-            "ferm_yield", "efficiency", "ferm_amount"
+            "ferm_yield", "efficiency", ferm_col 
         Where: 
             "ferm_amount" is scaled
+    ferm_col: str, default "ferm_amount"
+        The name of the column containing scaled fermentable quantities.
 
     Return
     ======
@@ -206,25 +224,73 @@ def gravity_kettle_sg(df):
     """
 
     # ferm_extract_yield
-    fey = df["ferm_amount"] * df["ferm_yield"] * df["efficiency"]
+    fey = df[ferm_col] * df["ferm_yield"] * df["efficiency"]
     return 1 + 0.004 * fey.groupby(fey.index).sum()
 
 
-def gravity_original_sg(df):
-    """ XXX write a better docstring
-    Calculate the original gravity of the recipe, in SG."""
-    gravity_kettle = gravity_kettle_sg(df)
-    # The percent of the volume evapourated during the boil, per hour
-    boiloff = 0.10
+def gravity_original_sg(df, boiloff=0.10, ferm_col="ferm_amount"):
+    """
+    Calculate the original gravity of the recipe, in SG.
+
+    original gravity = kettle full gravity * (1 - boiloff * boil time / 60 minutes)
+
+    Where: 
+        kettle full gravity is the gravity at the end of the lauter, before boil, in S.G.
+        boiloff is the % of volume lost to evaporation, per hour
+        boil time is the duration of the boil, in minutes
+
+    Parameters
+    ==========
+    df: DataFrame
+        A DataFrame containing, at minimum:
+            "boil_time", "ferm_yield", "efficiency", ferm_col 
+        Where: 
+            "ferm_amount" is scaled
+    boiloff: float, default 0.10
+        The % of the kettle full volume lost per 60 minutes.
+    ferm_col: str, default "ferm_amount"
+        The name of the column containing scaled fermentable quantities.
+
+    Return
+    ======
+    Series 
+        A Series representing the original gravity for each recipe.
+    """
+    gravity_kettle = gravity_kettle_sg(df, ferm_col)
     boil_time = df["boil_time"].groupby(df.index).first()
     return gravity_kettle * (1 - boiloff * boil_time / 60)
 
 
-def gravity_final_sg(df):
-    """ XXX write a better docstring
-    Calculate the final gravity of each recipe, in SG."""
+def gravity_final_sg(df, ferm_col="ferm_amount"):
+    """
+    Calculate the final gravity of the recipe, in SG.
+
+    final gravity = (original gravity - 1) * attenuation + 1
+
+    Where: 
+        original gravity is the gravity before fermentation, in SG 
+        attenuation is the apparent fraction of extract removed by fermentation
+
+    Parameters
+    ==========
+    df: DataFrame
+        A DataFrame containing, at minimum:
+            "yeast_attenuation", "boil_time", "ferm_yield", "efficiency", ferm_col 
+        Where: 
+            "ferm_amount" is scaled
+    boiloff: float, default 0.10
+        The % of the kettle full volume lost per 60 minutes.
+    ferm_col: str, default "ferm_amount"
+        The name of the column containing scaled fermentable quantities.
+
+    Return
+    ======
+    Series 
+        A Series representing the original gravity for each recipe.
+    """
+    gravity_kettle = gravity_kettle_sg(df, ferm_col)
     atten = df["yeast_attenuation"].groupby(df.index).mean() + 1
-    return (gravity_original_sg(df) - 1) * atten
+    return (gravity_original_sg(df) - 1) * atten + 1
 
 
 def srm(df, ferm_col="ferm_amount", srm_name="srm"):
@@ -259,9 +325,7 @@ def srm(df, ferm_col="ferm_amount", srm_name="srm"):
     # ferm_amount in kg, boil_size in kg
     kg_to_lb = 2.20462
     l_to_gal = 0.264172
-    import pdb
 
-    pdb.set_trace()
     mcu = df["ferm_color"] * df[ferm_col] * kg_to_lb / l_to_gal
     srm = 1.4922 * mcu.groupby(mcu.index).sum() ** 0.6859
     srm.name = srm_name
@@ -310,11 +374,11 @@ def abv(df, ferm_col="ferm_amount"):
         recipes.
     """
 
-    #gb = df.groupby(df.index)
-    #OE = np.roots([0.004, 1, -gb[ferm_col].sum().values])
-    #ABW = 0.42 * (OE - gb["yeast_attentuation"].mean() * OE)
-    #ABV = pd.Series(1.25 * ABW, index=ABW.index, name="abv")
-    #return df.merge(ABV, left_index=True, right_index=True, how="left")
+    # gb = df.groupby(df.index)
+    # OE = np.roots([0.004, 1, -gb[ferm_col].sum().values])
+    # ABW = 0.42 * (OE - gb["yeast_attentuation"].mean() * OE)
+    # ABV = pd.Series(1.25 * ABW, index=ABW.index, name="abv")
+    # return df.merge(ABV, left_index=True, right_index=True, how="left")
 
     og = gravity_original_sg(df)
     fg = gravity_final_sg(df)
