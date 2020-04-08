@@ -7,10 +7,9 @@ def get_style_guide():
         return json.load(f)
 
 
-def scale_ferm(df, new_col="ferm_amount", scale_volume="boil_size"):
+def scale_ferm(df, scale_volume="boil_size"):
     """
-    Scale the fermentables by the boil size (accounting for yield). Add the
-    results as the column `new_col`.
+    Scale the fermentables by the boil size (accounting for yield).
     
         scaled = `ferm_amount` * `efficiency` / `boil_size`
 
@@ -19,31 +18,21 @@ def scale_ferm(df, new_col="ferm_amount", scale_volume="boil_size"):
     df: DataFrame
         A dataframe containing, at minimum, "ferm_amount", "efficiency", and
         "boil_size".
-    new_col: str, default "ferm_amount"
-        Name of the new column to add to the given dataframe to contain the
-        scaled fermentable. 
     scale_volume: str, default "boil_size"
         The volume to use to scale the fermentable quantity.
     
     Return:
     =======
-    None:
-        Add `new_col` to the given dataframe containing the scaled
-        fermentables in units of kg/L extract in the boil kettle.
+    Series that represents the scaled fermentables in units of kg/L extract in the boil kettle.
     """
-    df[new_col] = df["ferm_amount"] / df[scale_volume]
-    df[new_col] = df[new_col].replace([np.inf, -np.inf], np.nan)
+    scaled_ferm = df["ferm_amount"] / df[scale_volume]
+    scaled_ferm = scaled_ferm.replace([np.inf, -np.inf], np.nan)
+    return scaled_ferm
 
 
-def scale_hop(
-    df,
-    new_col="hop_amount",
-    scale_volume_dry="batch_size",
-    scale_volume_boil="boil_size",
-):
+def scale_hop(df, scale_volume_dry="batch_size", scale_volume_boil="boil_size"):
     """
-    Compute the scaled hop quantities. Add the results as the column `new_col`.
-    Use the following equations.
+    Compute the scaled hop quantities.
 
         Dry hopping:
             scaled = hop_amount / scale_volume 
@@ -58,9 +47,6 @@ def scale_hop(
     df: DataFrame
         A dataframe containing, at minimum, `hop_amount`, `hop_use`,
         `hop_alpha`, `hop_form`, `boil_size`, and `batch_size`.
-    new_col: str, default "hop_amount"
-        Name of the new column to add to the given dataframe to contain the
-        scaled hops. 
     scale_volume_dry: str, default "batch_size"
         The volume to use to scale the hop quantity for dry hops.
     scale_volume_boil: str, default "boil_size"
@@ -68,9 +54,8 @@ def scale_hop(
 
     Return:
     =======
-    None:
-        Add `new_col` to the given dataframe containing the scaled
-        hops in units of kg/L extract in the boil kettle.
+    Series representing the scaled hops in units of kg/L extract in the boil
+    kettle.
     
     
     NOTE:
@@ -78,33 +63,32 @@ def scale_hop(
         column.
         `hop_use` == "dry hop"
             Calculate scaled hops as the kilograms of dry hops per liter by
-            dividing by `batch_size`.
+            dividing by scale_volume_dry
         `hop_use` != "dry hop" (all other categories)
-            Calculate scaled hops as the kilograms of alpha acids per liter in
-            the boil kettle. This calculation differentiates between
+            Calculate scaled hops as the kilograms of alpha acids per
+            scale_volume_boil. This calculation differentiates between
             `hop_form` == "leaf" and `hop_form` != "leaf".
     """
     # Dry hops
     dh_cond = df["hop_use"] == "dry hop"
-    df.loc[dh_cond, new_col] = (
-        df.loc[dh_cond, "hop_amount"] / df.loc[dh_cond, scale_volume_dry]
-    )
+    dry_scaled = df.loc[dh_cond, "hop_amount"] / df.loc[dh_cond, scale_volume_dry]
 
     # Every other hop use
     bh_cond = df["hop_use"] != "dry hop"
-    df.loc[bh_cond, new_col] = (
+    boil_scaled = (
         df.loc[bh_cond, "hop_amount"]
         * df.loc[bh_cond, "hop_alpha"]
         * (1 - 0.1 * (df.loc[bh_cond, "hop_form"] == "leaf").astype(int))
         / df.loc[bh_cond, scale_volume_boil]
     )
-    df[new_col] = df[new_col].replace([np.inf, -np.inf], np.nan)
+    scaled = dry_scaled.append(boil_scaled).sort_index()
+    scaled = scaled.replace([np.inf, -np.inf], np.nan)
+    return scaled
 
 
-def scale_misc(df, new_col="misc_amount", scale_volume="batch_size"):
+def scale_misc(df, scale_volume="batch_size"):
     """
-    Scale the miscellaneous quantities by the batch size. Add the results as
-    the column `new_col`.
+    Scale the miscellaneous quantities by the batch size.
     
         scaled = `misc_amount` / `batch_size`
 
@@ -112,46 +96,39 @@ def scale_misc(df, new_col="misc_amount", scale_volume="batch_size"):
     ==========
     df: DataFrame
         A dataframe containing, at minimum, "misc_amount" and "batch_size".
-    new_col: str, default "misc_amount"
-        Name of the new column to add to the given dataframe to contain the
-        scaled misc ingredients. 
     scale_volume: str, default "batch_size"
         The volume to use to scale the misc quantity.
     
     
     Return:
     =======
-    None:
-        Add `new_col` to the given dataframe containing the scaled
-        miscellaneous ingredients in units of kg/L in the batch kettle.
+    Series representing the scaled miscellaneous ingredients in units of kg/L
+    in the batch kettle.
     """
-    df[new_col] = df["misc_amount"] / df[scale_volume]
-    df[new_col] = df[new_col].replace([np.inf, -np.inf], np.nan)
+    misc_scaled = df["misc_amount"] / df[scale_volume]
+    misc_scaled = misc_scaled.replace([np.inf, -np.inf], np.nan)
+    return misc_scaled
 
 
-def scale_yeast(df, new_col="yeast_amount"):
+def scale_yeast(df):
     """
-    Return a DataFrame with  `new_col` = 1. This is considered scaled for yeast
+    Return a Series with 1's matching the indices of df. This is considered scaled for yeast
     since `yeast_amount` is not typically given.
 
     Parameters
     ==========
     df: DataFrame
         A dataframe containing, at minimum, "misc_amount" and "batch_size".
-    new_col: str, default "yeast_amount"
-        Name of the new column to add to the given dataframe to contain the
-        scaled yeast. 
     
     Return:
     =======
-    None:
-        Add `new_col` to the given dataframe containing the scaled
-        yeast. This value has no units.
+    Series representing the scaled yeast. This value has no units.
     """
-    df.loc[~df["yeast_name"].isna(), new_col] = 1
+    inds = df.loc[~df["yeast_name"].isna()].index
+    return pd.Series(np.ones(len(inds), index=inds))
 
 
-def ibu(df, hop_col="hop_amount", new_col="ibu"):
+def ibu(df, hop_col="hop_amount"):
     """Return IBU (International Bitterness Units), a measure of bitterness, for a
     recipe.
     Use the Tinseth formula:
@@ -177,8 +154,7 @@ def ibu(df, hop_col="hop_amount", new_col="ibu"):
 
     Return:
     =======
-    Dataframe with "ibu" column added to passed in Dataframe
-        Estimate of IBU for the given recipes.
+    Series representing estimate of IBU for the given recipes.
     """
     # if hops_col not in df.columns:
     #    scale_hop(df, hop_col)
@@ -192,8 +168,7 @@ def ibu(df, hop_col="hop_amount", new_col="ibu"):
     utilization = boil_time_factor * bigness_factor
     ibu = utilization * hop_amount
     ibu = ibu.groupby(ibu.index).sum()
-    ibu.name = new_col
-    return df.merge(ibu, left_index=True, right_index=True, how="left")
+    return ibu
 
 
 def gravity_kettle_sg(df, ferm_col="ferm_amount"):
@@ -219,8 +194,7 @@ def gravity_kettle_sg(df, ferm_col="ferm_amount"):
 
     Return
     ======
-    Series
-        A Series representing wort gravity for each recipe.
+    Series representing wort gravity for each recipe.
     """
 
     # ferm_extract_yield
@@ -253,8 +227,7 @@ def gravity_original_sg(df, boiloff=0.10, ferm_col="ferm_amount"):
 
     Return
     ======
-    Series 
-        A Series representing the original gravity for each recipe.
+    Series representing the original gravity for each recipe.
     """
     gravity_kettle = gravity_kettle_sg(df, ferm_col)
     boil_time = df["boil_time"].groupby(df.index).first()
@@ -285,15 +258,14 @@ def gravity_final_sg(df, ferm_col="ferm_amount"):
 
     Return
     ======
-    Series 
-        A Series representing the original gravity for each recipe.
+    Series representing the original gravity for each recipe.
     """
     gravity_kettle = gravity_kettle_sg(df, ferm_col)
     atten = df["yeast_attenuation"].groupby(df.index).mean() + 1
     return (gravity_original_sg(df) - 1) * atten + 1
 
 
-def srm(df, ferm_col="ferm_amount", srm_name="srm"):
+def srm(df, ferm_col="ferm_amount"):
     """Return SRM (Standard Reference Method units), a measure of colour, for a
     recipe.
     Use the Morey formula:
@@ -314,13 +286,10 @@ def srm(df, ferm_col="ferm_amount", srm_name="srm"):
         colors. Assumed column is "ferm_color".
     ferm_col: str, default "ferm_amount"
         Name of column containing **scaled** fermentables
-    srm_name: str, default "srm"
-        Name of column that will contain SRM estimate.
 
     Return:
     =======
-    Dataframe with new column `color_name` which is an estimate of the SRM for
-    the given recipes.
+    Series representing estimate of the SRM for the given recipes.
     """
     # ferm_amount in kg, boil_size in kg
     kg_to_lb = 2.20462
@@ -328,18 +297,11 @@ def srm(df, ferm_col="ferm_amount", srm_name="srm"):
 
     mcu = df["ferm_color"] * df[ferm_col] * kg_to_lb / l_to_gal
     srm = 1.4922 * mcu.groupby(mcu.index).sum() ** 0.6859
-    srm.name = srm_name
-    return df.merge(srm, left_index=True, right_index=True, how="left")
+    return srm
 
 
 def color(*args, **kwargs):
-    """This is a convenience function, see `srm` for documentation.
-
-    NOTE: This function passes `srm_name = "color"` to `srm` unless it has
-    already been specified.
-    """
-    if "srm_name" not in kwargs.keys():
-        kwargs.update({"srm_name": "color"})
+    """This is a convenience function, see `srm()` for documentation."""
     return srm(*args, **kwargs)
 
 
@@ -369,9 +331,7 @@ def abv(df, ferm_col="ferm_amount"):
 
     Return:
     =======
-    DataFrame:
-        New dataframe containing column "abv", an estimate of the ABV for the
-        recipes.
+    Series representing estimate of the ABV for the recipes.
     """
 
     # gb = df.groupby(df.index)
@@ -383,5 +343,4 @@ def abv(df, ferm_col="ferm_amount"):
     og = gravity_original_sg(df)
     fg = gravity_final_sg(df)
     abv = ((1.05 * (og - fg)) / fg) / 0.79 * 100.0
-    abv.name = "abv"
-    return df.merge(abv, left_index=True, right_index=True, how="left")
+    return abv
