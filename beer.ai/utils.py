@@ -164,14 +164,14 @@ def ibu(df, hop_col="hop_amount"):
     hop_amount = sub_df[hop_col] * 1000 * 1000
 
     boil_time_factor = (1 - np.exp(-0.04 * sub_df["hop_time"])) / 4.15
-    bigness_factor = 1.65 * 0.000125 ** (gravity_kettle_sg(df) - 1)
+    bigness_factor = 1.65 * 0.000125 ** (gravity_kettle(df) - 1)
     utilization = boil_time_factor * bigness_factor
     ibu = utilization * hop_amount
     ibu = ibu.groupby(ibu.index).sum()
     return ibu
 
 
-def gravity_kettle_sg(df, ferm_col="ferm_amount"):
+def gravity_kettle(df, ferm_col="ferm_amount"):
     """
     Return the wort gravity at the beginning of the boil, in S.G.
 
@@ -186,9 +186,7 @@ def gravity_kettle_sg(df, ferm_col="ferm_amount"):
     ==========
     df: DataFrame
         A DataFrame containing, at minimum:
-            "ferm_yield", "efficiency", ferm_col 
-        Where: 
-            "ferm_amount" is scaled
+            "ferm_yield", "efficiency", ferm_col
     ferm_col: str, default "ferm_amount"
         The name of the column containing scaled fermentable quantities.
 
@@ -202,7 +200,7 @@ def gravity_kettle_sg(df, ferm_col="ferm_amount"):
     return 1 + 0.004 * fey.groupby(fey.index).sum()
 
 
-def gravity_original_sg(df, boiloff=0.10, ferm_col="ferm_amount"):
+def gravity_original(df, boiloff=0.10, pbg_col="pbg", ferm_col="ferm_amount"):
     """
     Calculate the original gravity of the recipe, in SG.
 
@@ -216,25 +214,31 @@ def gravity_original_sg(df, boiloff=0.10, ferm_col="ferm_amount"):
     Parameters
     ==========
     df: DataFrame
-        A DataFrame containing, at minimum:
-            "boil_time", "ferm_yield", "efficiency", ferm_col 
-        Where: 
-            "ferm_amount" is scaled
+        A DataFrame containing "boil_time" and optionally `pbg_col`.
     boiloff: float, default 0.10
         The % of the kettle full volume lost per 60 minutes.
+    pbg_col: str, default "pbg"
+        The name of the column in df containing the pre-boil gravity
+        (kettle gravity). If this column does not exist, it is calculated by
+        calling `gravity_kettle()` (which has its own requirements).
     ferm_col: str, default "ferm_amount"
-        The name of the column containing scaled fermentable quantities.
+        The name of the column in df containing scaled fermentable quantities.
+        Only used if `pbg_col` does not exist. Passed through to
+        `gravity_kettle()`.
 
     Return
     ======
     Series representing the original gravity for each recipe.
     """
-    gravity_kettle = gravity_kettle_sg(df, ferm_col)
+    if pbg_col not in df.columns:
+        pbg = gravity_kettle(df, ferm_col=ferm_col)
+    else:
+        pbg = df[pbg_col]
     boil_time = df["boil_time"].groupby(df.index).first()
-    return gravity_kettle * (1 - boiloff * boil_time / 60)
+    return pbg * (1 - boiloff * boil_time / 60)
 
 
-def gravity_final_sg(df, ferm_col="ferm_amount"):
+def gravity_final(df, og_col="og", ferm_col="ferm_amount", boil_off=0.1):
     """
     Calculate the final gravity of the recipe, in SG.
 
@@ -247,22 +251,29 @@ def gravity_final_sg(df, ferm_col="ferm_amount"):
     Parameters
     ==========
     df: DataFrame
-        A DataFrame containing, at minimum:
-            "yeast_attenuation", "boil_time", "ferm_yield", "efficiency", ferm_col 
-        Where: 
-            "ferm_amount" is scaled
-    boiloff: float, default 0.10
-        The % of the kettle full volume lost per 60 minutes.
+        A DataFrame optionally containing og_col.
+    og_col: str, default "og"    
+        Column in df containing the original gravity of the recipes. If og_col
+        is not in df, calculate it by calling `original_gravity()` (which has
+        its own requirements).
     ferm_col: str, default "ferm_amount"
-        The name of the column containing scaled fermentable quantities.
+        The name of the column containing scaled fermentable quantities. Only
+        used if `og_col` not in df. Passed through to `gravity_original()`.
+    boiloff: float, default 0.10
+        The % of the kettle full volume lost per 60 minutes. Only used if
+        `og_col` not in df. Passed through to `gravity_original()`.
 
     Return
     ======
     Series representing the original gravity for each recipe.
     """
-    gravity_kettle = gravity_kettle_sg(df, ferm_col)
+    if og_col not in df.columns:
+        og = gravity_original(df, ferm_col=ferm_col, boiloff=boil_off)
+    else:
+        og = df[og_col]
+
     atten = df["yeast_attenuation"].groupby(df.index).mean() + 1
-    return (gravity_original_sg(df) - 1) * atten + 1
+    return (og - 1) * atten + 1
 
 
 def srm(df, ferm_col="ferm_amount"):
@@ -275,7 +286,7 @@ def srm(df, ferm_col="ferm_amount"):
         MCU =  grain color * grain weight / kettle volume
 
         Where:
-            grain color is in °L (degrees Lovabond)
+            grain color is in °L (degrees Lovibond)
             grain weight is in lbs
             kettle volume is in gallons
 
@@ -285,7 +296,7 @@ def srm(df, ferm_col="ferm_amount"):
         DataFrame containing scaled fermentable quantities and fermentable
         colors. Assumed column is "ferm_color".
     ferm_col: str, default "ferm_amount"
-        Name of column containing **scaled** fermentables
+        Name of column in df containing **scaled** fermentables
 
     Return:
     =======
@@ -305,7 +316,7 @@ def color(*args, **kwargs):
     return srm(*args, **kwargs)
 
 
-def abv(df, ferm_col="ferm_amount"):
+def abv(df, ferm_col="ferm_amount", og_col="og", fg_col="fg"):
     """Return ABV (Alcohol By Volume) for a recipe.
     Use the following formulae:
     (Source: "Brewing Calculations" by Jim Helmke, D.G. Yuengling & Son
@@ -325,22 +336,33 @@ def abv(df, ferm_col="ferm_amount"):
     ===========
     df: Pandas DataFrame
         DataFrame containing scaled fermentable quantities and yeast
-        attenuations. Assumed to have "yeast_attenuation" column as well as
-        `ferm_col` column. The `ferm_col` is the **scaled** fermentable
-        quantities.
+        attenuations. Assumed to contain og_col, fg_col as columns, though if
+        it does not, it calculates them.
+    og_col: str, default "og"
+        Name of column in df containing original gravity values. If this column
+        does not exist in df, it will be obtained by calling
+        `gravity_original()` (which has its own requirements - see docstring).
+    fg_col: str, default "fg"
+        Name of column in df containing final gravity values. If this column
+        does not exist in df, it will be obtained by calling `gravity_final()`
+        (which has its own requirements - see docstring).
+    ferm_col: str, default "ferm_amount"
+        Name of column in df containing scaled fermentable quantities. Only
+        used if og_col or fg_col are not in df (passed through to
+        gravity_original/final functions).
 
     Return:
     =======
     Series representing estimate of the ABV for the recipes.
     """
 
-    # gb = df.groupby(df.index)
-    # OE = np.roots([0.004, 1, -gb[ferm_col].sum().values])
-    # ABW = 0.42 * (OE - gb["yeast_attentuation"].mean() * OE)
-    # ABV = pd.Series(1.25 * ABW, index=ABW.index, name="abv")
-    # return df.merge(ABV, left_index=True, right_index=True, how="left")
-
-    og = gravity_original_sg(df)
-    fg = gravity_final_sg(df)
+    if og_col not in df.columns:
+        og = gravity_original(df, ferm_col=ferm_col)
+    else:
+        og = df[og_col]
+    if fg_col not in df.columns:
+        fg = gravity_final(df, ferm_col=ferm_col)
+    else:
+        fg = df[fg_col]
     abv = ((1.05 * (og - fg)) / fg) / 0.79 * 100.0
     return abv
