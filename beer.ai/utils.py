@@ -314,6 +314,7 @@ def srm(df, ferm_col="ferm_scaled"):
     kg_to_lb = 2.20462
     l_to_gal = 0.264172
 
+    # malt color units
     mcu = df["ferm_color"] * df[ferm_col] * kg_to_lb / l_to_gal
     srm = 1.4922 * mcu.groupby(mcu.index).sum() ** 0.6859
     return srm
