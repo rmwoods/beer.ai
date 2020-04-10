@@ -71,17 +71,25 @@ def scale_hop(df, scale_volume_dry="batch_size", scale_volume_boil="boil_size"):
     """
     # Dry hops
     dh_cond = df["hop_use"] == "dry hop"
+    dh_inds = np.where(dh_cond)[0]
     dry_scaled = df.loc[dh_cond, "hop_amount"] / df.loc[dh_cond, scale_volume_dry]
+    # Set to numerical index for appending to keep order
+    dry_scaled.index = dh_inds
 
     # Every other hop use
     bh_cond = df["hop_use"] != "dry hop"
+    bh_inds = np.where(bh_cond)[0]
     boil_scaled = (
         df.loc[bh_cond, "hop_amount"]
         * df.loc[bh_cond, "hop_alpha"]
         * (1 - 0.1 * (df.loc[bh_cond, "hop_form"] == "leaf").astype(int))
         / df.loc[bh_cond, scale_volume_boil]
     )
+    # Set to numerical index for appending to keep order
+    boil_scaled.index = bh_inds
     scaled = dry_scaled.append(boil_scaled).sort_index()
+    # Reset to original index
+    scaled.index = df.index
     scaled = scaled.replace([np.inf, -np.inf], np.nan)
     return scaled
 
@@ -156,8 +164,6 @@ def ibu(df, hop_col="hop_scaled"):
     =======
     Series representing estimate of IBU for the given recipes.
     """
-    # if hops_col not in df.columns:
-    #    scale_hop(df, hop_col)
     # Get rid of dry hops
     sub_df = df.loc[df["hop_use"] != "dry hop"]
     # Turn kg/L to mg/L
@@ -196,7 +202,8 @@ def gravity_kettle(df, ferm_col="ferm_scaled"):
     """
 
     # ferm_extract_yield
-    fey = df[ferm_col] * df["ferm_yield"] * df["efficiency"]
+    # Multiply by 100 to get from fraction to plato (which is percentage)
+    fey = df[ferm_col] * df["ferm_yield"] * df["efficiency"] * 100
     return 1 + 0.004 * fey.groupby(fey.index).sum()
 
 
@@ -242,7 +249,7 @@ def gravity_final(df, og_col="og", ferm_col="ferm_scaled", boil_off=0.1):
     """
     Calculate the final gravity of the recipe, in SG.
 
-    final gravity = (original gravity - 1) * attenuation + 1
+    final gravity = (original gravity - 1) * (1 - attenuation) + 1
 
     Where: 
         original gravity is the gravity before fermentation, in SG 
@@ -272,8 +279,9 @@ def gravity_final(df, og_col="og", ferm_col="ferm_scaled", boil_off=0.1):
     else:
         og = df[og_col]
 
-    atten = df["yeast_attenuation"].groupby(df.index).mean() + 1
-    return (og - 1) * atten + 1
+    # attenuation is in percent, not fraction, divide by 100 to get to fraction
+    atten = df["yeast_attenuation"].groupby(df.index).mean() / 100
+    return (og - 1) * (1 - atten) + 1
 
 
 def srm(df, ferm_col="ferm_scaled"):
