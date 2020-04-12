@@ -41,7 +41,7 @@ def scale_hop(df, scale_volume_dry="batch_size", scale_volume_boil="boil_size"):
         All other (most commonly boil):
             scaled = hop_amount * hop_alpha * (1 - 0.1 * (hop_form == "leaf")) / scale_volume 
 
-        Where scale_volume can be the volume of the batch or boil.    
+        Where scale_volume can be the volume of either the batch or boil.    
 
     Parameters
     ==========
@@ -178,75 +178,60 @@ def ibu(df, hop_col="hop_scaled"):
     return ibu
 
 
-def gravity_kettle(df, ferm_col="ferm_scaled"):
+def gravity_wort(df, scale_volume="batch_size"):
     """
-    Return the wort gravity at the beginning of the boil, in S.G.
+    Return the wort gravity, either:
+        Kettle gravity
+            Before the boil, if scale_volume is "boil_size" 
+        Original gravity
+            Before the fermentation, if scale_volume is "batch_size" 
 
     wort gravity = sum of (gravity contributions of each fermentable)
     Where, for a fermentable:
         gravity contribution (ºPlato) = 
-            mass * yield * efficiency / kettle volume 
+            mass * yield * efficiency / volume 
     And:
         S.G. = 1 + 0.004 * ºPlato
+
+    Scaling the fermentable accounts for the ratio of mass and volume.
 
     Parameters
     ==========
     df: DataFrame
         A DataFrame containing, at minimum:
-            "ferm_yield", "efficiency", ferm_col
-    ferm_col: str, default "ferm_scaled"
-        The name of the column containing scaled fermentable quantities.
+            "ferm_amount", "ferm_yield", "efficiency", scale_volume 
+    scale_volume: str, default "batch_size"
+        The name of the column containing the volume to use to scale the fermentable quantities. 
 
     Return
     ======
     Series representing wort gravity for each recipe.
     """
+    ferm_scaled = scale_ferm(df, scale_volume) 
 
     # ferm_extract_yield
     # Multiply by 100 to get from fraction to plato (which is percentage)
-    fey = df[ferm_col] * df["ferm_yield"] * df["efficiency"] * 100
+    fey = ferm_scaled * df["ferm_yield"] * df["efficiency"] * 100
     return 1 + 0.004 * fey.groupby(fey.index).sum()
 
 
-def gravity_original(df, boiloff=0.10, pbg_col="pbg", ferm_col="ferm_scaled"):
+def gravity_kettle(df):
     """
-    Calculate the original gravity of the recipe, in SG.
-
-    original gravity = (kettle full gravity - 1) * (1 + boiloff * boil time / 60 minutes) + 1
-
-    Where: 
-        kettle full gravity is the gravity at the end of the lauter, before boil, in S.G.
-        boiloff is the % of volume lost to evaporation, per hour
-        boil time is the duration of the boil, in minutes
-
-    Parameters
-    ==========
-    df: DataFrame
-        A DataFrame containing "boil_time" and optionally `pbg_col`.
-    boiloff: float, default 0.10
-        The % of the kettle full volume lost per 60 minutes.
-    pbg_col: str, default "pbg"
-        The name of the column in df containing the pre-boil gravity
-        (kettle gravity). If this column does not exist, it is calculated by
-        calling `gravity_kettle()` (which has its own requirements).
-    ferm_col: str, default "ferm_scaled"
-        The name of the column in df containing scaled fermentable quantities.
-        Only used if `pbg_col` does not exist. Passed through to
-        `gravity_kettle()`.
-
-    Return
-    ======
-    Series representing the original gravity for each recipe.
+    This is a convenience function to calculate pre-boil wort gravity.
+    See gravity_wort() for documentation.
     """
-    if pbg_col not in df.columns:
-        pbg = gravity_kettle(df, ferm_col=ferm_col)
-    else:
-        pbg = df[pbg_col]
-    boil_time = df["boil_time"].groupby(df.index).first()
-    return (pbg - 1) * (1 + boiloff * boil_time / 60) + 1
+    return gravity_wort(df, "boil_size")
 
 
-def gravity_final(df, og_col="og", ferm_col="ferm_scaled", boil_off=0.1):
+def gravity_original(df):
+    """
+    This is a convenience function to calculate pre-fermentation wort gravity.
+    See gravity_wort() for documentation.
+    """
+    return gravity_wort(df, "batch_size")
+
+
+def gravity_final(df, og_col="og"): 
     """
     Calculate the final gravity of the recipe, in SG.
 
@@ -261,26 +246,20 @@ def gravity_final(df, og_col="og", ferm_col="ferm_scaled", boil_off=0.1):
     df: DataFrame
         A DataFrame optionally containing og_col.
     og_col: str, default "og"    
-        Column in df containing the original gravity of the recipes. If og_col
-        is not in df, calculate it by calling `original_gravity()` (which has
-        its own requirements).
-    ferm_col: str, default "ferm_scaled"
-        The name of the column containing scaled fermentable quantities. Only
-        used if `og_col` not in df. Passed through to `gravity_original()`.
-    boiloff: float, default 0.10
-        The % of the kettle full volume lost per 60 minutes. Only used if
-        `og_col` not in df. Passed through to `gravity_original()`.
+        Column in df containing the original gravity of the recipes.
+        If og_col is not in df, calculate it by calling `original_gravity()`
+        (which has its own requirements)
 
     Return
     ======
     Series representing the original gravity for each recipe.
     """
     if og_col not in df.columns:
-        og = gravity_original(df, ferm_col=ferm_col, boiloff=boil_off)
+        og = gravity_original(df)
     else:
         og = df[og_col]
 
-    # attenuation is in percent, not fraction, divide by 100 to get to fraction
+    # Attenuation is in percent, not fraction. Divide by 100 to get to fraction
     atten = df["yeast_attenuation"].groupby(df.index).mean() / 100
     return (og - 1) * (1 - atten) + 1
 
