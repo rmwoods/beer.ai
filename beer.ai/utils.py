@@ -7,23 +7,24 @@ def get_style_guide():
         return json.load(f)
 
 
-def scale_ferm(df, scale_volume="boil_size"):
+def scale_ferm(df, scale_volume="batch_size"):
     """
-    Scale the fermentables by the boil size (accounting for yield).
+    Scale the fermentables by a volume measure.  
     
-        scaled = `ferm_amount` * `efficiency` / `boil_size`
+        scaled = `ferm_amount` / scale_volume 
 
     Parameters
     ==========
     df: DataFrame
-        A dataframe containing, at minimum, "ferm_amount", "efficiency", and
-        "boil_size".
-    scale_volume: str, default "boil_size"
-        The volume to use to scale the fermentable quantity.
+        A dataframe containing, at minimum:
+            "ferm_amount",
+            scale_volume
+    scale_volume: str, default "batch_size"
+        The column containing the volume to use to scale the fermentable quantity.
     
     Return:
     =======
-    Series that represents the scaled fermentables in units of kg/L extract in the boil kettle.
+    Series representing the scaled fermentables, in units of kg/L.
     """
     scaled_ferm = df["ferm_amount"] / df[scale_volume]
     scaled_ferm = scaled_ferm.replace([np.inf, -np.inf], np.nan)
