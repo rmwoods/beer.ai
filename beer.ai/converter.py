@@ -106,6 +106,7 @@ def fill_ferm(d, ferm, core_vals):
         if amount is not None and unit is not None and \
                 abs(amount*TO_KG.get(unit, 1) - d["ferm_amount"]) > EPS:
             d["ferm_amount"] = amount*TO_KG.get(unit, 1)
+        d["ferm_type"] = clean_text(getattr(ferm, "type", None))
         d["ferm_yield"] = safe_float(getattr(ferm, "_yield", None))*0.01
         d["ferm_color"] = safe_float(getattr(ferm, "color", None))
         d["ferm_potential"] = safe_float(getattr(ferm, "potential", None))
