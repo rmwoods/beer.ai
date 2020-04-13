@@ -189,9 +189,10 @@ def gravity_wort(df, scale_volume="batch_size"):
     wort gravity = sum of (gravity contributions of each fermentable)
     Where, for a fermentable:
         gravity contribution (ºPlato) = 
-            mass * yield * efficiency / volume 
+            mass * yield * moisture correction * efficiency / volume 
     And:
         S.G. = 1 + 0.004 * ºPlato
+        And moisture correction = 0.96
 
     Scaling the fermentable accounts for the ratio of mass and volume.
 
@@ -211,7 +212,7 @@ def gravity_wort(df, scale_volume="batch_size"):
 
     # ferm_extract_yield
     # Multiply by 100 to get from fraction to plato (which is percentage)
-    fey = ferm_scaled * df["ferm_yield"] * df["efficiency"] * 100
+    fey = ferm_scaled * df["ferm_yield"] * df["efficiency"] * 0.96 * 100
     return 1 + 0.004 * fey.groupby(fey.index).sum()
 
 
