@@ -1,5 +1,6 @@
 import json
 import numpy as np
+import pandas as pd
 
 
 def get_style_guide():
@@ -9,9 +10,9 @@ def get_style_guide():
 
 def scale_ferm(df, scale_volume="batch_size"):
     """
-    Scale the fermentables by a volume measure.  
-    
-        scaled = `ferm_amount` / scale_volume 
+    Scale the fermentables by a volume measure. 
+
+        scaled = `ferm_amount` / scale_volume
 
     Parameters
     ==========
@@ -21,7 +22,7 @@ def scale_ferm(df, scale_volume="batch_size"):
             scale_volume
     scale_volume: str, default "batch_size"
         The column containing the volume to use to scale the fermentable quantity.
-    
+
     Return:
     =======
     Series representing the scaled fermentables, in units of kg/L.
@@ -36,12 +37,12 @@ def scale_hop(df, scale_volume_dry="batch_size", scale_volume_boil="boil_size"):
     Compute the scaled hop quantities.
 
         Dry hopping:
-            scaled = hop_amount / scale_volume 
+            scaled = hop_amount / scale_volume
 
         All other (most commonly boil):
-            scaled = hop_amount * hop_alpha * (1 - 0.1 * (hop_form == "leaf")) / scale_volume 
+            scaled = hop_amount * hop_alpha * (1 - 0.1 * (hop_form == "leaf")) / scale_volume
 
-        Where scale_volume can be the volume of either the batch or boil.    
+        Where scale_volume can be the volume of either the batch or boil.
 
     Parameters
     ==========
@@ -57,8 +58,8 @@ def scale_hop(df, scale_volume_dry="batch_size", scale_volume_boil="boil_size"):
     =======
     Series representing the scaled hops in units of kg/L extract in the boil
     kettle.
-    
-    
+
+
     NOTE:
         The scaled hop quantities will differ depending on the `hop_use`
         column.
@@ -98,7 +99,7 @@ def scale_hop(df, scale_volume_dry="batch_size", scale_volume_boil="boil_size"):
 def scale_misc(df, scale_volume="batch_size"):
     """
     Scale the miscellaneous quantities by the batch size.
-    
+
         scaled = `misc_amount` / `batch_size`
 
     Parameters
@@ -107,8 +108,8 @@ def scale_misc(df, scale_volume="batch_size"):
         A dataframe containing, at minimum, "misc_amount" and "batch_size".
     scale_volume: str, default "batch_size"
         The volume to use to scale the misc quantity.
-    
-    
+
+
     Return:
     =======
     Series representing the scaled miscellaneous ingredients in units of kg/L
@@ -121,14 +122,14 @@ def scale_misc(df, scale_volume="batch_size"):
 
 def scale_yeast(df):
     """
-    Return a Series with 1's matching the indices of df. This is considered scaled for yeast
-    since `yeast_amount` is not typically given.
+    Return a Series with 1's matching the indices of df. This is considered
+    scaled for yeast since `yeast_amount` is not typically given.
 
     Parameters
     ==========
     df: DataFrame
         A dataframe containing, at minimum, "misc_amount" and "batch_size".
-    
+
     Return:
     =======
     Series representing the scaled yeast. This value has no units.
@@ -178,18 +179,63 @@ def ibu(df, hop_col="hop_scaled"):
     return ibu
 
 
+def adjust_efficiency(df, sugar_efficiency=1, lme_efficiency=0.8):
+    """
+    Return a Series of adjusted efficiencies based on the ferm_type / name.
+
+    Efficiency can vary depending on what fermentable it is, what form it's
+    in, and when it's added during the brew. Here, we assume the following:
+
+        ferm_type:                                      efficiency
+        ==========================================================
+        malt, adjunct (added in mash):        efficiency as-stated
+        dry malt extract, sugar (added to kettle): efficiency is 1
+        liquid malt extract (added to kettle):   efficiency is 0.8
+
+    Parameters
+    ==========
+    ...
+
+    Return
+    ======
+    Series representing efficiency of a particular fermentable
+    """
+
+    # Sugar types: "sugar", "dry extract"
+    sugar_types = ["sugar", "dry_extract"]
+    # lme types: "liquid extract", "extract"
+    lme_types = ["liquid extract", "extract"]
+    # all others -> keep recipe efficiency
+    sugar_mask = df["ferm_type"].isin(sugar_types)
+    sugar_inds = np.where(sugar_mask)[0]
+    lme_mask = df["ferm_type"].isin(lme_types)
+    lme_inds = np.where(lme_mask)[0]
+    other_mask = ~sugar_mask & ~lme_mask
+    other_inds = np.where(other_mask)[0]
+
+    sugar_eff = pd.Series(sugar_efficiency * np.ones(len(sugar_inds)), index=sugar_inds)
+    lme_eff = pd.Series(lme_efficiency * np.ones(len(lme_inds)), index=lme_inds)
+    other_eff = df.loc[other_mask, "efficiency"]
+    other_eff.index = other_inds
+
+    total = sugar_eff.append(lme_eff)
+    total = total.append(other_eff).sort_index()
+    total.index = df.index
+    return total
+
+
 def gravity_wort(df, scale_volume="batch_size"):
     """
     Return the wort gravity, either:
         Kettle gravity
-            Before the boil, if scale_volume is "boil_size" 
+            Before the boil, if scale_volume is "boil_size"
         Original gravity
-            Before the fermentation, if scale_volume is "batch_size" 
+            Before the fermentation, if scale_volume is "batch_size"
 
     wort gravity = sum of (gravity contributions of each fermentable)
     Where, for a fermentable:
-        gravity contribution (ºPlato) = 
-            mass * yield * moisture correction * efficiency / volume 
+        gravity contribution (ºPlato) =
+            mass * yield * moisture correction * efficiency / volume
     And:
         S.G. = 1 + 0.004 * ºPlato
         And moisture correction = 0.96
@@ -200,15 +246,16 @@ def gravity_wort(df, scale_volume="batch_size"):
     ==========
     df: DataFrame
         A DataFrame containing, at minimum:
-            "ferm_amount", "ferm_yield", "efficiency", scale_volume 
+            "ferm_amount", "ferm_yield", "efficiency", scale_volume
     scale_volume: str, default "batch_size"
-        The name of the column containing the volume to use to scale the fermentable quantities. 
+        The name of the column containing the volume to use to scale the
+        fermentable quantities.
 
     Return
     ======
     Series representing wort gravity for each recipe.
     """
-    ferm_scaled = scale_ferm(df, scale_volume) 
+    ferm_scaled = scale_ferm(df, scale_volume)
 
     # ferm_extract_yield
     # Multiply by 100 to get from fraction to plato (which is percentage)
@@ -232,21 +279,21 @@ def gravity_original(df):
     return gravity_wort(df, "batch_size")
 
 
-def gravity_final(df, og_col="og"): 
+def gravity_final(df, og_col="og"):
     """
     Calculate the final gravity of the recipe, in SG.
 
     final gravity = (original gravity - 1) * (1 - attenuation) + 1
 
-    Where: 
-        original gravity is the gravity before fermentation, in SG 
+    Where:
+        original gravity is the gravity before fermentation, in SG
         attenuation is the apparent fraction of extract removed by fermentation
 
     Parameters
     ==========
     df: DataFrame
         A DataFrame optionally containing og_col.
-    og_col: str, default "og"    
+    og_col: str, default "og"   
         Column in df containing the original gravity of the recipes.
         If og_col is not in df, calculate it by calling `original_gravity()`
         (which has its own requirements)
@@ -308,12 +355,12 @@ def color(*args, **kwargs):
 
 def abv(df, ferm_col="ferm_scaled", og_col="og", fg_col="fg"):
     """Return ABV (Alcohol By Volume) for a recipe.
-    Formula: 
+    Formula:
         abv = ((1.05 * (og - fg)) / fg) / 0.79 * 100.0
         Source: TBD
 
         Where:
-            og is the original gravity, in SG 
+            og is the original gravity, in SG
             fg is the final gravity, in SG
 
     Parameters:
