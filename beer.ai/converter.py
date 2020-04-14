@@ -322,8 +322,8 @@ def convert_a_bunch(filenames, n, jobs=N_CPUS):
         # Calculate a filename as a hash of the xml files that were read in.
         fname = str(abs(hash(tuple(samples)))) + ".h5"
     print(f"Writing {len(samples)} examples to {fname}.")
-    df_core.to_hdf(fname, "core", mode="w", **write_options)
-    df_ing.to_hdf(fname, "ingredients", mode="a", **write_options)
+    df_core.to_hdf(fname, "core", mode="w", data_columns=True, **write_options)
+    df_ing.to_hdf(fname, "ingredients", mode="a", data_columns=True, **write_options)
 
 
 def _setup_argparser():
