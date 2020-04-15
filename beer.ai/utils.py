@@ -202,7 +202,7 @@ def adjust_efficiency(df, sugar_efficiency=1, lme_efficiency=0.8):
     """
 
     # Sugar types: "sugar", "dry extract"
-    sugar_types = ["sugar", "dry_extract"]
+    sugar_types = ["sugar", "dry extract"]
     # lme types: "liquid extract", "extract"
     lme_types = ["liquid extract", "extract"]
     # all others -> keep recipe efficiency
