@@ -155,7 +155,7 @@ def ibu(df, hop_col="hop_scaled"):
 
     Parameters:
     ===========
-    df: Panadas DataFrame
+    df: Pandas DataFrame
         Dataframe containing scaled hop quantities and addition times.
         Dataframe assumed to have "hop_time" as a column, which represents the
         duration of boil following hop addition in minutes.
