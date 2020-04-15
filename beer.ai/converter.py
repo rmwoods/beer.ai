@@ -188,12 +188,12 @@ def fill_core(d, recipe):
             d["efficiency"] /= 100.0
         d["boil_time"] = safe_float(getattr(recipe, "boil_time", None))
 
-        # estimated quantities
-        d["ibu"] = safe_float(getattr(recipe, "ibu", None))
-        d["og"] = safe_float(getattr(recipe, "og", None))
-        d["fg"] = safe_float(getattr(recipe, "fg", None))
-        d["est_abv"] = safe_float(getattr(recipe, "est_abv", None))
-        d["est_color"] = safe_float(getattr(recipe, "est_color", None))
+        # beer properties as per recipe source (e.g. brewer's friend)
+        d["src_ibu"] = safe_float(getattr(recipe, "ibu", None))
+        d["src_og"] = safe_float(getattr(recipe, "og", None))
+        d["src_fg"] = safe_float(getattr(recipe, "fg", None))
+        d["src_abv"] = safe_float(getattr(recipe, "est_abv", None))
+        d["src_color"] = safe_float(getattr(recipe, "est_color", None))
 
         d["style_name"] = clean_text(getattr(recipe.style, "name", None))
         d["style_guide"] = clean_text(getattr(recipe.style, "style_guide", None))
