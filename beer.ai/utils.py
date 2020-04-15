@@ -179,7 +179,7 @@ def ibu(df, hop_col="hop_scaled"):
     return ibu
 
 
-def adjust_efficiency(df, sugar_efficiency=1, lme_efficiency=0.8):
+def adjust_efficiency(df, sugar_efficiency=1, lme_efficiency=1):
     """
     Return a Series of adjusted efficiencies based on the ferm_type / name.
 
@@ -190,7 +190,7 @@ def adjust_efficiency(df, sugar_efficiency=1, lme_efficiency=0.8):
         ==========================================================
         malt, adjunct (added in mash):        efficiency as-stated
         dry malt extract, sugar (added to kettle): efficiency is 1
-        liquid malt extract (added to kettle):   efficiency is 0.8
+        liquid malt extract (added to kettle):     efficiency is 1 
 
     Parameters
     ==========
