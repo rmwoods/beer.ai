@@ -10,3 +10,4 @@ sklearn
 tables
 wget
 tqdm
+seaborn
