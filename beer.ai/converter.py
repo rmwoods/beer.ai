@@ -252,10 +252,9 @@ def convert_runner(fname, origin, recipe_id):
     try:
         core_vals, ingredients = recipe_to_dicts(recipe, fname, recipe_id, origin)
     except Exception as e:
-        raise(e)
-        #print(f"Failed {fname}:", file=sys.stderr)
-        #print(e, file=sys.stderr)
-        #core_vals, ingredients = {}, []
+        print(f"Failed {fname}:", file=sys.stderr)
+        print(e, file=sys.stderr)
+        core_vals, ingredients = {}, []
     return (core_vals, ingredients)
 
 
