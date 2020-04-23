@@ -32,7 +32,7 @@ def scale_ferm(df, scale_volume="batch_size"):
     return scaled_ferm
 
 
-def scale_hop(df, scale_volume_dry="batch_size", scale_volume_boil="boil_size"):
+def scale_hop(df, scale_volume_dry="batch_size", scale_volume_boil="batch_size"):
     """
     Compute the scaled hop quantities.
 
@@ -51,7 +51,7 @@ def scale_hop(df, scale_volume_dry="batch_size", scale_volume_boil="boil_size"):
         `hop_alpha`, `hop_form`, `boil_size`, and `batch_size`.
     scale_volume_dry: str, default "batch_size"
         The volume to use to scale the hop quantity for dry hops.
-    scale_volume_boil: str, default "boil_size"
+    scale_volume_boil: str, default "batch_size"
         The volume to use to scale the hop quantity for kettle hops.
 
     Return:
@@ -138,7 +138,7 @@ def scale_yeast(df):
     return pd.Series(np.ones(len(inds), index=inds))
 
 
-def ibu(df, hop_col="hop_scaled"):
+def ibu(df, hop_col="hop_scaled", pbg_col="pbg", utilization_factor=4.15):
     """Return IBU (International Bitterness Units), a measure of bitterness, for a
     recipe.
     Use the Tinseth formula:
@@ -161,6 +161,13 @@ def ibu(df, hop_col="hop_scaled"):
         duration of boil following hop addition in minutes.
     hop_col: str, default "hop_scaled"
         Name of column containing scaled hop quantities.
+    pbg_col: str, default "pbg"
+        Name of column containing pre-boil gravity (kettle gravity). If this
+        column does not exist, it is calculated using `gravity_kettle()`.
+    utilization_factor: float, default 4.15
+        Value used to normalize boil time factor. Tinseth uses 4.15, but
+        comments that this is an adjustable parameter. For example, it looks
+        like Brewer's Friend might use 3.75.
 
     Return:
     =======
@@ -171,60 +178,20 @@ def ibu(df, hop_col="hop_scaled"):
     # Turn kg/L to mg/L
     hop_amount = sub_df[hop_col] * 1000 * 1000
 
-    boil_time_factor = (1 - np.exp(-0.04 * sub_df["hop_time"])) / 4.15
-    bigness_factor = 1.65 * 0.000125 ** (gravity_kettle(df) - 1)
+    if pbg_col in df.columns:
+        pbg = sub_df[pbg_col]
+    else:
+        pbg = gravity_kettle(sub_df)
+
+    boil_time_factor = (1 - np.exp(-0.04 * sub_df["hop_time"])) / utilization_factor
+    bigness_factor = 1.65 * 0.000125 ** (pbg - 1)
     utilization = boil_time_factor * bigness_factor
     ibu = utilization * hop_amount
     ibu = ibu.groupby(ibu.index).sum()
     return ibu
 
 
-def adjust_efficiency(df, sugar_efficiency=1, lme_efficiency=1):
-    """
-    Return a Series of adjusted efficiencies based on the ferm_type / name.
-
-    Efficiency can vary depending on what fermentable it is, what form it's
-    in, and when it's added during the brew. Here, we assume the following:
-
-        ferm_type:                                      efficiency
-        ==========================================================
-        malt, adjunct (added in mash):        efficiency as-stated
-        dry malt extract, sugar (added to kettle): efficiency is 1
-        liquid malt extract (added to kettle):     efficiency is 1 
-
-    Parameters
-    ==========
-    ...
-
-    Return
-    ======
-    Series representing efficiency of a particular fermentable
-    """
-
-    # Sugar types: "sugar", "dry extract"
-    sugar_types = ["sugar", "dry extract"]
-    # lme types: "liquid extract", "extract"
-    lme_types = ["liquid extract", "extract"]
-    # all others -> keep recipe efficiency
-    sugar_mask = df["ferm_type"].isin(sugar_types)
-    sugar_inds = np.where(sugar_mask)[0]
-    lme_mask = df["ferm_type"].isin(lme_types)
-    lme_inds = np.where(lme_mask)[0]
-    other_mask = ~sugar_mask & ~lme_mask
-    other_inds = np.where(other_mask)[0]
-
-    sugar_eff = pd.Series(sugar_efficiency * np.ones(len(sugar_inds)), index=sugar_inds)
-    lme_eff = pd.Series(lme_efficiency * np.ones(len(lme_inds)), index=lme_inds)
-    other_eff = df.loc[other_mask, "efficiency"]
-    other_eff.index = other_inds
-
-    total = sugar_eff.append(lme_eff)
-    total = total.append(other_eff).sort_index()
-    total.index = df.index
-    return total
-
-
-def gravity_wort(df, scale_volume="batch_size"):
+def gravity_wort(df, scale_volume="batch_size", moisture_factor=0.96):
     """
     Return the wort gravity, either:
         Kettle gravity
@@ -250,6 +217,9 @@ def gravity_wort(df, scale_volume="batch_size"):
     scale_volume: str, default "batch_size"
         The name of the column containing the volume to use to scale the
         fermentable quantities.
+    moisture_factor: float, default 0.96
+        Factor to account for the moisture in fermentables (0.96 implies 4%
+        moisture in the fermentable).
 
     Return
     ======
@@ -259,24 +229,24 @@ def gravity_wort(df, scale_volume="batch_size"):
 
     # ferm_extract_yield
     # Multiply by 100 to get from fraction to plato (which is percentage)
-    fey = ferm_scaled * df["ferm_yield"] * df["efficiency"] * 0.96 * 100
+    fey = ferm_scaled * df["ferm_yield"] * df["efficiency"] * moisture_factor * 100
     return 1 + 0.004 * fey.groupby(fey.index).sum()
 
 
-def gravity_kettle(df):
+def gravity_kettle(df, *args, **kwargs):
     """
     This is a convenience function to calculate pre-boil wort gravity.
     See gravity_wort() for documentation.
     """
-    return gravity_wort(df, "boil_size")
+    return gravity_wort(df, *args, scale_volume="boil_size", **kwargs)
 
 
-def gravity_original(df):
+def gravity_original(df, *args, **kwargs):
     """
     This is a convenience function to calculate pre-fermentation wort gravity.
     See gravity_wort() for documentation.
     """
-    return gravity_wort(df, "batch_size")
+    return gravity_wort(df, *args, scale_volume="batch_size", **kwargs)
 
 
 def gravity_final(df, og_col="og"):
@@ -342,6 +312,11 @@ def srm(df, ferm_col="ferm_scaled"):
     kg_to_lb = 2.20462
     l_to_gal = 0.264172
 
+    if ferm_col in df.columns:
+        ferm_scaled = df[ferm_col]
+    else:
+        ferm_scaled = scale_ferm(df)
+
     # malt color units
     mcu = df["ferm_color"] * df[ferm_col] * kg_to_lb / l_to_gal
     srm = 1.4922 * mcu.groupby(mcu.index).sum() ** 0.6859
@@ -391,9 +366,10 @@ def abv(df, ferm_col="ferm_scaled", og_col="og", fg_col="fg"):
         og = gravity_original(df, ferm_col=ferm_col)
     else:
         og = df[og_col]
+
     if fg_col not in df.columns:
         fg = gravity_final(df, ferm_col=ferm_col)
     else:
         fg = df[fg_col]
-    abv = ((1.05 * (og - fg)) / fg) / 0.79 * 100.0
-    return abv
+
+    return ((1.05 * (og - fg)) / fg) / 0.79 * 100.0
