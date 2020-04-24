@@ -21,3 +21,11 @@ Generate a recipe that is:
 * Not terrible
   * Identify patterns in ingredients that produce good flavours
   * Which are still uncommon
+
+# Low-Level Tasks
+## Documentation
+* Add tabular data dictionary for fields in `all\_recipes.h5` 
+  * Core
+  * Ingredients
+* Add super high level overview of data pipeline
+  * .xml ---(converter.py)---> .h5 ---(recipe2vec)---> .h5   
