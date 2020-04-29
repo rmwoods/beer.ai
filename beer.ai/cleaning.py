@@ -1,4 +1,6 @@
-from .utils import split_series_on_range
+from utils import split_series_on_range
+import pandas as pd
+import numpy as np
 
 
 def clean_efficiency(series, acceptable_min=0.5, acceptable_max=1.0):
@@ -56,8 +58,8 @@ def clean_ferm_yield(df, ferm_yield_cutoff=0.03, exceptions=None):
     if exceptions is None:
         exceptions = ["rice hulls"]
 
-    unacceptable_mask, acceptable_mask = split_series_on_range(
-        df["ferm_yield"], 0, ferm_yield_cutoff, return_mask=True
+    acceptable_mask, unacceptable_mask = split_series_on_range(
+        df["ferm_yield"], ferm_yield_cutoff, 1, return_mask=True
     )
     exceptions_mask = df["ferm_name"].isin(exceptions)
 
