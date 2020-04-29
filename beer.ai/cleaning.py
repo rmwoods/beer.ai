@@ -1,102 +1,41 @@
-# OG Corrections from the Utils_Troubleshooting notebook:
-# Correction 2: Replace efficiency below 0.5 with the mean (above 0.5) 
-# ====================================================================
-def split_series_on_range(series, min_value, max_value):
-    inside_mask = series.between(min_value, max_value)
-    inside = series[inside_mask]
-    outside = series[~inside_mask]
-    return inside, outside
-
-def replace_with_mean(series, acceptable_min=0.5, acceptable_max=1.0):
-    """ Replace unacceptable quantities in a series with the mean acceptable quantity. """
-    good, bad = split_series_on_range(series, acceptable_min, acceptable_max)
-    mean_good = good.groupby(good.index).first().mean()
-    fixed_series = good.append(pd.Series(index=bad.index, data=mean_good))
-
-# Correction 3: Replace efficiency for sugars and extracts with 1
-# Shower thought:
-#   Would it be better to make this correct instead by
-#   introducing a new rule in gravity_wort:
-#       use df["efficiency"] for grains and adjuncts
-#       use 1 otherwise?
-# ====================================================================
-
-extract_types = ["sugar", "dry extract", "liquid extract", "extract"]
-def adjust_efficiency(df, col_efficiency, ferm_types_extract, new_efficiency=1):
-    """
-    Return a Series of adjusted efficiencies based on the ferm_type / name.
-
-    Efficiency can vary depending on what fermentable it is, what form it's
-    in, and when it's added during the brew. Here, we assume the following:
-
-        ferm_type:                                      efficiency
-        ==========================================================
-        malt, adjunct (added in mash):        efficiency as-stated
-        dry malt extract, sugar (added to kettle): efficiency is 1
-        liquid malt extract (added to kettle):     efficiency is 1 
-
-    Parameters
-    ==========
-    ...
-
-    Return
-    ======
-    Series representing efficiency of a particular fermentable
-    """
-    # Version from Jupyter Notebook
-    extract_mask = df["ferm_type"].isin(ferm_types_extract)
-    extract_inds = np.where(extract_mask)[0]
-    other_mask = ~extract_mask
-    other_inds = np.where(other_mask)[0]
-
-    extract_eff = pd.Series(new_efficiency * np.ones(len(extract_inds)), index=extract_inds)
-    other_eff = df.loc[other_mask, "efficiency"]
-    other_eff.index = other_inds
-
-    all_ferms = extract_eff.append(other_eff).sort_index()
-    all_ferms.index = df.index
-    return all_ferms
-
-    # Previous version from utils.py
-    ## Sugar types: "sugar", "dry extract"
-    #sugar_types = ["sugar", "dry extract"]
-    ## lme types: "liquid extract", "extract"
-    #lme_types = ["liquid extract", "extract"]
-    ## all others -> keep recipe efficiency
-    #sugar_mask = df["ferm_type"].isin(sugar_types)
-    #sugar_inds = np.where(sugar_mask)[0]
-    #lme_mask = df["ferm_type"].isin(lme_types)
-    #lme_inds = np.where(lme_mask)[0]
-    #other_mask = ~sugar_mask & ~lme_mask
-    #other_inds = np.where(other_mask)[0]
-
-    #sugar_eff = pd.Series(sugar_efficiency * np.ones(len(sugar_inds)), index=sugar_inds)
-    #lme_eff = pd.Series(lme_efficiency * np.ones(len(lme_inds)), index=lme_inds)
-    #other_eff = df.loc[other_mask, "efficiency"]
-    #other_eff.index = other_inds
-
-    #total = sugar_eff.append(lme_eff)
-    #total = total.append(other_eff).sort_index()
-    #total.index = df.index
-    #return total
+from .utils import split_series_on_range
 
 
-# Correction 4: Replace ferm_yield below 0.03 with the mean above 0.03
-#   For that ferm_type
-#   Excluding ferm_name == 'rice hulls'
-#
-#   Should we do this using the same function we use for Correction 2?
-# ====================================================================
-ferm_yield_cutoff = 0.03
-good_ferm_yield_mask = bf["ferm_yield"] > ferm_yield_cutoff
-bad_ferm_yield_mask = bf["ferm_yield"] <= ferm_yield_cutoff
-non_rice_hulls_mask = bf["ferm_name"] != "rice hulls"
-ferm_yield_mean = bf[good_ferm_yield_mask & non_rice_hulls_mask].groupby("ferm_type")["ferm_yield"].mean()
-ferm_yield_ind_to_replace = bf[bad_ferm_yield_mask & non_rice_hulls_mask].index
+def clean_efficiency(series, acceptable_min=0.5, acceptable_max=1.0):
+    """XXX"""
+    acceptable, unacceptable = split_series_on_range(
+        series, acceptable_min, acceptable_max
+    )
+    mean_acceptable = acceptable.groupby(acceptable.index).first().mean()
+    efficiency_fixed = acceptable.append(pd.Series(index=unacceptable.index, data=mean_acceptable)).sort_index()
+    return efficiency_fixed
 
-bf["ferm_yield_adj"] = bf["ferm_yield"]
 
-bf.loc[ferm_yield_ind_to_replace, "ferm_yield_adj"] = bf.loc[ferm_yield_ind_to_replace, "ferm_type"].map(ferm_yield_mean)
+def clean_yield(df, ferm_yield_cutoff=0.03, exceptions=None):
+    """XXX"""
+    if exceptions is None:
+        exceptions = ["rice hulls"]
 
-# IBU corrections from the Utils_Troubleshooting notebook
-utilization_factor=3.75
+    unacceptable_mask, acceptable_mask = split_series_on_range(
+        df["ferm_yield"], 0, ferm_yield_cutoff, return_mask=True
+    )
+    exceptions_mask = df["ferm_name"].isin(exceptions)
+
+    # Identify average yield for each ferm_type amongst the good ones
+    ferm_type_to_yield = (
+        df.loc[acceptable_mask].groupby("ferm_type")["ferm_yield"].mean()
+    )
+
+    to_fix_mask = unacceptable_mask & ~exceptions_mask
+    # Get rows to fix, set indices to iloc indices. For the bad ones, map their
+    # ferm type to the average ferm_yield for that type.
+    ferm_yield_fixed = df.loc[to_fix_mask, "ferm_type"].map(ferm_type_to_yield)
+    ferm_yield_fixed.index = np.where(to_fix_mask)[0]
+    # Get good ones, set indices to iloc indices
+    ferm_yield_untouched = df.loc[~to_fix_mask, "ferm_yield"]
+    ferm_yield_untouched.index = np.where(~to_fix_mask)[0]
+    # Append and fix index back to original
+    ferm_yield = ferm_yield_fixed.append(ferm_yield_untouched).sort_index()
+    ferm_yield.index = df.index
+
+    return ferm_yield
