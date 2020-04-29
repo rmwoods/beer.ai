@@ -9,7 +9,28 @@ def get_style_guide():
 
 
 def split_series_on_range(series, min_value, max_value, return_mask=False):
-    """XXX"""
+    """
+    Split a Series by whether its values are inside or outside a range.
+
+    Parameters
+    ==========
+    series: Series
+        The Series to split.
+    min_value: float-like
+        The left bound of the range (inclusive).
+    max_value: float-like
+        The right bound of the range (inclusive).
+    return_mask: bool
+        Whether or not to return a pair of masks.
+        If False, return a pair of Series.
+        Default: False
+    
+    Return: 
+    =======
+    Tuple of length 2 whose values are either masks or Series.
+    The first value is the part inside the range, 
+    the second value is the part outside the range.
+    """
     inside_mask = series.between(min_value, max_value)
 
     if return_mask:
