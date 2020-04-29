@@ -8,6 +8,16 @@ def get_style_guide():
         return json.load(f)
 
 
+def split_series_on_range(series, min_value, max_value, return_mask=False):
+    """XXX"""
+    inside_mask = series.between(min_value, max_value)
+
+    if return_mask:
+        return inside_mask, ~inside_mask
+    else:
+        return series[inside_mask], series[~inside_mask]
+
+
 def scale_ferm(df, scale_volume="batch_size"):
     """
     Scale the fermentables by a volume measure. 
@@ -191,7 +201,9 @@ def ibu(df, hop_col="hop_scaled", pbg_col="pbg", utilization_factor=4.15):
     return ibu
 
 
-def gravity_wort(df, scale_volume="batch_size", moisture_factor=0.96):
+def gravity_wort(
+    df, scale_volume="batch_size", moisture_factor=0.96, extract_types=None
+):
     """
     Return the wort gravity, either:
         Kettle gravity
@@ -220,16 +232,25 @@ def gravity_wort(df, scale_volume="batch_size", moisture_factor=0.96):
     moisture_factor: float, default 0.96
         Factor to account for the moisture in fermentables (0.96 implies 4%
         moisture in the fermentable).
+    extract_types: list of strings, default ["sugar", "dry extract", "liquid extract", "extract"]
+        list of "ferm_types" that should not have efficiency applied to their
+        calculation of ferm extract yield (in other words, their efficiency is
+        1).
 
     Return
     ======
     Series representing wort gravity for each recipe.
     """
+    if extract_types is None:
+        extract_types = ["sugar", "dry extract", "liquid extract", "extract"]
+
     ferm_scaled = scale_ferm(df, scale_volume)
 
-    # ferm_extract_yield
+    extract_mask = df["ferm_type"].isin(extract_types)
     # Multiply by 100 to get from fraction to plato (which is percentage)
-    fey = ferm_scaled * df["ferm_yield"] * df["efficiency"] * moisture_factor * 100
+    fey = ferm_scaled * df["ferm_yield"] * moisture_factor * 100
+    # Now multiply only non-extracts by their efficiency to get "ferm extract yield"
+    fey.loc[~extract_mask] *= df.loc[extract_mask, "efficiency"]
     return 1 + 0.004 * fey.groupby(fey.index).sum()
 
 
