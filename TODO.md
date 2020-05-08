@@ -5,6 +5,24 @@ Compare the BJCP and real recipes:
 * (ABV, IBU, colour)
 * Characteristic ingredients
 
+Deliverable? Interactive plots / tables
+* Lookup table of style -> ranges of properties.
+* IBU vs ABV (Rory likes this)
+  * Color of point represents SRM.
+  * Size of point could represent number of recipes or spread of data.
+  * Size could also be spread of data
+  * Could also do contour lines
+  * FG, OG
+  * Matrix plots - can show relationships of all 4 variables. Highlighting section of data in 1 plot shows same points in other relationships
+* Word cloud
+  * Beer names
+  * Hop varieties
+  * Styles?
+* Hop vs boil time (Rory also likes this)
+  * Show amount of hop added at each point in boil time for different beers
+  * Compare style A to style B
+  * Show how this changes over time
+
 ## 2. Generate recipe for style X
 For a given style, what is a "typical" recipe?
 Generate a vector in ingredient-space.
