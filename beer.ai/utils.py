@@ -271,7 +271,7 @@ def gravity_wort(
     # Multiply by 100 to get from fraction to plato (which is percentage)
     fey = ferm_scaled * df["ferm_yield"] * moisture_factor * 100
     # Now multiply only non-extracts by their efficiency to get "ferm extract yield"
-    fey.loc[~extract_mask] *= df.loc[extract_mask, "efficiency"]
+    fey.loc[~extract_mask] *= df.loc[~extract_mask, "efficiency"]
     return 1 + 0.004 * fey.groupby(fey.index).sum()
 
 
@@ -405,12 +405,12 @@ def abv(df, ferm_col="ferm_scaled", og_col="og", fg_col="fg"):
     """
 
     if og_col not in df.columns:
-        og = gravity_original(df, ferm_col=ferm_col)
+        og = gravity_original(df)
     else:
         og = df[og_col]
 
     if fg_col not in df.columns:
-        fg = gravity_final(df, ferm_col=ferm_col)
+        fg = gravity_final(df)
     else:
         fg = df[fg_col]
 
