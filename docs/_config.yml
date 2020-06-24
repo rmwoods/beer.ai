@@ -1,6 +1,6 @@
 theme: jekyll-theme-hacker
 title: [Compubeer]
-description: [Beer That's Super Smrt]
+description: [Beer that thinks while you drink]
 remote_theme: "mmistakes/minimal-mistakes@4.19.3"
 plugins:
   - jekyll-include-cache
