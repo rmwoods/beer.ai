@@ -1,3 +1,12 @@
-# Compubeer - Beer That's Super Smrt
+Welcome to our data-driven exploration of beer and brewing.
 
-Testing
+# Members
+<ul>
+{% for member in site.data.members %}
+  <li>
+    <a href="https://github.com/{{ member.github }}">
+      {{ member.name }}
+    </a>
+  </li>
+{% endfor %}
+</ul>
