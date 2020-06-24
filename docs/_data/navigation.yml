@@ -1,0 +1,7 @@
+main:
+  - title: "Posts"
+    url: /posts/
+  - title: "Apps"
+    url: /apps/
+  - title: "About"
+    url: /about/ 
