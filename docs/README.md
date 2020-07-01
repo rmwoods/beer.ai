@@ -1,4 +1,4 @@
-Compubeer is a data-driven exploration of beer and brewing.
+This project is a data-driven exploration of beer and brewing.
 
-We want to understand beer from first principals to pints. Our goal is to produce new insights and new recipes by applying data science methods to the collective knowledge of real brewers.  
+We want to understand beer from first principals to pints - to produce new insights and recipes by applying data science to the collective knowledge of brewers.  
 
