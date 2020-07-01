@@ -41,6 +41,11 @@ Generate a recipe that is:
   * Which are still uncommon
 
 # Low-Level Tasks
+## Website
+* Add a collection-type page for apps
+* Decide on a list of posts
+* Figure out how to post a Dash/Plotly.js app
+
 ## Documentation
 * Add tabular data dictionary for fields in `all\_recipes.h5` 
   * Core
