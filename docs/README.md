@@ -1,12 +1,4 @@
-Welcome to our data-driven exploration of beer and brewing.
+Compubeer is a data-driven exploration of beer and brewing.
 
-# Members
-<ul>
-{% for member in site.data.members %}
-  <li>
-    <a href="https://github.com/{{ member.github }}">
-      {{ member.name }}
-    </a>
-  </li>
-{% endfor %}
-</ul>
+We want to understand beer from first principals to pints. Our goal is to produce new insights and new recipes by applying data science methods to the collective knowledge of real brewers.  
+
