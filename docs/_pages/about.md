@@ -3,9 +3,7 @@ permalink: /about/
 title: About the project 
 ---
 
-Compubeer was made by 3 guys with computers who like beer.
-
-# Contributors
+The compubeer project is maintained by the following people:
 
 <ul> 
 {% for member in site.data.members %}
