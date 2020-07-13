@@ -22,5 +22,7 @@ defaults:
       author_profile: true
       read_time: true
       comments: true
-      share: false
+      share: true
       related: false
+# specify a default teaser image site-wide here
+teaser: /assets/images/shit-logo.png
