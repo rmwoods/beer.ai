@@ -40,7 +40,7 @@ defaults:
       author_profile: true
       read_time: true
       comments: true
-      share: false
+      share: true
       related: false
   # _apps
   - scope:
