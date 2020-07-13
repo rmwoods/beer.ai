@@ -2,9 +2,12 @@ theme: jekyll-theme-hacker
 title: [Compubeer]
 description: [Beer that thinks while you drink]
 remote_theme: "mmistakes/minimal-mistakes@4.19.3"
+minimal_mistakes_skin: "default" # "air", "aqua", "contrast", "dark", "dirt", "neon", "mint", "plum" "sunrise"
 plugins:
   - jekyll-include-cache
 include: ["_pages", "_posts"] 
+collections:
+  apps:
 defaults:
   # _pages
   - scope:
