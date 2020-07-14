@@ -10,6 +10,5 @@
   * Share, comment, Author(s), read time?
   * Aaron
 * Apps
-  * List of apps - pref in grid format
-  * Can we automate this similar to posts?
-  * Rory
+  * Is there a way to disable the side bar but keep the grid?
+  * Is there a way to control the app ordering?
