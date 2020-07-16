@@ -2,7 +2,7 @@
 title: IBU vs ABV vs SRM
 author: rory
 app_src: ibu_abv_color.html
-excerpt: "Explore Beer by IBU, ABV, and Color"
+excerpt: "Explore beer styles by IBU, ABV, and SRM."
 header:
   teaser: assets/images/ibu_abv_color.png
 ---
