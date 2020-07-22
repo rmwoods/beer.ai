@@ -17,4 +17,7 @@
   * Aaron
 * Apps
   * Is there a way to disable the side bar but keep the grid?
+    * Figured out how to do it in ALL pages, how to do with parameter?
+  * Can we set the number of columns in the grid?
+    * Figured out how to do it by hand in the sass file. Can we do it with a parameter?
   * Is there a way to control the app ordering?

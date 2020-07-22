@@ -53,7 +53,7 @@ defaults:
       type: apps
     values:
       layout: single
-      sidebar: false
+      author_profile: false
       read_time: false
       comments: false
       share: true
