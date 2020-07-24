@@ -6,6 +6,7 @@ excerpt: "Chck out my cool app!"
 hidden: true
 header:
   teaser: http://placekitten.com/200/300
+position: 0
 ---
 
 Remove "Hidden: True" in the front matter to make this visible.

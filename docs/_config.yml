@@ -19,11 +19,6 @@ include:
 # Collections
 collections:
   apps:
-    order:
-      - aaron-app.md
-      - rob-app.md
-      - derek-app.md
-      - ibu_abv_color.md
     output: true
     permalink: /:collection/:path/
 
@@ -52,7 +47,7 @@ defaults:
       path: ""
       type: apps
     values:
-      layout: single
+      layout: splash
       author_profile: false
       read_time: false
       comments: false
