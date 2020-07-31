@@ -14,3 +14,4 @@
   * Import some default images (make a banner?)
   * Define authors, if not already done
   * Look into nbconvert html templates with jinja
+    * This is not as straight forward as we expected. There are a few templates available for converting to markdown, but nothing super clean. We probably will need to build something pretty custom since we'd like whatever we export to be consistent with what jekyll builds.
