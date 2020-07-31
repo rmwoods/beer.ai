@@ -1,5 +1,5 @@
 ---
-layout: splash
+layout: splash-post
 title: Welcome To Compubeer
 author: everyone
 draft: true
