@@ -111,6 +111,4 @@ ENV/
 # mypy
 .mypy_cache/
 
-*.pickle
-*.h5
 recipes/
