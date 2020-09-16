@@ -9,33 +9,64 @@ header:
   teaser: /assets/images/kettle-thumbnail.jpg
 ---
 
+# Outline
+
+* What we want to know about beer
+* What beer data is out there
+* What is beerXML
+  * Load and print a beerXML file
+  * Compare brewtoad and brewersfriend: presence/absense of tags
+* How much did we get
+  * Count recipes
+* How did we represent it
+  * Print a DataFrame  
+* What does the beer recipe landscape look like
+  * \# recipes/styles
+  * what's cloned the most often?
+  * most common malt, hop, yeast names
+  * batch sizes
+* Sneak preview: beer measurables (IBU, ABV, SRM)
+
 # What is Compubeer?
 
-Check out our about page.
+* What is this site?
+* What we want to know about beer
 
 # Our Dataset
 
-Over 400k homebrew recipes...
+* What beer data is out there?
 
-## Beer.xml content
+# Beer.xml content
 
-...
+* What is a beer XML?
+  * What one looks like
+  * Brewtoad vs Brewersfriend content
+* How much did we get?
 
-## Our representation
+# Our representation
 
-...
+* How do we represent it? (print dataframe)
+  * Comment - can do some basic statistics on this
+  * Comment - need to transform this for any sort of ML
+* IBU, ABV, OG, FG, etc.
+  * Included by some recipes, but we wrote our own functions... more later
 
-## Our Measures
 
-IBU, ABV, OG, FG, etc.
+# Recipe Landscape
 
-# Data Cleaning
-
-Oh boy was this a mess. We spent a butt-load of time trying to normalize ingredients.
+* \# recipes/styles
+* what's cloned the most often?
+* most common malt, hop, yeast names
+* batch sizes
 
 # What Next?
 
-Here's what's on our roadmap...
+Roadmap:
+* Recipe analysis
+* Recipe generation
+* ...
+
+As a sneak Peak: IBU, ABV, SRM...
 
 {% if page.notebook_src %}
   {% include {{ page.notebook_src }} %}
