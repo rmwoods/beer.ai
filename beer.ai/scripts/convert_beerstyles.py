@@ -1,3 +1,4 @@
+"""Convert the beerstyles2015 json files (from BJCP) to something easier to use."""
 import json
 
 # Format is as follows:
@@ -51,7 +52,7 @@ def main():
         for sub_style in sub_styles:
             converted.update(categories_to_dict(sub_style))
 
-    with open("../styleguide.json","w") as f:
+    with open("../supporting_files/styleguide.json","w") as f:
         json.dump(converted, f)
 
 if __name__ == "__main__":
