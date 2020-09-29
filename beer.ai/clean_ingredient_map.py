@@ -1,6 +1,6 @@
-import pickle
-import os
 import csv
+import os
+import pickle
 
 VALID_CATEGORIES = ["ferm", "hop", "yeast", "misc"]
 
