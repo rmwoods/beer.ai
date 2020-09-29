@@ -5,6 +5,7 @@
 *.h5
 *.out
 *.zip
+beer.ai/recipes
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
