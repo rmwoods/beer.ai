@@ -15,18 +15,18 @@ R = re.compile("[0-9]+")
 
 # Start by trying to load checkpoint file so we don't redo work.
 try:
-    with open(CHECKPOINT_FILE,"rb") as bf:
+    with open(CHECKPOINT_FILE, "rb") as bf:
         stats = pickle.load(bf)
-    start = stats["page"]+1
+    start = stats["page"] + 1
 except FileNotFoundError:
-    start = 1 
+    start = 1
 
 print("Starting on page {}".format(start))
 
 # We do the first page outside of the loop to obtain the total number of pages
 # that we'll need to loop over. Otherwise we don't know how long to loop.
 request = requests.get(URL.format(start))
-html = bs4.BeautifulSoup(request.text,"lxml")
+html = bs4.BeautifulSoup(request.text, "lxml")
 
 pagination = html.find("div", attrs={"class": "pagination"})
 n = re.findall(R, pagination.text)
@@ -38,10 +38,10 @@ else:
 
 # Need to loop to n_pages+1 since the current loop is actually working on the
 # nth-1 page.
-for i in range(start+1, n_pages+1):
-    recipes = html.find_all(name='li', attrs={"class":"recipe-container"})
+for i in range(start + 1, n_pages + 1):
+    recipes = html.find_all(name="li", attrs={"class": "recipe-container"})
     for recipe in recipes:
-        sub = recipe.find("a", attrs={"class":"recipe-link"})
+        sub = recipe.find("a", attrs={"class": "recipe-link"})
         address = sub.get("href")
         # The xml files are nicely named after the page they're from
         link = WEBSITE + address + ".xml"
@@ -52,13 +52,13 @@ for i in range(start+1, n_pages+1):
         # an issue worth trying to get around.
         if not f.is_file():
             wget.download(link, out=fname)
-    print("Done page {}".format(i-1))
+    print("Done page {}".format(i - 1))
     # Checkpoint the page we finished so if we restart later, we continue from
     # the same page.
-    with open(CHECKPOINT_FILE,"wb") as bf:
-        pickle.dump({"page":i-1},bf)
+    with open(CHECKPOINT_FILE, "wb") as bf:
+        pickle.dump({"page": i - 1}, bf)
     # Grab the new page
     request = requests.get(URL.format(i))
-    html = bs4.BeautifulSoup(request.text,"lxml")
+    html = bs4.BeautifulSoup(request.text, "lxml")
 
 print("Done")

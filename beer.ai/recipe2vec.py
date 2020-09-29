@@ -7,7 +7,7 @@ import numpy as np
 import pandas as pd
 import pickle
 from tqdm import tqdm
-from .utils import scale_ferm, scale_hop, scale_misc, scale_yeast 
+from .utils import scale_ferm, scale_hop, scale_misc, scale_yeast
 
 CORE_COLS = ["batch_size", "boil_size", "boil_time", "efficiency"]
 ING_COLS = [

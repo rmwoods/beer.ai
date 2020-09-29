@@ -5,6 +5,7 @@ import pickle
 CATEGORIES = ["ferm", "yeast", "hop", "misc"]
 MAP_NAME = "{}map.pickle"
 
+
 def create_vocab(out_file=None):
     """Given a category, load in the corresponding columns from the HDF and
     create unique id's for each ingredient. Valid categories:
@@ -22,10 +23,16 @@ def create_vocab(out_file=None):
         with open(map_name, "rb") as f:
             ing_map = pickle.load(f)
             ings = sorted(set(ing_map.values()))
-            vocab.update({category + "_" + ing: i for i, ing in enumerate(ings, len(vocab))})
+            vocab.update(
+                {category + "_" + ing: i for i, ing in enumerate(ings, len(vocab))}
+            )
             if category == "hop":
-                vocab.update({category + "_" + ing + "_dry": i for i, ing in enumerate(ings, len(vocab))})
-
+                vocab.update(
+                    {
+                        category + "_" + ing + "_dry": i
+                        for i, ing in enumerate(ings, len(vocab))
+                    }
+                )
 
     with open(out_file, "wb") as f:
         pickle.dump(vocab, f)
