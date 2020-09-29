@@ -1,6 +1,7 @@
 """Convert the beerstyles2015 json files (from BJCP) to something easier to use."""
 import json
 
+from .utils import DATA_DIR, SUPPORT_DIR
 # Format is as follows:
 # styles = {"styleguide":
 #              {"class": 
@@ -51,8 +52,9 @@ def main():
         # Go through sub styles and add those
         for sub_style in sub_styles:
             converted.update(categories_to_dict(sub_style))
-
-    with open("../supporting_files/styleguide.json","w") as f:
+    
+    fname = os.path.join(DATA_DIR, "styleguide.json")
+    with open(fname, "w") as f:
         json.dump(converted, f)
 
 if __name__ == "__main__":

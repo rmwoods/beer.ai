@@ -1,8 +1,11 @@
+"""Useful tools for cleaning the ingredient maps. These are meant to be
+imported and used by hand."""
+
 import csv
 import os
 import pickle
 
-VALID_CATEGORIES = ["ferm", "hop", "yeast", "misc"]
+from .utils import VALID_CATEGORIES, DATA_DIR
 
 
 def load_map(map_category):
@@ -11,7 +14,7 @@ def load_map(map_category):
         print("Category is not valid.")
         return {}
 
-    fname = f"{map_category}map.pickle"
+    fname = os.path.join(DATA_DIR, f"/{map_category}map.pickle")
     try:
         f = open(fname, "rb")
         d = pickle.load(f)
@@ -61,7 +64,7 @@ def ingred_to_csv(d, name):
     unique_values = set(val for val in d.values())
     unique_values_list = sorted(unique_values)
 
-    fname = f"{name}.csv"
+    fname = os.path.join(DATA_DIR, f"{name}.csv")
 
     with open(fname, "w") as f:
         out = csv.writer(f, delimiter=",", quoting=csv.QUOTE_ALL)
@@ -82,7 +85,7 @@ def save_map(d, map_category, *suffix):
     else:
         suffix_str = ""
 
-    fname = f"{map_category}map_{suffix_str}.pickle"
+    fname = os.path.join(DATA_DIR, f"{map_category}map_{suffix_str}.pickle")
     if os.path.exists(fname):
         print(
             f"a file named {fname} already exists! Map not saved. Add a suffix to make a unique filename."
