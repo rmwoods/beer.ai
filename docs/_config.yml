@@ -4,7 +4,7 @@ minimal_mistakes_skin: "default" # "air", "aqua", "contrast", "dark", "dirt", "n
 # Site Settings
 locale: "en-US"
 title: "Compubeer"
-description: "Beer that thinks while you drink"
+description: "beer that's smarter than you"
 url: "https://compubeer.com"
 baseurl: "/"
 repository: "rmwoods/beer.ai"
