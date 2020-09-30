@@ -3,12 +3,14 @@
 
 # External
 bs4
+dropbox
 joblib
 jupyter
 lxml
 matplotlib
 pandas
 pybeerxml
+python-dotenv
 requests
 sklearn
 tables
