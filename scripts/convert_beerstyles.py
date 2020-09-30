@@ -1,7 +1,8 @@
 """Convert the beerstyles2015 json files (from BJCP) to something easier to use."""
 import json
+import os
 
-from .utils import DATA_DIR, SUPPORT_DIR
+from beerai.config import DATA_DIR
 # Format is as follows:
 # styles = {"styleguide":
 #              {"class": 
@@ -39,7 +40,8 @@ def categories_to_dict(cat):
 
 def main():
 
-    with open("../supporting_files/styleguide-2015.json","r") as f:
+    fname = os.path.join(DATA_DIR, "external/styleguide-2015.json")
+    with open(fname ,"r") as f:
         # Format specified in comments at top of script
         styles = json.load(f)["styleguide"]["class"][0]["category"]
 
@@ -53,7 +55,7 @@ def main():
         for sub_style in sub_styles:
             converted.update(categories_to_dict(sub_style))
     
-    fname = os.path.join(DATA_DIR, "styleguide.json")
+    fname = os.path.join(DATA_DIR, "processed/styleguide.json")
     with open(fname, "w") as f:
         json.dump(converted, f)
 
