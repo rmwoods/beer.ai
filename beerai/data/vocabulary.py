@@ -1,9 +1,10 @@
 import argparse
-import pandas
+import os
 import pickle
 
-CATEGORIES = ["ferm", "yeast", "hop", "misc"]
-MAP_NAME = "{}map.pickle"
+from ..config import DATA_DIR, INGREDIENT_CATEGORIES
+
+MAP_NAME = os.path.join(DATA_DIR, "interim/{}map.pickle")
 
 
 def create_vocab(out_file=None):
@@ -14,11 +15,11 @@ def create_vocab(out_file=None):
     Note: We can make the assumption that the set of unique values we want are
     the values from the _map.pickle files.
     """
-    if out_file == None:
-        out_file = "vocab.pickle"
+    if out_file is None:
+        out_file = os.path.join(DATA_DIR, "processed/vocab.pickle")
 
     vocab = {}
-    for category in CATEGORIES:
+    for category in INGREDIENT_CATEGORIES:
         map_name = MAP_NAME.format(category)
         with open(map_name, "rb") as f:
             ing_map = pickle.load(f)
@@ -43,7 +44,11 @@ def _setup_argparser():
         description='Program to create a "vocabulatory" from a list of '
         "ingredients (unique index per ingredient)."
     )
-    parser.add_argument("-o", "--output_file", help="File to dump vocabulary to.")
+    parser.add_argument(
+        "-o",
+        "--output_file",
+        help="File to dump vocabulary to. Default is `data/processed/vocab.pickle`.",
+    )
     return parser
 
 
