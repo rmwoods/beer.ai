@@ -1,4 +1,4 @@
-from utils import split_series_on_range
+from .utils import split_series_on_range
 import pandas as pd
 import numpy as np
 
