@@ -1,20 +1,23 @@
-from pathlib import Path
+import os
+import pandas as pd
 import pickle
 import re
 import requests
-import pandas as pd
+
+from pathlib import Path
+
+from ..config import DATA_DIR
 
 URL = "https://www.brewersfriend.com/homebrew/recipe/beerxml1.0/"
-CHECKPOINT_FILE = "checkpoint.pickle"
-RECIPEPATH = "recipes_brewersfriend/"
+CHECKPOINT_FILE = os.path.join(DATA_DIR, "raw/recipes/brewersfriend_checkpoint.pickle")
+RECIPEPATH = os.path.join(DATA_DIR, "raw/recipes/brewersfriend")
 USERAGENT = {
     "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36"
 }
 
 # Load the recipe CSV
-recipe_df = pd.read_csv("supporting_files/recipeData.csv", encoding="ISO-8859-1")[
-    ["BeerID", "URL"]
-]
+recipe_data_file = os.path.join(DATA_DIR, "raw/external/recipeData.csv")
+recipe_df = pd.read_csv(recipe_data_file, encoding="ISO-8859-1")[["BeerID", "URL"]]
 print("CSV loaded. Listing {} recipes.".format(len(recipe_df)))
 
 # Load the checkpoint variable

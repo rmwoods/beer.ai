@@ -9,8 +9,8 @@ import pickle
 
 from tqdm import tqdm
 
-from .config import DATA_DIR, INGREDIENT_CATEGORIES
-from .utils import scale_ferm, scale_hop, scale_misc, scale_yeast
+from ..config import DATA_DIR, INGREDIENT_CATEGORIES
+from ..utils import scale_ferm, scale_hop, scale_misc, scale_yeast
 
 CORE_COLS = ["batch_size", "boil_size", "boil_time", "efficiency"]
 ING_COLS = [
