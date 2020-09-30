@@ -3,13 +3,6 @@ import numpy as np
 import os
 import pandas as pd
 
-# For use everywhere...
-BASE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-DATA_DIR = os.path.abspath(os.path.join(BASE, "data/"))
-SUPPORT_DIR = os.path.abspath(os.path.join(BASE, "supporting_files/"))
-
-VALID_CATEGORIES = ["ferm", "hop", "yeast", "misc"]
-
 
 def get_style_guide():
     with open(DATA_DIR + "/styleguide.json") as f:
