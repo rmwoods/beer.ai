@@ -1,10 +1,18 @@
+# Local Repo
+-e .
+
+# External
 bs4
+dropbox
+imblearn
 joblib
 jupyter
 lxml
 matplotlib
 pandas
+plotly
 pybeerxml
+python-dotenv
 requests
 sklearn
 tables

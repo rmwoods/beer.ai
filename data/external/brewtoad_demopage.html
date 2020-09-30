@@ -1,0 +1,2352 @@
+<!DOCTYPE html>
+<!--[if lt IE 9 ]> <html class="no-js oldie"> <![endif]-->
+<!--[if IE 9 ]> <html class="no-js ie9"> <![endif]-->
+<!--[if (gt IE 9)|!(IE)]> ><! <![endif]-->
+<html class='no-js'>
+<!-- <![endif] -->
+<head>
+<meta charset='utf-8'>
+<meta content='chrome=1' http-equiv='X-UA-Compatible'>
+<script type="text/javascript">window.NREUM||(NREUM={});NREUM.info={"beacon":"bam.nr-data.net","errorBeacon":"bam.nr-data.net","licenseKey":"8133495815","applicationID":"3690331","transactionName":"d15bTBMMWVVcF0pFXFdYRV0STFxXXQAd","queueTime":0,"applicationTime":597,"agent":""}</script>
+<script type="text/javascript">window.NREUM||(NREUM={}),__nr_require=function(e,t,n){function r(n){if(!t[n]){var o=t[n]={exports:{}};e[n][0].call(o.exports,function(t){var o=e[n][1][t];return r(o||t)},o,o.exports)}return t[n].exports}if("function"==typeof __nr_require)return __nr_require;for(var o=0;o<n.length;o++)r(n[o]);return r}({1:[function(e,t,n){function r(){}function o(e,t,n){return function(){return i(e,[f.now()].concat(u(arguments)),t?null:this,n),t?void 0:this}}var i=e("handle"),a=e(2),u=e(3),c=e("ee").get("tracer"),f=e("loader"),s=NREUM;"undefined"==typeof window.newrelic&&(newrelic=s);var p=["setPageViewName","setCustomAttribute","setErrorHandler","finished","addToTrace","inlineHit","addRelease"],d="api-",l=d+"ixn-";a(p,function(e,t){s[t]=o(d+t,!0,"api")}),s.addPageAction=o(d+"addPageAction",!0),s.setCurrentRouteName=o(d+"routeName",!0),t.exports=newrelic,s.interaction=function(){return(new r).get()};var m=r.prototype={createTracer:function(e,t){var n={},r=this,o="function"==typeof t;return i(l+"tracer",[f.now(),e,n],r),function(){if(c.emit((o?"":"no-")+"fn-start",[f.now(),r,o],n),o)try{return t.apply(this,arguments)}catch(e){throw c.emit("fn-err",[arguments,this,e],n),e}finally{c.emit("fn-end",[f.now()],n)}}}};a("setName,setAttribute,save,ignore,onEnd,getContext,end,get".split(","),function(e,t){m[t]=o(l+t)}),newrelic.noticeError=function(e){"string"==typeof e&&(e=new Error(e)),i("err",[e,f.now()])}},{}],2:[function(e,t,n){function r(e,t){var n=[],r="",i=0;for(r in e)o.call(e,r)&&(n[i]=t(r,e[r]),i+=1);return n}var o=Object.prototype.hasOwnProperty;t.exports=r},{}],3:[function(e,t,n){function r(e,t,n){t||(t=0),"undefined"==typeof n&&(n=e?e.length:0);for(var r=-1,o=n-t||0,i=Array(o<0?0:o);++r<o;)i[r]=e[t+r];return i}t.exports=r},{}],4:[function(e,t,n){t.exports={exists:"undefined"!=typeof window.performance&&window.performance.timing&&"undefined"!=typeof window.performance.timing.navigationStart}},{}],ee:[function(e,t,n){function r(){}function o(e){function t(e){return e&&e instanceof r?e:e?c(e,u,i):i()}function n(n,r,o,i){if(!d.aborted||i){e&&e(n,r,o);for(var a=t(o),u=m(n),c=u.length,f=0;f<c;f++)u[f].apply(a,r);var p=s[y[n]];return p&&p.push([b,n,r,a]),a}}function l(e,t){v[e]=m(e).concat(t)}function m(e){return v[e]||[]}function w(e){return p[e]=p[e]||o(n)}function g(e,t){f(e,function(e,n){t=t||"feature",y[n]=t,t in s||(s[t]=[])})}var v={},y={},b={on:l,emit:n,get:w,listeners:m,context:t,buffer:g,abort:a,aborted:!1};return b}function i(){return new r}function a(){(s.api||s.feature)&&(d.aborted=!0,s=d.backlog={})}var u="nr@context",c=e("gos"),f=e(2),s={},p={},d=t.exports=o();d.backlog=s},{}],gos:[function(e,t,n){function r(e,t,n){if(o.call(e,t))return e[t];var r=n();if(Object.defineProperty&&Object.keys)try{return Object.defineProperty(e,t,{value:r,writable:!0,enumerable:!1}),r}catch(i){}return e[t]=r,r}var o=Object.prototype.hasOwnProperty;t.exports=r},{}],handle:[function(e,t,n){function r(e,t,n,r){o.buffer([e],r),o.emit(e,t,n)}var o=e("ee").get("handle");t.exports=r,r.ee=o},{}],id:[function(e,t,n){function r(e){var t=typeof e;return!e||"object"!==t&&"function"!==t?-1:e===window?0:a(e,i,function(){return o++})}var o=1,i="nr@id",a=e("gos");t.exports=r},{}],loader:[function(e,t,n){function r(){if(!x++){var e=h.info=NREUM.info,t=d.getElementsByTagName("script")[0];if(setTimeout(s.abort,3e4),!(e&&e.licenseKey&&e.applicationID&&t))return s.abort();f(y,function(t,n){e[t]||(e[t]=n)}),c("mark",["onload",a()+h.offset],null,"api");var n=d.createElement("script");n.src="https://"+e.agent,t.parentNode.insertBefore(n,t)}}function o(){"complete"===d.readyState&&i()}function i(){c("mark",["domContent",a()+h.offset],null,"api")}function a(){return E.exists&&performance.now?Math.round(performance.now()):(u=Math.max((new Date).getTime(),u))-h.offset}var u=(new Date).getTime(),c=e("handle"),f=e(2),s=e("ee"),p=window,d=p.document,l="addEventListener",m="attachEvent",w=p.XMLHttpRequest,g=w&&w.prototype;NREUM.o={ST:setTimeout,SI:p.setImmediate,CT:clearTimeout,XHR:w,REQ:p.Request,EV:p.Event,PR:p.Promise,MO:p.MutationObserver};var v=""+location,y={beacon:"bam.nr-data.net",errorBeacon:"bam.nr-data.net",agent:"js-agent.newrelic.com/nr-1071.min.js"},b=w&&g&&g[l]&&!/CriOS/.test(navigator.userAgent),h=t.exports={offset:u,now:a,origin:v,features:{},xhrWrappable:b};e(1),d[l]?(d[l]("DOMContentLoaded",i,!1),p[l]("load",r,!1)):(d[m]("onreadystatechange",o),p[m]("onload",r)),c("mark",["firstbyte",u],null,"api");var x=0,E=e(4)},{}]},{},["loader"]);</script>
+<title>Homebrew Beer Recipes | Brewtoad
+</title>
+<meta content='Search homebrew beer recipes based on type, property, style, and ingredient.' name='description'>
+<meta content='' name='keywords'>
+<meta content='Ackmann &amp; Dickenson, Inc' name='author'>
+<meta content='width=device-width, initial-scale=0.9, user-scalable=no' name='viewport'>
+<meta content='ZHwJubiX3Uo_Q4FzwMXowZ-E6RfaHOmbv_nQ37SS8y8' name='google-site-verification'>
+<meta content='ba5c47f5ad5c883c8a813eb74b441953' name='p:domain_verify'>
+<meta content='513416568' property='twitter:account_id'>
+<link href='//bt-prod-assets.s3.amazonaws.com/assets/favicon.png' rel='shortcut icon'>
+<link href='//bt-prod-assets.s3.amazonaws.com/assets/apple-touch-icon.png' rel='apple-touch-icon'>
+<script src='https://maps.google.com/maps/api/js?sensor=false&amp;language=en' type='text/javascript'></script>
+<script src="//bt-prod-assets.s3.amazonaws.com/assets/modernizr.custom.82648.js"></script>
+<link rel="stylesheet" media="all" href="//bt-prod-assets.s3.amazonaws.com/assets/application.css" />
+<link rel="stylesheet" media="print" href="//bt-prod-assets.s3.amazonaws.com/assets/print.css" />
+<script src="//bt-prod-assets.s3.amazonaws.com/assets/application.js"></script>
+<script src='https://use.typekit.com/eiq6bjr.js' type='text/javascript'></script>
+<script>
+  try{Typekit.load();}catch(e){}
+</script>
+<script>
+  dataLayer = [{
+    'event': 'pageLoad',
+    'loggedIn': false
+  }];
+</script>
+<script>
+  var _queryStringToObj = function(q) {
+      var obj = {};
+      q.replace(new RegExp('([^?=&]+)(=([^&]*))?', 'g'), function($0, $1, $2, $3) {
+      var key = unescape($1);
+      var val = unescape($3);
+  
+      // NOTE: this `if` enforces the protocol that every filter keyword
+      // *must* have a value. This arose when some foreign website
+      // published a mal-formed url for brewtoad. Every filter produced
+      // by Brewtoad works fine.
+  
+      if(val !== 'undefined') {
+          if(key.slice(-2) === '[]') {
+              key = key.slice(0, key.length - 2);
+              if(typeof obj[key] === 'undefined') {
+                  obj[key] = [];
+              }
+              obj[key].push(val);
+          } else {
+              obj[key] = val;
+          }
+      }
+      });
+      return obj;
+  }
+  
+  var _recipeSearchPageName = function() {
+      var title;
+      var queryObject = _queryStringToObj(window.location.search);
+      if(window.location.pathname.match(/\/users\//)) {
+          title = "Users recipes"
+      } else {
+          title = document.title
+      }
+      return title + ' - ' + (queryObject.sort || 'rank') + ' - ' + (queryObject.page || '1')
+  };
+  
+  var ecom = {"ecommerce":{"impressions":[{"name":"Rainy Day IPA","id":"rainy-day-ipa-1","price":"0.0","brand":"MoreBeer!","category":"American IPA","variant":"5.0 gal","list":"recipe_search","position":1},{"name":"My First Hopville Beer","id":"my-first-hopville-beer","price":"0.0","brand":"MoreBeer!","category":"American IPA","variant":"5.0 gal","list":"recipe_search","position":2},{"name":"Oatmeal Stout","id":"oatmeal-stout-8","price":"0.0","brand":"MoreBeer!","category":"Oatmeal Stout","variant":"6.5 gal","list":"recipe_search","position":3},{"name":"AK #47","id":"ak-47","price":"0.0","brand":"MoreBeer!","category":"American Brown Ale","variant":"5.0 gal","list":"recipe_search","position":4},{"name":"Jacobite Scotch Ale","id":"jacobite-scotch-ale","price":"0.0","brand":"MoreBeer!","category":"Specialty Beer","variant":"5.0 gal","list":"recipe_search","position":5},{"name":"Nessie Ale","id":"nessie-ale","price":"0.0","brand":"MoreBeer!","category":"Scottish Export 80/-","variant":"5.5 gal","list":"recipe_search","position":6},{"name":"Pantry IPA","id":"pantry-ipa","price":"0.0","brand":"MoreBeer!","category":"Imperial IPA","variant":"5.0 gal","list":"recipe_search","position":7},{"name":"Wisest Man Espresso Stout","id":"wisest-man-espresso-stout","price":"0.0","brand":"MoreBeer!","category":"Russian Imperial Stout","variant":"5.0 gal","list":"recipe_search","position":8},{"name":"Red EyePA","id":"red-eyepa","price":"0.0","brand":"MoreBeer!","category":"Imperial IPA","variant":"5.0 gal","list":"recipe_search","position":9},{"name":"Jalapeno Brown","id":"jalapeno-brown","price":"39.606","brand":"MoreBeer!","category":"Northern English Brown Ale","variant":"5.5 gal","list":"recipe_search","position":10},{"name":"Just a Wee Scottish","id":"just-a-wee-scottish","price":"0.0","brand":"MoreBeer!","category":"Scottish Light 60/-","variant":"5.0 gal","list":"recipe_search","position":11},{"name":"Pale Ale","id":"pale-ale-5","price":"0.0","brand":"MoreBeer!","category":"English IPA","variant":"5.0 gal","list":"recipe_search","position":12},{"name":"Bond St, Baby","id":"bond-st-baby","price":"0.0","brand":"MoreBeer!","category":"Specialty Beer","variant":"5.0 gal","list":"recipe_search","position":13},{"name":"leap year","id":"leap-year","price":"45.129","brand":"MoreBeer!","category":"American Pale Ale","variant":"5.0 gal","list":"recipe_search","position":14},{"name":"Simpleton Stout","id":"simpleton-stout","price":"0.0","brand":"MoreBeer!","category":"Dry Stout","variant":"5.0 gal","list":"recipe_search","position":15},{"name":"Rainy Day Stout","id":"rainy-day-stout-2","price":"0.0","brand":"MoreBeer!","category":"Dry Stout","variant":"6.0 gal","list":"recipe_search","position":16},{"name":"Guiness Cloned","id":"guiness-cloned","price":"0.0","brand":"MoreBeer!","category":"Dry Stout","variant":"6.0 gal","list":"recipe_search","position":17},{"name":"Guiness Cloned Strong (5.2% Alcohol)","id":"guiness-cloned-strong-52-alcohol","price":"0.0","brand":"MoreBeer!","category":"Dry Stout","variant":"6.0 gal","list":"recipe_search","position":18},{"name":"ABT De La GDB","id":"abt-de-la-gdb","price":"0.0","brand":"MoreBeer!","category":"Belgian Pale Ale","variant":"5.0 gal","list":"recipe_search","position":19},{"name":"German Alt","id":"german-alt","price":"0.0","brand":"MoreBeer!","category":"Northern German Altbier","variant":"5.5 gal","list":"recipe_search","position":20},{"name":"Look out below","id":"look-out-below","price":"0.0","brand":"MoreBeer!","category":"American IPA","variant":"5.0 gal","list":"recipe_search","position":21},{"name":"Irish Red Lager","id":"irish-red-lager","price":"0.0","brand":"MoreBeer!","category":"Irish Red Ale","variant":"6.0 gal","list":"recipe_search","position":22},{"name":"Honey Red","id":"honey-red-4","price":"0.0","brand":"MoreBeer!","category":"Irish Red Ale","variant":"5.0 gal","list":"recipe_search","position":23},{"name":"Spontaneous Ale","id":"spontaneous-ale","price":"0.0","brand":"MoreBeer!","category":"American Amber Ale","variant":"5.0 gal","list":"recipe_search","position":24},{"name":"Whitehorse Stout","id":"whitehorse-stout","price":"0.0","brand":"MoreBeer!","category":"Dry Stout","variant":"5.02 gal","list":"recipe_search","position":25},{"name":"Hunter's 55","id":"hunters-55","price":"0.0","brand":"MoreBeer!","category":"American Pale Ale","variant":"5.0 gal","list":"recipe_search","position":26},{"name":"Bitter Blonde Ale 2","id":"bitter-blonde-ale-2","price":"0.0","brand":"MoreBeer!","category":"German Pilsner (Pils)","variant":"5.0 gal","list":"recipe_search","position":27},{"name":"Bitter Blonde Ale","id":"bitter-blonde-ale","price":"0.0","brand":"MoreBeer!","category":"German Pilsner (Pils)","variant":"5.0 gal","list":"recipe_search","position":28},{"name":"Cambridge Common Steam Beer","id":"cambridge-common-steam-beer","price":"35.0175","brand":"MoreBeer!","category":"California Common Beer","variant":"5.0 gal","list":"recipe_search","position":29},{"name":"Scottish Ale (2008-12-06 version)","id":"scottish-ale-2008-12-06-version","price":"0.0","brand":"MoreBeer!","category":"Scottish Export 80/-","variant":"5.0 gal","list":"recipe_search","position":30}]}};
+  
+  if('recipe_search' === 'recipe_search') {
+      page_name = _recipeSearchPageName();
+      ecom.ecommerce.impressions = _.map(ecom.ecommerce.impressions, function (item) {
+          item.list = page_name;
+          return item;
+      });
+  };
+  
+  dataLayer.push(ecom);
+</script>
+
+
+
+<meta name="csrf-param" content="authenticity_token" />
+<meta name="csrf-token" content="ZMd4Gw8bx7CJOnVgCXZGDulZrjdcRUJPjm+wTw6HqyLfBHXzp5mlMuhNem6jLj64h0MYtCp4LPqqnTktDf8OVg==" />
+</head>
+<body>
+<!-- Google Tag Manager -->
+<noscript><iframe src="//www.googletagmanager.com/ns.html?id=GTM-KCZDBR"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'//www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-KCZDBR');</script>
+<!-- End Google Tag Manager -->
+<!-- / Site header -->
+<div class='header'>
+<div class='site-header'>
+<!-- / Toggle menu -->
+<a class='site-header--toggle-menu' href='#'>
+<i class='ion-navicon'></i>
+</a>
+<!-- / Logo -->
+<figure class='site-header--logo'>
+<a href='/'>
+<img alt='Brewtoad' src='//bt-prod-assets.s3.amazonaws.com/assets/brewtoad-2x.png'>
+</a>
+</figure>
+<!-- / Pro advert -->
+<!-- - if current_user.nil? || (current_user && !current_user.pro?) -->
+<!-- %a.site-header--pro.hide-on-mobile{:href => pro_path, :title => "Learn about Brewtoad Pro"} -->
+<!-- Go Brewtoad -->
+<!-- %strong Pro! -->
+<!-- / Site search -->
+<div class='site-header--search'>
+<a href='#'>
+<i class='ion-search'></i>
+</a>
+<form action="/search" accept-charset="UTF-8" method="get"><input name="utf8" type="hidden" value="&#x2713;" />
+<input type="text" name="search" id="search" />
+<input type="submit" value="Search" />
+</form>
+
+</div>
+<ul class='hide-on-mobile site-header--social'>
+<li>
+<a href='https://www.facebook.com/brewtoad' target='_blank'>
+<i class='icon icon-facebook'></i>
+</a>
+</li>
+<li>
+<a href='https://twitter.com/brewtoad' target='_blank'>
+<i class='icon icon-twitter'></i>
+</a>
+</li>
+</ul>
+<!-- / User dropdown -->
+<!-- / Sign up / log in -->
+<div class='logged-out hide-on-mobile'>
+<a href='/accounts/sign_up'>Sign Up</a>
+<a href='/accounts/sign_in'>Log In</a>
+</div>
+<a class='site-header--login-button hide-above-mobile' href='/accounts/sign_in'>
+<i class='ion-person'></i>
+</a>
+<!-- / Active order -->
+</div>
+<nav class='site-nav'>
+<a class='toggle-nav' href='#'>
+<i class='ion-close'></i>
+</a>
+<ul>
+<li>
+<a>
+<i class='ion-beer'></i>
+Recipes
+</a>
+<ul>
+<li>
+<a href='/recipes'>
+<i class='ion-beer'></i>
+All Recipes
+</a>
+</li>
+<li>
+<a href='/recipes/new'>
+<i class='ion-compose'></i>
+New Recipe
+</a>
+</li>
+</ul>
+</li>
+<li>
+<a>
+<i class='ion-chatbubbles'></i>
+Community
+</a>
+<ul>
+<li>
+<a href='/users'>
+<i class='ion-person'></i>
+Brewers
+</a>
+</li>
+<li>
+<a href='/groups'>
+<i class='ion-person-stalker'></i>
+Groups
+</a>
+</li>
+</ul>
+</li>
+<li>
+<a>
+<i class='ion-bag'></i>
+Shopping
+</a>
+<ul>
+<li>
+<a href='/shopping'>
+<i class='icon-cart'></i>
+Click to Order
+</a>
+</li>
+</ul>
+</li>
+<li>
+<a>
+<i class='ion-stats-bars'></i>
+Styles &amp; Ingredients
+</a>
+<ul>
+<li>
+<a href='/styles'>
+<i class='ion-stats-bars'></i>
+Styles
+</a>
+</li>
+<li>
+<a href='/generic-fermentables'>
+<i class='ion-cube'></i>
+Fermentables
+</a>
+</li>
+<li>
+<a href='/hops'>
+<i class='ion-leaf'></i>
+Hops
+</a>
+</li>
+<li>
+<a href='/yeasts'>
+<i class='ion-bug'></i>
+Yeasts
+</a>
+</li>
+<li>
+<a href='/extras'>
+<i class='ion-beaker'></i>
+Extras
+</a>
+</li>
+</ul>
+</li>
+<li>
+<a>
+<i class='ion-calculator'></i>
+Tools &amp; Calculators
+</a>
+<ul>
+<li>
+<a href='/tools/alcohol-calculator'>
+<i class='ion-calculator'></i>
+Alcohol Calculator
+</a>
+</li>
+<li>
+<a href='/tools/color-converter'>
+<i class='ion-calculator'></i>
+Color Converter
+</a>
+</li>
+<li>
+<a href='/tools/hydrometer-temperature-correction'>
+<i class='ion-calculator'></i>
+Hydrometer Temperature Correction
+</a>
+</li>
+<li>
+<a href='/tools/mash-water-calculator'>
+<i class='ion-calculator'></i>
+Mash Water Calculator
+</a>
+</li>
+<li>
+<a href='/tools/mash-infusion-calculator'>
+<i class='ion-calculator'></i>
+Mash Infusion Calculator
+</a>
+</li>
+<li>
+<a href='/tools/malt-potential-extract-calculator'>
+<i class='ion-calculator'></i>
+Malt Potential Extract
+</a>
+</li>
+<li>
+<a href='/tools/pitch-rate-calculator'>
+<i class='ion-calculator'></i>
+Pitch Rate Calculator
+</a>
+</li>
+</ul>
+</li>
+<li>
+<a>
+<i class='icon-star'></i>
+Membership
+</a>
+<ul>
+<li>
+<a href='/free'>
+<i class='ion-person'></i>
+Free Membership
+</a>
+</li>
+<li>
+<a href='/pro'>
+<i class='ion-star'></i>
+Brewtoad
+<strong>Pro</strong>
+</a>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</div>
+<div class='site-container recipes recipes-index'>
+<div class='site-content ' id='js-content'>
+<script src="//bt-prod-assets.s3.amazonaws.com/assets/bt/recipe-search/application.js"></script>
+<script>
+  $(function() {
+    new RecipeSearchViewModel({
+      data: {
+        recipeTypes:  [{"id":1,"name":"Extract"},{"id":2,"name":"Partial Mash"},{"id":3,"name":"All Grain"}],
+        styles:       [{"id":34,"name":"American Amber Ale"},{"id":73,"name":"American Barleywine"},{"id":35,"name":"American Brown Ale"},{"id":49,"name":"American IPA"},{"id":33,"name":"American Pale Ale"},{"id":46,"name":"American Stout"},{"id":21,"name":"American Wheat or Rye Beer"},{"id":41,"name":"Baltic Porter"},{"id":66,"name":"Belgian Blond Ale"},{"id":70,"name":"Belgian Dark Strong Ale"},{"id":67,"name":"Belgian Dubbel"},{"id":69,"name":"Belgian Golden Strong Ale"},{"id":56,"name":"Belgian Pale Ale"},{"id":59,"name":"Belgian Specialty Ale"},{"id":68,"name":"Belgian Tripel"},{"id":60,"name":"Berliner Weisse"},{"id":58,"name":"Bière de Garde"},{"id":19,"name":"Blonde Ale"},{"id":7,"name":"Bohemian Pilsener"},{"id":39,"name":"Brown Porter"},{"id":23,"name":"California Common Beer"},{"id":76,"name":"Christmas/Winter Specialty Spiced Beer"},{"id":8,"name":"Classic American Pilsner"},{"id":77,"name":"Classic Rauchbier"},{"id":18,"name":"Cream Ale"},{"id":11,"name":"Dark American Lager"},{"id":16,"name":"Doppelbock"},{"id":5,"name":"Dortmunder Export"},{"id":42,"name":"Dry Stout"},{"id":52,"name":"Dunkelweizen"},{"id":24,"name":"Düsseldorf Altbier"},{"id":17,"name":"Eisbock"},{"id":72,"name":"English Barleywine"},{"id":48,"name":"English IPA"},{"id":27,"name":"Extra Special/Strong Bitter (English Pale Ale)"},{"id":62,"name":"Flanders Brown Ale/Oud Bruin"},{"id":61,"name":"Flanders Red Ale"},{"id":45,"name":"Foreign Extra Stout"},{"id":74,"name":"Fruit Beer"},{"id":65,"name":"Fruit Lambic"},{"id":6,"name":"German Pilsner (Pils)"},{"id":64,"name":"Gueuze"},{"id":50,"name":"Imperial IPA"},{"id":31,"name":"Irish Red Ale"},{"id":20,"name":"Kölsch"},{"id":1,"name":"Lite American Lager"},{"id":14,"name":"Maibock/Helles Bock"},{"id":36,"name":"Mild"},{"id":12,"name":"Munich Dunkel"},{"id":4,"name":"Munich Helles"},{"id":38,"name":"Northern English Brown Ale"},{"id":22,"name":"Northern German Altbier"},{"id":44,"name":"Oatmeal Stout"},{"id":10,"name":"Oktoberfest/Märzen"},{"id":71,"name":"Old Ale"},{"id":78,"name":"Other Smoked Beer"},{"id":3,"name":"Premium American Lager"},{"id":40,"name":"Robust Porter"},{"id":54,"name":"Roggenbier (German Rye Beer)"},{"id":47,"name":"Russian Imperial Stout"},{"id":57,"name":"Saison"},{"id":13,"name":"Schwarzbier (Black Beer)"},{"id":30,"name":"Scottish Export 80/-"},{"id":29,"name":"Scottish Heavy 70/-"},{"id":28,"name":"Scottish Light 60/-"},{"id":37,"name":"Southern English Brown"},{"id":26,"name":"Special/Best/Premium Bitter"},{"id":80,"name":"Specialty Beer"},{"id":75,"name":"Spice, Herb, or Vegetable Beer"},{"id":2,"name":"Standard American Lager"},{"id":25,"name":"Standard/Ordinary Bitter"},{"id":63,"name":"Straight (Unblended) Lambic"},{"id":32,"name":"Strong Scotch Ale"},{"id":43,"name":"Sweet Stout"},{"id":15,"name":"Traditional Bock"},{"id":9,"name":"Vienna Lager"},{"id":53,"name":"Weizenbock"},{"id":51,"name":"Weizen/Weissbier"},{"id":55,"name":"Witbier"},{"id":79,"name":"Wood-Aged Beer"}],
+        fermentables: [{"id":37,"name":"2-Row (US)"},{"id":38,"name":"6-Row (US)"},{"id":122,"name":"Abbey Malt  (BE)"},{"id":1,"name":"Acidulated Malt (DE)"},{"id":205,"name":"Agave Nectar"},{"id":123,"name":"Amber (UK)"},{"id":131,"name":"Aromatic (BE)"},{"id":133,"name":"Aromatic Malt (UK)"},{"id":132,"name":"Aromatic Malt (US)"},{"id":124,"name":"Ashbourne Mild (US)"},{"id":184,"name":"Belgian Candi Sugar - Amber/Brown"},{"id":185,"name":"Belgian Candi Sugar - Clear/Blond"},{"id":186,"name":"Belgian Candi Sugar - Dark"},{"id":154,"name":"Belgian Candi Syrup - Amber"},{"id":155,"name":"Belgian Candi Syrup - Clear"},{"id":156,"name":"Belgian Candi Syrup - D2"},{"id":157,"name":"Belgian Candi Syrup - Dark"},{"id":224,"name":"Belgian Candi Syrup - Extra Dark"},{"id":134,"name":"Biscuit (BE)"},{"id":166,"name":"Black Barley (US)"},{"id":168,"name":"Black Malt (UK)"},{"id":167,"name":"Black Malt (US)"},{"id":169,"name":"Black Patent (UK)"},{"id":170,"name":"Blackprinz (US)"},{"id":39,"name":"Bohemian Pilsner (DE)"},{"id":135,"name":"Bonlander Munich (US)"},{"id":125,"name":"Brown Malt (UK)"},{"id":158,"name":"Brown Rice Syrup"},{"id":187,"name":"Brown Sugar"},{"id":188,"name":"Cane Sugar"},{"id":64,"name":"Cara 20L (BE)"},{"id":65,"name":"Cara 45L (BE)"},{"id":67,"name":"CaraAmber (DE)"},{"id":68,"name":"CaraAroma (DE)"},{"id":69,"name":"CaraBelge (DE)"},{"id":70,"name":"CaraBohemian (DE)"},{"id":126,"name":"CaraBrown (US)"},{"id":127,"name":"CaraCrystal Wheat Malt (US)"},{"id":71,"name":"Carafa I (DE)"},{"id":72,"name":"Carafa II (DE)"},{"id":73,"name":"Carafa III (DE)"},{"id":219,"name":"Carafa Special II"},{"id":2,"name":"CaraFoam (DE)"},{"id":203,"name":"Cara Gold (BE)"},{"id":74,"name":"CaraHell (DE)"},{"id":66,"name":"Cara Malt (UK)"},{"id":75,"name":"Caramel/Crystal 10L (US)"},{"id":76,"name":"Caramel/Crystal 120L (US)"},{"id":77,"name":"Caramel/Crystal 150L (US)"},{"id":78,"name":"Caramel/Crystal 15L (US)"},{"id":79,"name":"Caramel/Crystal 20L (US)"},{"id":80,"name":"Caramel/Crystal 30L (US)"},{"id":81,"name":"Caramel/Crystal 40L (US)"},{"id":82,"name":"Caramel/Crystal 60L (US)"},{"id":83,"name":"Caramel/Crystal 75L (US)"},{"id":84,"name":"Caramel/Crystal 80L (US)"},{"id":85,"name":"Caramel/Crystal 90L (US)"},{"id":210,"name":"Caramel Munich 60L (US)"},{"id":3,"name":"Caramel Pils (BE)"},{"id":86,"name":"Caramel Pils (DE)"},{"id":113,"name":"Caramel Vienne 20L"},{"id":87,"name":"Caramel Wheat (DE)"},{"id":136,"name":"CaraMunich (BE)"},{"id":88,"name":"CaraMunich I (DE)"},{"id":89,"name":"CaraMunich II (DE)"},{"id":90,"name":"CaraMunich III (DE)"},{"id":4,"name":"Carapils (DE)"},{"id":5,"name":"Carapils (Dextrine Malt) (US)"},{"id":91,"name":"CaraRed (DE)"},{"id":128,"name":"Carastan 30L (UK)"},{"id":129,"name":"Carastan Light 15L (UK)"},{"id":137,"name":"CaraVienne (BE)"},{"id":171,"name":"Chocolate (BE)"},{"id":174,"name":"Chocolate Rye (DE)"},{"id":172,"name":"Chocolate (UK)"},{"id":173,"name":"Chocolate (US)"},{"id":175,"name":"Chocolate Wheat (DE)"},{"id":176,"name":"Coffee Malt (UK)"},{"id":189,"name":"Corn Syrup"},{"id":103,"name":"Crystal 120L (CA)"},{"id":206,"name":"Crystal 135L (UK)"},{"id":92,"name":"Crystal 140L (UK)"},{"id":101,"name":"Crystal 15L (CA)"},{"id":93,"name":"Crystal 15L (UK)"},{"id":94,"name":"Crystal 30L (UK)"},{"id":100,"name":"Crystal 40L (CA)"},{"id":95,"name":"Crystal 45L (UK)"},{"id":96,"name":"Crystal 50L (UK)"},{"id":102,"name":"Crystal 60L (CA)"},{"id":97,"name":"Crystal 60L (UK)"},{"id":98,"name":"Crystal 70L (UK)"},{"id":99,"name":"Crystal 90L (UK)"},{"id":104,"name":"Crystal Rye (UK)"},{"id":177,"name":"Dark Chocolate (US)"},{"id":105,"name":"Dark Crystal 80L (UK)"},{"id":138,"name":"Dark Munich (DE)"},{"id":139,"name":"Dark Wheat (DE)"},{"id":178,"name":"De-Bittered Black (BE)"},{"id":106,"name":"De-Husked Caraf I (DE)"},{"id":107,"name":"De-Husked Caraf II (DE)"},{"id":108,"name":"De-Husked Caraf III (DE)"},{"id":204,"name":"Demerara (Raw) Sugar"},{"id":6,"name":"Dextrine Malt (UK)"},{"id":190,"name":"Dextrose (Corn Sugar)"},{"id":114,"name":"Dry Malt Extract - Amber"},{"id":115,"name":"Dry Malt Extract - Dark"},{"id":116,"name":"Dry Malt Extract - Extra Light"},{"id":117,"name":"Dry Malt Extract - Light"},{"id":213,"name":"Dry Malt Extract - Maris Otter"},{"id":118,"name":"Dry Malt Extract - Munich"},{"id":212,"name":"Dry Malt Extract - Pale\t"},{"id":119,"name":"Dry Malt Extract - Pilsen"},{"id":214,"name":"Dry Malt Extract - Rye"},{"id":120,"name":"Dry Malt Extract - Wheat"},{"id":130,"name":"ESB Malt (CA)"},{"id":109,"name":"Extra Dark Crystal 120L (UK)"},{"id":110,"name":"Extra Dark Crystal 160L (UK)"},{"id":218,"name":"Extra Special Malt (US)"},{"id":7,"name":"Flaked Barley"},{"id":8,"name":"Flaked Corn"},{"id":9,"name":"Flaked Oats"},{"id":10,"name":"Flaked Rice"},{"id":11,"name":"Flaked Rye"},{"id":12,"name":"Flaked Wheat"},{"id":40,"name":"Floor-Malted Bohemian Dark Pilsner (DE)"},{"id":41,"name":"Floor-Malted Bohemian Pilsner (DE)"},{"id":13,"name":"Floor-Malted Bohemian Wheat (DE)"},{"id":14,"name":"Golden Naked Oats (UK)"},{"id":42,"name":"Golden Promise (UK)"},{"id":15,"name":"Grits"},{"id":43,"name":"Halcyon (UK)"},{"id":191,"name":"Honey "},{"id":192,"name":"Honey (Buckwheat)"},{"id":111,"name":"Honey Malt (CA)"},{"id":193,"name":"Invert Sugar"},{"id":44,"name":"Kölsch (DE)"},{"id":194,"name":"Lactose (Milk Sugar)"},{"id":45,"name":"Lager (UK)"},{"id":159,"name":"Liquid Malt Extract - Amber"},{"id":160,"name":"Liquid Malt Extract - Dark"},{"id":161,"name":"Liquid Malt Extract - Extra Light"},{"id":162,"name":"Liquid Malt Extract - Light"},{"id":216,"name":"Liquid Malt Extract - Maris Otter"},{"id":163,"name":"Liquid Malt Extract - Munich"},{"id":215,"name":"Liquid Malt Extract - Pale"},{"id":164,"name":"Liquid Malt Extract - Pilsen"},{"id":217,"name":"Liquid Malt Extract - Rye"},{"id":165,"name":"Liquid Malt Extract - Wheat"},{"id":16,"name":"Malted Naked Oats (UK)"},{"id":195,"name":"Maltodextrin "},{"id":196,"name":"Maple Syrup"},{"id":211,"name":"Maris Otter Malt Extract"},{"id":46,"name":"Maris Otter Pale (UK)"},{"id":140,"name":"Melanoidin (DE)"},{"id":17,"name":"Midnight Wheat Malt (US)"},{"id":47,"name":"Mild (UK)"},{"id":197,"name":"Molasses "},{"id":141,"name":"Munich - 60L (US)"},{"id":144,"name":"Munich (BE)"},{"id":142,"name":"Munich - Dark 20L (US)"},{"id":146,"name":"Munich Dark (CA)"},{"id":147,"name":"Munich Dark (DE)"},{"id":209,"name":"Munich (DE)"},{"id":143,"name":"Munich - Light 10L (US)"},{"id":148,"name":"Munich Light (CA)"},{"id":149,"name":"Munich Light (DE)"},{"id":145,"name":"Munich (UK)"},{"id":18,"name":"Oat Malt (UK)"},{"id":48,"name":"Optic (UK)"},{"id":50,"name":"Pale 2-Row (CA)"},{"id":49,"name":"Pale 2-Row - Toasted (US)"},{"id":51,"name":"Pale 2-Row (UK)"},{"id":52,"name":"Pale 2-Row (US)"},{"id":53,"name":"Pale 6-Row (US)"},{"id":54,"name":"Pale Ale (BE)"},{"id":57,"name":"Pale Ale (CA)"},{"id":55,"name":"Pale Ale (DE)"},{"id":56,"name":"Pale Ale (US)"},{"id":179,"name":"Pale Chocolate (UK)"},{"id":208,"name":"Pale Malt (US)"},{"id":58,"name":"Pale Wheat (CA)"},{"id":19,"name":"Pale Wheat (DE)"},{"id":59,"name":"Pearl (UK)"},{"id":20,"name":"Peated Malt (UK)"},{"id":60,"name":"Pilsen (UK)"},{"id":61,"name":"Pilsner (BE)"},{"id":62,"name":"Pilsner (DE)"},{"id":63,"name":"Pilsner (US)"},{"id":21,"name":"Red Wheat (US)"},{"id":22,"name":"Rice Hulls"},{"id":121,"name":"Rice Syrup Solids"},{"id":180,"name":"Roasted Barley (BE)"},{"id":181,"name":"Roasted Barley (UK)"},{"id":182,"name":"Roasted Barley (US)"},{"id":23,"name":"Rolled Oats"},{"id":24,"name":"Rye (DE)"},{"id":25,"name":"Rye (US)"},{"id":26,"name":"Smoked Malt (DE)"},{"id":27,"name":"Smoked Malt (US)"},{"id":198,"name":"Soft Candi Sugar - Blond"},{"id":199,"name":"Soft Candi Sugar - Brown"},{"id":220,"name":"Sorghum Extract"},{"id":112,"name":"Special B (BE)"},{"id":183,"name":"Special Roast (US)"},{"id":28,"name":"Spelt Malt (DE)"},{"id":202,"name":"Sucrose (Table Sugar)"},{"id":29,"name":"Torrified Barley"},{"id":30,"name":"Torrified Wheat"},{"id":200,"name":"Turbinado"},{"id":31,"name":"Unmalted Wheat (BE)"},{"id":150,"name":"Victory (US)"},{"id":151,"name":"Vienna (DE)"},{"id":153,"name":"Vienna (UK)"},{"id":152,"name":"Vienna (US)"},{"id":32,"name":"Wheat (BE)"},{"id":35,"name":"Wheat Malt (DE)"},{"id":33,"name":"Wheat (UK)"},{"id":34,"name":"Wheat (US)"},{"id":201,"name":"White Sorghum Syrup"},{"id":36,"name":"White Wheat  (US)"}],
+        hops:         [{"id":52483,"name":"3-6-9 Experimental (Simcoe Sister Strain) (US)"},{"id":52131,"name":"Admiral (UK)"},{"id":52132,"name":"Ahtanum (US)"},{"id":52133,"name":"Amarillo (US)"},{"id":52134,"name":"Apollo (US)"},{"id":52135,"name":"Bramling Cross (UK)"},{"id":52281,"name":"Bravo (US)"},{"id":52137,"name":"Brewers Gold (DE)"},{"id":52136,"name":"Brewers Gold (US)"},{"id":52138,"name":"Bullion (DE)"},{"id":52272,"name":"Calypso (US)"},{"id":52247,"name":"Cascade (NZ)"},{"id":52139,"name":"Cascade (US)"},{"id":52140,"name":"Centennial (US)"},{"id":52141,"name":"Challenger (UK)"},{"id":53365,"name":"Chelan (US)"},{"id":52142,"name":"Chinook (US)"},{"id":52222,"name":"Citra (US)"},{"id":52143,"name":"Cluster (US)"},{"id":52144,"name":"Columbus (US)"},{"id":52448,"name":"Comet (US)"},{"id":52145,"name":"Crystal (US)"},{"id":53372,"name":"Delta (US)"},{"id":52146,"name":"East Kent Golding (UK)"},{"id":52464,"name":"El Dorado (US)"},{"id":52482,"name":"Ella (Stella) (AU)"},{"id":52557,"name":"Endeavour (UK)"},{"id":52147,"name":"Eroica (US)"},{"id":52216,"name":"Falconer's Flight (US)"},{"id":52148,"name":"First Gold (UK)"},{"id":52149,"name":"Fuggle (UK)"},{"id":52150,"name":"Fuggle (US)"},{"id":52240,"name":"Galaxy (AU)"},{"id":52151,"name":"Galena (US)"},{"id":52152,"name":"German Spalt Select (DE)"},{"id":52153,"name":"Glacier (US)"},{"id":52154,"name":"Golding (UK)"},{"id":52155,"name":"Golding (US)"},{"id":52426,"name":"Green Bullet (NZ)"},{"id":52156,"name":"Hallertau (DE)"},{"id":52248,"name":"Hallertauer Aroma (NZ)"},{"id":52159,"name":"Hallertauer Mittelfrüh (DE)"},{"id":52160,"name":"Hallertauer Tradition (DE)"},{"id":52158,"name":"Hallertau Gold (DE)"},{"id":52157,"name":"Hallertau (US)"},{"id":52438,"name":"Herald (UK)"},{"id":52241,"name":"Herkules (DE)"},{"id":52161,"name":"Hersbrucker (DE)"},{"id":52162,"name":"Horizon (US)"},{"id":52480,"name":"Kohatu (AU)"},{"id":52164,"name":"Liberty (US)"},{"id":52165,"name":"Magnum (DE)"},{"id":52166,"name":"Magnum (US)"},{"id":52242,"name":"Merkur (DE)"},{"id":52167,"name":"Millenium (US)"},{"id":53366,"name":"Mosaic™ (US)"},{"id":52249,"name":"Motueka (NZ)"},{"id":52168,"name":"Mount Hood (US)"},{"id":52238,"name":"Mount Rainier (US)"},{"id":52250,"name":"Nelson Sauvin (NZ)"},{"id":52169,"name":"Newport (US)"},{"id":52170,"name":"Northdown (UK)"},{"id":52171,"name":"Northern Brewer (DE)"},{"id":52172,"name":"Northern Brewer (US)"},{"id":52173,"name":"Nugget (US)"},{"id":52174,"name":"Olympic (US)"},{"id":52243,"name":"Opal (DE)"},{"id":52251,"name":"Pacifica (NZ)"},{"id":52252,"name":"Pacific Gem (NZ)"},{"id":52273,"name":"Pacific Jade (NZ)"},{"id":52239,"name":"Palisade (US)"},{"id":52176,"name":"Perle (US)"},{"id":52177,"name":"Phoenix (UK)"},{"id":52256,"name":"Pilgrim (UK)"},{"id":52178,"name":"Pioneer (UK)"},{"id":52566,"name":"Polaris (DE)"},{"id":52179,"name":"Polish Lublin (PL)"},{"id":52181,"name":"Pride of Ringwood (AU)"},{"id":52180,"name":"Progress (UK)"},{"id":52289,"name":"Rakau (AU)"},{"id":52182,"name":"Riwaka (NZ)"},{"id":52183,"name":"Saaz (CZ)"},{"id":52184,"name":"Saaz (US)"},{"id":52185,"name":"San Juan Ruby Red (US)"},{"id":52186,"name":"Santiam (US)"},{"id":52244,"name":"Saphir (DE)"},{"id":52187,"name":"Satus (US)"},{"id":53370,"name":"Silva (AU)"},{"id":52188,"name":"Simcoe (US)"},{"id":52245,"name":"Smaragd (DE)"},{"id":52237,"name":"Sorachi Ace (JP)"},{"id":52298,"name":"Southern Cross (NZ)"},{"id":52189,"name":"Spalt (DE)"},{"id":52190,"name":"Spalt Select (DE)"},{"id":52191,"name":"Spalt Select (US)"},{"id":52192,"name":"Sterling (US)"},{"id":52425,"name":"Sticklebract (AU)"},{"id":52193,"name":"Strisselspalt (FR)"},{"id":52253,"name":"Styrian Arora (SI)"},{"id":52254,"name":"Styrian Bobek (SI)"},{"id":52255,"name":"Styrian Celeia (SI)"},{"id":52194,"name":"Styrian Golding (SI)"},{"id":52561,"name":"Summer (AU)"},{"id":52195,"name":"Summit (US)"},{"id":52282,"name":"Super Galena (US)"},{"id":52650,"name":"Super Pride (AU)"},{"id":53368,"name":"Sylva (AU)"},{"id":52196,"name":"Tardif de Bourgogne (FR)"},{"id":52197,"name":"Target (UK)"},{"id":52246,"name":"Taurus (DE)"},{"id":52198,"name":"Tettnanger (DE)"},{"id":52199,"name":"Tettnanger (US)"},{"id":52200,"name":"Tomahawk (US)"},{"id":52452,"name":"Topaz (AU)"},{"id":52201,"name":"Tradition (DE)"},{"id":52202,"name":"Ultra (US)"},{"id":52203,"name":"Vanguard (US)"},{"id":53367,"name":"Vic Secret (AU)"},{"id":52479,"name":"Wai-iti (NZ)"},{"id":52568,"name":"Waimea (NZ)"},{"id":52204,"name":"Warrior (US)"},{"id":52205,"name":"WGV (Whitbread Golding Variety) (UK)"},{"id":52206,"name":"Willamette (US)"},{"id":52259,"name":"Williamette (US)"},{"id":52207,"name":"Yakima Cluster (US)"},{"id":52208,"name":"Zeus (US)"},{"id":52271,"name":"Zythos (US)"}],
+        yeasts:       [{"id":26096,"name":"Abbaye"},{"id":32,"name":"Abbey Ale Yeast"},{"id":33,"name":"Abbey IV Ale Yeast"},{"id":26077,"name":"Amalgamation - Brett Super Blend"},{"id":55,"name":"American Ale"},{"id":60,"name":"American Ale II"},{"id":21,"name":"American Ale Yeast Blend"},{"id":24,"name":"American Hefeweizen Ale Yeast"},{"id":48,"name":"American Lager Yeast"},{"id":89,"name":"American Lager Yeast"},{"id":53,"name":"American Wheat"},{"id":31,"name":"Antwerp Ale Yeast"},{"id":8,"name":"Australian Ale Yeast"},{"id":93,"name":"Bavarian Lager"},{"id":26084,"name":"Bavarian Weizen"},{"id":25099,"name":"Bavarian Wheat"},{"id":79,"name":"Bavarian Wheat"},{"id":73,"name":"Bavarian Wheat Blend"},{"id":5,"name":"Bedford British"},{"id":26071,"name":"Beersel Brettanomyces Blend"},{"id":70,"name":"Belgian Abbey"},{"id":72,"name":"Belgian Abbey II"},{"id":25100,"name":"Belgian Ale"},{"id":35,"name":"Belgian Ale Yeast"},{"id":78,"name":"Belgian Ardennes"},{"id":30,"name":"Belgian Bastogne Ale Yeast"},{"id":39,"name":"Belgian Golden Ale Yeast"},{"id":75,"name":"Belgian Lambic Blend"},{"id":37,"name":"Belgian Saison II Yeast"},{"id":36,"name":"Belgian Saison I Yeast"},{"id":81,"name":"Belgian Saison Yeast"},{"id":26090,"name":"Belgian Sour Mix I"},{"id":71,"name":"Belgian Strong Ale"},{"id":34,"name":"Belgian Strong Ale Yeast"},{"id":40,"name":"Belgian Style Ale Yeast Blend"},{"id":38,"name":"Belgian Style Saison Ale Yeast Blend"},{"id":84,"name":"Belgian Wheat"},{"id":27,"name":"Belgian Wit Ale Yeast"},{"id":85,"name":"Belgian Witbier"},{"id":26103,"name":"Belgian Wit II"},{"id":28,"name":"Belgian Wit II Ale Yeast"},{"id":24073,"name":"Belle Saison"},{"id":26104,"name":"Berliner Weisse Blend"},{"id":92,"name":"Bohemian Lager"},{"id":25101,"name":"Bohemian Lager"},{"id":26087,"name":"Brettanomyces Bruxellensis"},{"id":97,"name":"Brettanomyces Bruxellensis"},{"id":26089,"name":"Brettanomyces Claussenii"},{"id":99,"name":"Brettanomyces Lambicus"},{"id":26088,"name":"Brettanomyces Lambicus"},{"id":25102,"name":"British Ale"},{"id":57,"name":"British Ale"},{"id":64,"name":"British Ale II"},{"id":4,"name":"British Ale Yeast"},{"id":26072,"name":"Brussels Brettanomyces Blend"},{"id":86,"name":"Budvar Lager"},{"id":12,"name":"Burton Ale Yeast"},{"id":25103,"name":"Burton Union"},{"id":26097,"name":"California Ale"},{"id":1,"name":"California Ale Yeast"},{"id":91,"name":"California Lager"},{"id":20,"name":"California V Ale Yeast"},{"id":25104,"name":"Cider"},{"id":22,"name":"Cream Ale Yeast Blend"},{"id":26093,"name":"Cry Havoc"},{"id":42,"name":"Czech Budejovice Lager Yeast"},{"id":94,"name":"Czech Pils"},{"id":90,"name":"Danish Lager"},{"id":66,"name":"Denny's Favorite 50"},{"id":26083,"name":"Dry Belgian Ale"},{"id":6,"name":"Dry English Ale Yeast"},{"id":15,"name":"Dusseldorf Alt Yeast"},{"id":7,"name":"East Coast Ale Yeast"},{"id":26095,"name":"East Midlands Ale Yeast"},{"id":13,"name":"Edinburgh Scottish Ale Yeast"},{"id":2,"name":"English Ale Yeast"},{"id":65,"name":"European Ale"},{"id":9,"name":"European Ale Yeast"},{"id":26078,"name":"Farmhouse Sour Ale"},{"id":77,"name":"Forbidden Fruit"},{"id":26094,"name":"French Ale"},{"id":80,"name":"French Saison"},{"id":26075,"name":"Funktown Pale Ale"},{"id":52,"name":"German Ale"},{"id":443,"name":"German Ale II"},{"id":14,"name":"German Ale/Kölsch Yeast"},{"id":46,"name":"German Bock Lager Yeast"},{"id":45,"name":"German Lager Yeast"},{"id":76,"name":"German Wheat"},{"id":23,"name":"Hefeweizen Ale Yeast"},{"id":26,"name":"Hefeweizen IV Ale Yeast"},{"id":56,"name":"Irish Ale"},{"id":3,"name":"Irish Ale Yeast"},{"id":69,"name":"Kölsh"},{"id":98,"name":"Lactobacillus"},{"id":26092,"name":"Lactobacillus Delbrueckii"},{"id":26073,"name":"Lochristi Brettanomyces Blend"},{"id":54,"name":"London Ale"},{"id":62,"name":"London Ale III"},{"id":10,"name":"London Ale Yeast"},{"id":68,"name":"London ESB Ale"},{"id":17,"name":"Manchester Ale Yeast"},{"id":51,"name":"Mexican Lager Yeast"},{"id":26098,"name":"Munich Helles"},{"id":95,"name":"Munich Lager"},{"id":25105,"name":"Newcastle Dark Ale"},{"id":26081,"name":"Northeastern Abbey"},{"id":63,"name":"Northwest Ale"},{"id":18,"name":"Nottingham Ale Yeast"},{"id":44,"name":"Oktoberfest/Märzen Lager Yeast"},{"id":50,"name":"Old Bavarian Lager Yeast"},{"id":26085,"name":"Old Bruin Blend"},{"id":19,"name":"Pacific Ale Yeast"},{"id":26091,"name":"Pacman Yeast"},{"id":100,"name":"Pediococcus"},{"id":88,"name":"Pilsen Lager"},{"id":41,"name":"Pilsner Lager Yeast"},{"id":59,"name":"Ringwood Ale"},{"id":82,"name":"Roeselare Ale Blend"},{"id":103,"name":"Safale S-04"},{"id":23664,"name":"Safale US-05"},{"id":106,"name":"Safbrew S-33"},{"id":105,"name":"Safbrew T-58"},{"id":107,"name":"Safbrew WB-06"},{"id":101,"name":"Saflager S-23"},{"id":102,"name":"Saflager W-34/70"},{"id":26082,"name":"Saison Blend"},{"id":26074,"name":"Saison/Brettanomyces Blend"},{"id":26099,"name":"San Diego Super Yeast"},{"id":43,"name":"San Francisco Lager Yeast"},{"id":67,"name":"Scottish Ale"},{"id":47,"name":"Southern German Lager Yeast"},{"id":61,"name":"Thames Valley Ale"},{"id":87,"name":"Urquell Lager"},{"id":25106,"name":"U.S. West Coast"},{"id":26079,"name":"Vermont Ale"},{"id":26080,"name":"Wallonian Farmhouse"},{"id":74,"name":"Weihenstephan Weizen"},{"id":58,"name":"Whitbread Ale"},{"id":25107,"name":"Workhorse"},{"id":16,"name":"Yorkshire Square Ale Yeast"},{"id":49,"name":"Zurich Lager Yeast"}],
+        extras:       [{"id":40310,"name":"ACCUmash"},{"id":782,"name":"Allspice"},{"id":31,"name":"Allspice Powder"},{"id":784,"name":"American Oak Chips"},{"id":50,"name":"American Oak Cubes (Heavy Toast)"},{"id":54,"name":"American Oak Cubes (Medium-Heavy Toast)"},{"id":47,"name":"American Oak Cubes (Medium Toast)"},{"id":38,"name":"American Oak Spiral (Heavy Toast)"},{"id":35,"name":"American Oak Spiral (Light Toast)"},{"id":37,"name":"American Oak Spiral (Medium Plus Toast)"},{"id":36,"name":"American Oak Spiral (Medium Toast)"},{"id":806,"name":"Amylase Enzyme"},{"id":43,"name":"Apple Extract"},{"id":44,"name":"Apricot Extract"},{"id":61,"name":"Apricot Puree"},{"id":45,"name":"Banana Extract"},{"id":11,"name":"Bitter Orange Peel"},{"id":821,"name":"Blackberries (Fresh)"},{"id":822,"name":"Blackberries (Frozen)"},{"id":48,"name":"Blackberry Extract"},{"id":63,"name":"Blackberry Puree"},{"id":46,"name":"Black Currant Extract"},{"id":7,"name":"Black Pepper"},{"id":814,"name":"Black Pepper (Ground)"},{"id":813,"name":"Black Pepper (Whole)"},{"id":809,"name":"Blueberries (Fresh)"},{"id":811,"name":"Blueberries (Frozen)"},{"id":64,"name":"Blueberry Puree"},{"id":792,"name":"Bourbon"},{"id":793,"name":"Bourbon Soaked French Oak Chips"},{"id":803,"name":"BrewVint Yeast Nutrient"},{"id":800,"name":"Burton Water Salts"},{"id":810,"name":"Calcium Carbonate"},{"id":798,"name":"Calcium Chloride"},{"id":805,"name":"Campden Tablet"},{"id":816,"name":"Cardamom (Ground)"},{"id":14,"name":"Cardamom Seed"},{"id":815,"name":"Cardamom (Whole)"},{"id":842,"name":"Chamomile (Dried)"},{"id":802,"name":"Chamomile (Fresh)"},{"id":808,"name":"Cherries"},{"id":49,"name":"Cherry Extract"},{"id":65,"name":"Cherry Puree"},{"id":30,"name":"Chicory Root"},{"id":831,"name":"Chipotle Chili"},{"id":819,"name":"Chocolate (Dark)"},{"id":51,"name":"Chocolate Extract"},{"id":818,"name":"Chocolate (Milk)"},{"id":785,"name":"Cinnamon (Ground)"},{"id":25,"name":"Cinnamon Sticks"},{"id":786,"name":"Cocoa Nibs"},{"id":781,"name":"Cocoa Powder"},{"id":789,"name":"Coffee (Brewed)"},{"id":788,"name":"Coffee (Ground)"},{"id":3,"name":"Coriander Seed"},{"id":52,"name":"Cranberry Extract"},{"id":804,"name":"Dextrose"},{"id":33,"name":"Dried Woodruff"},{"id":16,"name":"Elderflowers (Dried)"},{"id":829,"name":"Epsom Salt (MgSO4)"},{"id":812,"name":"Espresso"},{"id":801,"name":"Fermax Yeast Nutrient"},{"id":779,"name":"Five Star 5.2 pH Stabilizer"},{"id":40308,"name":"French Oak Chips"},{"id":62,"name":"French Oak Cubes (Heavy Toast)"},{"id":60,"name":"French Oak Cubes (Medium-Heavy Toast)"},{"id":57,"name":"French Oak Cubes (Medium Toast)"},{"id":42,"name":"French Oak Spiral (Heavy Toast)"},{"id":39,"name":"French Oak Spiral (Light Toast)"},{"id":41,"name":"French Oak Spiral (Medium Plus Toast)"},{"id":40,"name":"French Oak Spiral (Medium Toast)"},{"id":791,"name":"Gelatin"},{"id":53,"name":"Ginger Extract"},{"id":28,"name":"Ginger Root (Dried)"},{"id":27,"name":"Ginger Root (Fresh)"},{"id":15,"name":"Grains of Paradise"},{"id":55,"name":"Grape Extract"},{"id":778,"name":"Grapefruit Zest"},{"id":774,"name":"Gypsum (Calcium Sulfate)"},{"id":22,"name":"Heather Tips"},{"id":832,"name":"Hibiscus"},{"id":40307,"name":"Hungarian Oak Cubes (Medium Toast)"},{"id":21,"name":"Indian Sarsaparilla"},{"id":2,"name":"Irish Moss"},{"id":17,"name":"Juniper Berries (Dried)"},{"id":18,"name":"Juniper Berries (Fresh)"},{"id":775,"name":"Lactose"},{"id":840,"name":"Lavender"},{"id":830,"name":"Lemongrass (Fresh)"},{"id":794,"name":"Lemon Peel"},{"id":29,"name":"Lemon Peel (Dried)"},{"id":6,"name":"Lemon Zest"},{"id":23,"name":"Licorice Root"},{"id":10,"name":"Licorice Stick"},{"id":32,"name":"Lime Peel (Dried)"},{"id":777,"name":"Lime Zest"},{"id":787,"name":"Maltodextrin"},{"id":838,"name":"Mango (Fresh)"},{"id":839,"name":"Mango (Frozen)"},{"id":34,"name":"Mugwort (Dried)"},{"id":783,"name":"Nutmeg (Ground)"},{"id":8,"name":"Oak Chips (Light)"},{"id":841,"name":"Orange Juice"},{"id":790,"name":"Orange Peel"},{"id":776,"name":"Orange Zest"},{"id":823,"name":"Peaches (Fresh)"},{"id":824,"name":"Peaches (Frozen)"},{"id":66,"name":"Peach Puree"},{"id":807,"name":"Pumpkin Pie Spice"},{"id":40309,"name":"Pumpkin Puree"},{"id":817,"name":"Raisins"},{"id":56,"name":"Raspberry Extract"},{"id":67,"name":"Raspberry Puree"},{"id":797,"name":"Raspberry (Whole)"},{"id":19,"name":"Rose Hips"},{"id":826,"name":"Rosemary (Dried)"},{"id":825,"name":"Rosemary (Fresh)"},{"id":835,"name":"Sage (Dried)"},{"id":834,"name":"Sage (Fresh)"},{"id":82,"name":"Serrano Chili"},{"id":795,"name":"Servomyces Yeast Nutrient"},{"id":836,"name":"Sour Cherries (Fresh)"},{"id":837,"name":"Sour Cherries (Frozen)"},{"id":828,"name":"Spearmint (Dried)"},{"id":827,"name":"Spearmint (Fresh)"},{"id":9,"name":"Spruce Essence"},{"id":833,"name":"Spruce Tips"},{"id":24,"name":"Star Anise"},{"id":4,"name":"Strawberries (Fresh)"},{"id":5,"name":"Strawberries (Frozen)"},{"id":58,"name":"Strawberry Extract"},{"id":796,"name":"Super Moss HB"},{"id":12,"name":"Sweet Orange Peel"},{"id":84,"name":"Toasted Coconut"},{"id":13,"name":"Vanilla Beans"},{"id":780,"name":"Vanilla Extract"},{"id":59,"name":"Watermelon Extract"},{"id":1,"name":"Whirlfloc Tablet"},{"id":820,"name":"Whiskey"},{"id":83,"name":"Whole Cloves"},{"id":26,"name":"Wintergreen Leaves"},{"id":20,"name":"Wormwood (Dried)"},{"id":799,"name":"Yeast Energizer"},{"id":773,"name":"Yeast Nutrient (Wyeast)"}]
+      }
+    });
+  });
+</script>
+
+
+<div class='page'>
+<header>
+<a class='fr btn-blue hide-on-mobile' href='/recipes/new'>
+<i class='ion-compose'></i>
+Create Recipe
+</a>
+<h1>Homebrew Beer Recipes</h1>
+</header>
+<div class='recipe-search filtered-search cf'>
+<div class='filtered-search--filters'>
+<div class='filtered-search--filters--header'>
+<div class='arrow'></div>
+</div>
+<div class='filtered-search--filters--content soft--half'>
+<ul class='nav-tabs three'>
+<li class='active'>
+<a data-target='#general'>General</a>
+</li>
+<li>
+<a data-target='#ingredients'>Ingredients</a>
+</li>
+<li>
+<a data-target='#properties'>Properties</a>
+</li>
+</ul>
+<div class='form tab-content cf'>
+<div class='tab-pane active' id='general'>
+<div class='form-group'>
+<input data-bind='value: nameFilter' placeholder='Name' type='search'>
+</div>
+<div class='form-group'>
+<select data-bind='options: activeRecipeTypes, optionsCaption: "Recipe Types...", optionsText: "name", value: selectedRecipeType'></select>
+<!-- ko if: recipeTypeFilters().length > 0 -->
+<ul data-bind='foreach: recipeTypeFilters'>
+<li>
+<i class='icon ion-close-circled' data-bind='click: $parent.deleteRecipeTypeFilter'></i>
+<span data-bind='text: name'></span>
+</li>
+</ul>
+<!-- /ko -->
+</div>
+<div class='form-group'>
+<select data-bind='options: activeStyles, optionsCaption: "Styles...", optionsText: "name", value: selectedStyle'></select>
+<!-- ko if: styleFilters().length > 0 -->
+<ul data-bind='foreach: styleFilters'>
+<li>
+<i class='icon ion-close-circled' data-bind='click: $parent.deleteStyleFilter'></i>
+<span data-bind='text: name'></span>
+</li>
+</ul>
+<!-- /ko -->
+</div>
+<div class='form-group'>
+<ul class='checklist'>
+<li>
+<input data-bind='checked: limitOrderable' id='limit-orderable' type='checkbox'>
+<label for='limit-orderable'>Recipes which are fully orderable</label>
+</li>
+<li>
+<input data-bind='checked: limitBrewLogs' id='limit-brew-logs' type='checkbox'>
+<label for='limit-brew-logs'>Recipes with brew logs</label>
+</li>
+<li>
+<input data-bind='checked: limitComments' id='limit-comments' type='checkbox'>
+<label for='limit-comments'>Recipes with comments</label>
+</li>
+<li>
+<input data-bind='checked: limitReviews' id='limit-reviews' type='checkbox'>
+<label for='limit-reviews'>Recipes with reviews</label>
+</li>
+</ul>
+</div>
+</div>
+<div class='tab-pane' id='ingredients'>
+<div class='form-group'>
+<select data-bind='options: activeFermentables, optionsCaption: "Fermentables...", optionsText: "name", value: selectedFermentable'></select>
+<!-- ko if: fermentableFilters().length > 0 -->
+<ul data-bind='foreach: fermentableFilters'>
+<li>
+<i class='icon ion-close-circled' data-bind='click: $parent.deleteFermentableFilter'></i>
+<span data-bind='text: name'></span>
+</li>
+</ul>
+<!-- /ko -->
+</div>
+<div class='form-group'>
+<select data-bind='options: activeHops, optionsCaption: "Hops...", optionsText: "name", value: selectedHop'></select>
+<!-- ko if: hopFilters().length > 0 -->
+<ul data-bind='foreach: hopFilters'>
+<li>
+<i class='icon ion-close-circled' data-bind='click: $parent.deleteHopFilter'></i>
+<span data-bind='text: name'></span>
+</li>
+</ul>
+<!-- /ko -->
+</div>
+<div class='form-group'>
+<select data-bind='options: activeYeasts, optionsCaption: "Yeasts...", optionsText: "name", value: selectedYeast'></select>
+<!-- ko if: yeastFilters().length > 0 -->
+<ul data-bind='foreach: yeastFilters'>
+<li>
+<i class='icon ion-close-circled' data-bind='click: $parent.deleteYeastFilter'></i>
+<span data-bind='text: name'></span>
+</li>
+</ul>
+<!-- /ko -->
+</div>
+<div class='form-group'>
+<select data-bind='options: activeExtras, optionsCaption: "Extras...", optionsText: "name", value: selectedExtra'></select>
+<!-- ko if: extraFilters().length > 0 -->
+<ul data-bind='foreach: extraFilters'>
+<li>
+<i class='icon ion-close-circled' data-bind='click: $parent.deleteExtraFilter'></i>
+<span data-bind='text: name'></span>
+</li>
+</ul>
+<!-- /ko -->
+</div>
+</div>
+<div class='tab-pane' id='properties'>
+<div class='form-group'>
+<label>OG</label>
+<input data-bind='value: ogMinFilter' placeholder='0.000' type='search'>
+<span class='dash'>&ndash;</span>
+<input data-bind='value: ogMaxFilter' placeholder='∞' type='search'>
+</div>
+<div class='form-group'>
+<label>FG</label>
+<input data-bind='value: fgMinFilter' placeholder='0.000' type='search'>
+<span class='dash'>&ndash;</span>
+<input data-bind='value: fgMaxFilter' placeholder='∞' type='search'>
+</div>
+<div class='form-group'>
+<label>IBU</label>
+<input data-bind='value: ibuMinFilter' placeholder='0' type='search'>
+<span class='dash'>&ndash;</span>
+<input data-bind='value: ibuMaxFilter' placeholder='∞' type='search'>
+</div>
+<div class='form-group'>
+<label>ABV</label>
+<input data-bind='value: abvMinFilter' placeholder='0' type='search'>
+<span class='dash'>&ndash;</span>
+<input data-bind='value: abvMaxFilter' placeholder='∞' type='search'>
+</div>
+<div class='form-group'>
+<label>Color</label>
+<input data-bind='value: colorMinFilter' placeholder='0' type='search'>
+<span class='dash'>&ndash;</span>
+<input data-bind='value: colorMaxFilter' placeholder='∞' type='search'>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class='filtered--search--results soft--half'>
+<div class='filtered-search--results-header'>
+<a class='toggle-filters btn-small btn-white' href='#'>
+<i class='ion-search'></i>
+</a>
+<!-- ko if: viewAsTable -->
+<a class='toggle-view btn-small btn-white hide-below-desktop' data-bind='click: toggleView' href='#' title='Switch to Grid View'>
+<i class='ion-grid'></i>
+</a>
+<!-- /ko -->
+<!-- ko if: viewAsTable() == false -->
+<a class='toggle-view btn-small btn-white hide-below-desktop' data-bind='click: toggleView' href='#' title='Switch to Table View'>
+<i class='ion-navicon'></i>
+</a>
+<!-- /ko -->
+<a class='toggle-sort-direction hide-on-mobile btn-small btn-white' data-bind='click: toggleSortDirection'>
+<i class='ion-arrow-swap'></i>
+</a>
+<div class='form-group sort-key'>
+<select data-bind='options: sortOptions, optionsText: "name", value: sortKey'></select>
+</div>
+</div>
+<div class='filtered-search--results-content'>
+<p class='total'>332,806 homebrew beer recipes</p>
+<ol class='recipe-grid'>
+<li class='recipe-container'>
+<div class='recipe'>
+<a class='recipe-link' href='/recipes/rainy-day-ipa-1'>
+<span class='name'>Rainy Day IPA</span>
+<span class='style'>American IPA</span>
+</a>
+<figure class='recipe-color srm8'>
+<span class='icon icon-pint-glass'></span>
+</figure>
+<figure class='recipe-stats show-desktop-wide-and-up'>
+<div class='content'>
+<div class='graphs'>
+<div class='bar-bg og'>
+<div class='bar' style='height: 40.159952239693375%;'></div>
+</div>
+<div class='bar-bg fg'>
+<div class='bar' style='height: 10.441587582319983%;'></div>
+</div>
+<div class='bar-bg ibu'>
+<div class='bar' style='height: 79.54322373578549%;'></div>
+</div>
+<div class='bar-bg abv'>
+<div class='bar' style='height: 37.22814350133992%;'></div>
+</div>
+</div>
+<figcaption>
+<p class='og'>
+1.060
+<abbr title='Original Gravity'>OG</abbr>
+</p>
+<p class='fg'>
+1.016
+<abbr title='Final Gravity'>FG</abbr>
+</p>
+<p class='ibu'>
+95
+<abbr title='International Bitterness Units'>IBU</abbr>
+</p>
+<p class='abv'>
+5.8%
+<abbr title='Alcohol by Volume'>ABV</abbr>
+</p>
+<p class='type'>All Grain</p>
+</figcaption>
+</div>
+<div class='buy-kit'>
+<form class="button_to" method="post" action="/recipes/rainy-day-ipa-1/order"><button class="btn btn-blue btn-small" title="Buy Ingredients for this Recipe" rel="nofollow" type="submit"><i class='ion-bag'></i>
+Buy Recipe Kit
+</button><input type="hidden" name="authenticity_token" value="pNtaji7fST/Qj7b7gf+T11SYdUggfo1L0Bjiyx2YteUfGFdmhl0rvbH4ufUrp+thOoLDy1ZD4/706mupHuAQkQ==" /></form></div>
+</figure>
+<div class='author'>
+by <a href="/users/2463">Todd J Gehman</a>
+</div>
+</div>
+</li>
+
+<li class='recipe-container'>
+<div class='recipe'>
+<a class='recipe-link' href='/recipes/my-first-hopville-beer'>
+<span class='name'>My First Hopville Beer</span>
+<span class='style'>American IPA</span>
+</a>
+<figure class='recipe-color srm8'>
+<span class='icon icon-pint-glass'></span>
+</figure>
+<figure class='recipe-stats show-desktop-wide-and-up'>
+<div class='content'>
+<div class='graphs'>
+<div class='bar-bg og'>
+<div class='bar' style='height: 36.58662315595329%;'></div>
+</div>
+<div class='bar-bg fg'>
+<div class='bar' style='height: 9.146655788986696%;'></div>
+</div>
+<div class='bar-bg ibu'>
+<div class='bar' style='height: 24.667298999402163%;'></div>
+</div>
+<div class='bar-bg abv'>
+<div class='bar' style='height: 33.78425836621793%;'></div>
+</div>
+</div>
+<figcaption>
+<p class='og'>
+1.055
+<abbr title='Original Gravity'>OG</abbr>
+</p>
+<p class='fg'>
+1.014
+<abbr title='Final Gravity'>FG</abbr>
+</p>
+<p class='ibu'>
+30
+<abbr title='International Bitterness Units'>IBU</abbr>
+</p>
+<p class='abv'>
+5.4%
+<abbr title='Alcohol by Volume'>ABV</abbr>
+</p>
+<p class='type'>All Grain</p>
+</figcaption>
+</div>
+<div class='buy-kit'>
+<form class="button_to" method="post" action="/recipes/my-first-hopville-beer/order"><button class="btn btn-blue btn-small" title="Buy Ingredients for this Recipe" rel="nofollow" type="submit"><i class='ion-bag'></i>
+Buy Recipe Kit
+</button><input type="hidden" name="authenticity_token" value="9a/WlZAhF5o3ckG8NrXAwh+o+/NwYowwHrsW3Id+8LhObNt9OKN1GFYFTrKc7bh0cbJNcAZf4oU6SZ++hAZVzA==" /></form></div>
+</figure>
+<div class='author'>
+by <a href="/users/2464">Testy McTesterson</a>
+</div>
+</div>
+</li>
+
+<li class='recipe-container'>
+<div class='recipe'>
+<a class='recipe-link' href='/recipes/oatmeal-stout-8'>
+<span class='name'>Oatmeal Stout</span>
+<span class='style'>Oatmeal Stout</span>
+</a>
+<figure class='recipe-color srm40'>
+<span class='icon icon-pint-glass'></span>
+</figure>
+<figure class='recipe-stats show-desktop-wide-and-up'>
+<div class='content'>
+<div class='graphs'>
+<div class='bar-bg og'>
+<div class='bar' style='height: 49.116617989413285%;'></div>
+</div>
+<div class='bar-bg fg'>
+<div class='bar' style='height: 11.787988317460012%;'></div>
+</div>
+<div class='bar-bg ibu'>
+<div class='bar' style='height: 27.57540447903225%;'></div>
+</div>
+<div class='bar-bg abv'>
+<div class='bar' style='height: 48.73135177337885%;'></div>
+</div>
+</div>
+<figcaption>
+<p class='og'>
+1.074
+<abbr title='Original Gravity'>OG</abbr>
+</p>
+<p class='fg'>
+1.018
+<abbr title='Final Gravity'>FG</abbr>
+</p>
+<p class='ibu'>
+33
+<abbr title='International Bitterness Units'>IBU</abbr>
+</p>
+<p class='abv'>
+7.3%
+<abbr title='Alcohol by Volume'>ABV</abbr>
+</p>
+<p class='type'>All Grain</p>
+</figcaption>
+</div>
+<div class='buy-kit'>
+<form class="button_to" method="post" action="/recipes/oatmeal-stout-8/order"><button class="btn btn-blue btn-small" title="Buy Ingredients for this Recipe" rel="nofollow" type="submit"><i class='ion-bag'></i>
+Buy Recipe Kit
+</button><input type="hidden" name="authenticity_token" value="hykohjqaqP73mRSs+yruMYj6ar0vaTZgang4fJTgUZI86iVukhjKfJbuG6JRcpaH5uDcPllUWNVOirEel5j05g==" /></form></div>
+</figure>
+<div class='author'>
+by <a href="/users/2496">johnenkosky</a>
+</div>
+</div>
+</li>
+
+<li class='recipe-container'>
+<div class='recipe'>
+<a class='recipe-link' href='/recipes/ak-47'>
+<span class='name'>AK #47</span>
+<span class='style'>American Brown Ale</span>
+</a>
+<figure class='recipe-color srm22'>
+<span class='icon icon-pint-glass'></span>
+</figure>
+<figure class='recipe-stats show-desktop-wide-and-up'>
+<div class='content'>
+<div class='graphs'>
+<div class='bar-bg og'>
+<div class='bar' style='height: 40.86661806596004%;'></div>
+</div>
+<div class='bar-bg fg'>
+<div class='bar' style='height: 11.033986877806731%;'></div>
+</div>
+<div class='bar-bg ibu'>
+<div class='bar' style='height: 34.874415829856744%;'></div>
+</div>
+<div class='bar-bg abv'>
+<div class='bar' style='height: 37.40086175747276%;'></div>
+</div>
+</div>
+<figcaption>
+<p class='og'>
+1.061
+<abbr title='Original Gravity'>OG</abbr>
+</p>
+<p class='fg'>
+1.017
+<abbr title='Final Gravity'>FG</abbr>
+</p>
+<p class='ibu'>
+42
+<abbr title='International Bitterness Units'>IBU</abbr>
+</p>
+<p class='abv'>
+5.9%
+<abbr title='Alcohol by Volume'>ABV</abbr>
+</p>
+<p class='type'>Partial Mash</p>
+</figcaption>
+</div>
+<div class='buy-kit'>
+<form class="button_to" method="post" action="/recipes/ak-47/order"><button class="btn btn-blue btn-small" title="Buy Ingredients for this Recipe" rel="nofollow" type="submit"><i class='ion-bag'></i>
+Buy Recipe Kit
+</button><input type="hidden" name="authenticity_token" value="qybpHwbNqK3BiluZGmqksqA+xKzKehBa+Z6VcY+96okQ5eT3rk/KL6D9VJewMtwEziRyL7xHfu/dbBwTjMVP/Q==" /></form></div>
+</figure>
+<div class='author'>
+by <a href="/users/2470">Akerris</a>
+</div>
+</div>
+</li>
+
+<li class='recipe-container'>
+<div class='recipe'>
+<a class='recipe-link' href='/recipes/jacobite-scotch-ale'>
+<span class='name'>Jacobite Scotch Ale</span>
+<span class='style'>Specialty Beer</span>
+</a>
+<figure class='recipe-color srm21'>
+<span class='icon icon-pint-glass'></span>
+</figure>
+<figure class='recipe-stats show-desktop-wide-and-up'>
+<div class='content'>
+<div class='graphs'>
+<div class='bar-bg og'>
+<div class='bar' style='height: 38.399954332779984%;'></div>
+</div>
+<div class='bar-bg fg'>
+<div class='bar' style='height: 11.135986756506622%;'></div>
+</div>
+<div class='bar-bg ibu'>
+<div class='bar' style='height: 24.990198406172752%;'></div>
+</div>
+<div class='bar-bg abv'>
+<div class='bar' style='height: 33.51822791336462%;'></div>
+</div>
+</div>
+<figcaption>
+<p class='og'>
+1.058
+<abbr title='Original Gravity'>OG</abbr>
+</p>
+<p class='fg'>
+1.017
+<abbr title='Final Gravity'>FG</abbr>
+</p>
+<p class='ibu'>
+30
+<abbr title='International Bitterness Units'>IBU</abbr>
+</p>
+<p class='abv'>
+5.4%
+<abbr title='Alcohol by Volume'>ABV</abbr>
+</p>
+<p class='type'>Partial Mash</p>
+</figcaption>
+</div>
+<div class='buy-kit'>
+<form class="button_to" method="post" action="/recipes/jacobite-scotch-ale/order"><button class="btn btn-blue btn-small" title="Buy Ingredients for this Recipe" rel="nofollow" type="submit"><i class='ion-bag'></i>
+Buy Recipe Kit
+</button><input type="hidden" name="authenticity_token" value="UuvILP7pMa//NL5d5S/mKIxlnV8xqYeNIKYQbvvw7pPpKMXEVmtTLZ5DsVNPd56e4n8r3EeU6TgEVJkM+IhL5w==" /></form></div>
+</figure>
+<div class='author'>
+by <a href="/users/2470">Akerris</a>
+</div>
+</div>
+</li>
+
+<li class='recipe-container'>
+<div class='recipe'>
+<a class='recipe-link' href='/recipes/nessie-ale'>
+<span class='name'>Nessie Ale</span>
+<span class='style'>Scottish Export 80/-</span>
+</a>
+<figure class='recipe-color srm19'>
+<span class='icon icon-pint-glass'></span>
+</figure>
+<figure class='recipe-stats show-desktop-wide-and-up'>
+<div class='content'>
+<div class='graphs'>
+<div class='bar-bg og'>
+<div class='bar' style='height: 60.65145504260671%;'></div>
+</div>
+<div class='bar-bg fg'>
+<div class='bar' style='height: 17.588921962360025%;'></div>
+</div>
+<div class='bar-bg ibu'>
+<div class='bar' style='height: 31.363667025399415%;'></div>
+</div>
+<div class='bar-bg abv'>
+<div class='bar' style='height: 57.39836730976692%;'></div>
+</div>
+</div>
+<figcaption>
+<p class='og'>
+1.091
+<abbr title='Original Gravity'>OG</abbr>
+</p>
+<p class='fg'>
+1.026
+<abbr title='Final Gravity'>FG</abbr>
+</p>
+<p class='ibu'>
+38
+<abbr title='International Bitterness Units'>IBU</abbr>
+</p>
+<p class='abv'>
+8.5%
+<abbr title='Alcohol by Volume'>ABV</abbr>
+</p>
+<p class='type'>Partial Mash</p>
+</figcaption>
+</div>
+<div class='buy-kit'>
+<form class="button_to" method="post" action="/recipes/nessie-ale/order"><button class="btn btn-blue btn-small" title="Buy Ingredients for this Recipe" rel="nofollow" type="submit"><i class='ion-bag'></i>
+Buy Recipe Kit
+</button><input type="hidden" name="authenticity_token" value="jfDvAD5R/iFWyrPQ1yr2XS6fUhmTezsM3IVyYckuIQE2M+LoltOcoze9vN59co7rQIXkmuVGVbn4d/sDylaEdQ==" /></form></div>
+</figure>
+<div class='author'>
+by <a href="/users/2478">DoctorMirk</a>
+</div>
+</div>
+</li>
+
+<li class='recipe-container'>
+<div class='recipe'>
+<a class='recipe-link' href='/recipes/pantry-ipa'>
+<span class='name'>Pantry IPA</span>
+<span class='style'>Imperial IPA</span>
+</a>
+<figure class='recipe-color srm9'>
+<span class='icon icon-pint-glass'></span>
+</figure>
+<figure class='recipe-stats show-desktop-wide-and-up'>
+<div class='content'>
+<div class='graphs'>
+<div class='bar-bg og'>
+<div class='bar' style='height: 53.86660260570005%;'></div>
+</div>
+<div class='bar-bg fg'>
+<div class='bar' style='height: 14.54398270354007%;'></div>
+</div>
+<div class='bar-bg ibu'>
+<div class='bar' style='height: 84.78692445536917%;'></div>
+</div>
+<div class='bar-bg abv'>
+<div class='bar' style='height: 51.74534469826754%;'></div>
+</div>
+</div>
+<figcaption>
+<p class='og'>
+1.081
+<abbr title='Original Gravity'>OG</abbr>
+</p>
+<p class='fg'>
+1.022
+<abbr title='Final Gravity'>FG</abbr>
+</p>
+<p class='ibu'>
+102
+<abbr title='International Bitterness Units'>IBU</abbr>
+</p>
+<p class='abv'>
+7.7%
+<abbr title='Alcohol by Volume'>ABV</abbr>
+</p>
+<p class='type'>Partial Mash</p>
+</figcaption>
+</div>
+<div class='buy-kit'>
+<form class="button_to" method="post" action="/recipes/pantry-ipa/order"><button class="btn btn-blue btn-small" title="Buy Ingredients for this Recipe" rel="nofollow" type="submit"><i class='ion-bag'></i>
+Buy Recipe Kit
+</button><input type="hidden" name="authenticity_token" value="29+zu3RLkOJIpDRYKjt9gfT26zTCk45nsBuhy5n3Jx1gHL5T3MnyYCnTO1aAYwU3muxdt7Su4NKU6Sipmo+CaQ==" /></form></div>
+</figure>
+<div class='author'>
+by <a href="/users/2478">DoctorMirk</a>
+</div>
+</div>
+</li>
+
+<li class='recipe-container'>
+<div class='recipe'>
+<a class='recipe-link' href='/recipes/wisest-man-espresso-stout'>
+<span class='name'>Wisest Man Espresso Stout</span>
+<span class='style'>Russian Imperial Stout</span>
+</a>
+<figure class='recipe-color srm40'>
+<span class='icon icon-pint-glass'></span>
+</figure>
+<figure class='recipe-stats show-desktop-wide-and-up'>
+<div class='content'>
+<div class='graphs'>
+<div class='bar-bg og'>
+<div class='bar' style='height: 68.41991863147328%;'></div>
+</div>
+<div class='bar-bg fg'>
+<div class='bar' style='height: 17.104979657866615%;'></div>
+</div>
+<div class='bar-bg ibu'>
+<div class='bar' style='height: 54.779987942221%;'></div>
+</div>
+<div class='bar-bg abv'>
+<div class='bar' style='height: 69.87219621779614%;'></div>
+</div>
+</div>
+<figcaption>
+<p class='og'>
+1.103
+<abbr title='Original Gravity'>OG</abbr>
+</p>
+<p class='fg'>
+1.026
+<abbr title='Final Gravity'>FG</abbr>
+</p>
+<p class='ibu'>
+66
+<abbr title='International Bitterness Units'>IBU</abbr>
+</p>
+<p class='abv'>
+10.1%
+<abbr title='Alcohol by Volume'>ABV</abbr>
+</p>
+<p class='type'>Partial Mash</p>
+</figcaption>
+</div>
+<div class='buy-kit'>
+<form class="button_to" method="post" action="/recipes/wisest-man-espresso-stout/order"><button class="btn btn-blue btn-small" title="Buy Ingredients for this Recipe" rel="nofollow" type="submit"><i class='ion-bag'></i>
+Buy Recipe Kit
+</button><input type="hidden" name="authenticity_token" value="k6WAcbi5r9Dl1Yp4j4xEIkAFW+9cu5t9dnm4kDON0HkoZo2ZEDvNUoSihXYl1DyULh/tbCqG9chSizHyMPV1DQ==" /></form></div>
+</figure>
+<div class='author'>
+by <a href="/users/2478">DoctorMirk</a>
+</div>
+</div>
+</li>
+
+<li class='recipe-container'>
+<div class='recipe'>
+<a class='recipe-link' href='/recipes/red-eyepa'>
+<span class='name'>Red EyePA</span>
+<span class='style'>Imperial IPA</span>
+</a>
+<figure class='recipe-color srm20'>
+<span class='icon icon-pint-glass'></span>
+</figure>
+<figure class='recipe-stats show-desktop-wide-and-up'>
+<div class='content'>
+<div class='graphs'>
+<div class='bar-bg og'>
+<div class='bar' style='height: 58.13326419823328%;'></div>
+</div>
+<div class='bar-bg fg'>
+<div class='bar' style='height: 14.533316049559986%;'></div>
+</div>
+<div class='bar-bg ibu'>
+<div class='bar' style='height: 70.13010239559075%;'></div>
+</div>
+<div class='bar-bg abv'>
+<div class='bar' style='height: 58.21069085549554%;'></div>
+</div>
+</div>
+<figcaption>
+<p class='og'>
+1.087
+<abbr title='Original Gravity'>OG</abbr>
+</p>
+<p class='fg'>
+1.022
+<abbr title='Final Gravity'>FG</abbr>
+</p>
+<p class='ibu'>
+84
+<abbr title='International Bitterness Units'>IBU</abbr>
+</p>
+<p class='abv'>
+8.6%
+<abbr title='Alcohol by Volume'>ABV</abbr>
+</p>
+<p class='type'>Partial Mash</p>
+</figcaption>
+</div>
+<div class='buy-kit'>
+<form class="button_to" method="post" action="/recipes/red-eyepa/order"><button class="btn btn-blue btn-small" title="Buy Ingredients for this Recipe" rel="nofollow" type="submit"><i class='ion-bag'></i>
+Buy Recipe Kit
+</button><input type="hidden" name="authenticity_token" value="Q+eMlke+cIYdnFGfVT8/jYPb7aUhIj7M+WZRdW5jdRr4JIF+7zwSBHzrXpH/Z0c77cFbJlcfUHndlNgXbRvQbg==" /></form></div>
+</figure>
+<div class='author'>
+by <a href="/users/2478">DoctorMirk</a>
+</div>
+</div>
+</li>
+
+<li class='recipe-container'>
+<div class='recipe'>
+<a class='recipe-link' href='/recipes/jalapeno-brown'>
+<span class='name'>Jalapeno Brown</span>
+<span class='style'>Northern English Brown Ale</span>
+</a>
+<figure class='recipe-color srm19'>
+<span class='icon icon-pint-glass'></span>
+</figure>
+<figure class='recipe-stats show-desktop-wide-and-up'>
+<div class='content'>
+<div class='graphs'>
+<div class='bar-bg og'>
+<div class='bar' style='height: 38.7635979467933%;'></div>
+</div>
+<div class='bar-bg fg'>
+<div class='bar' style='height: 9.690899486700063%;'></div>
+</div>
+<div class='bar-bg ibu'>
+<div class='bar' style='height: 44.29602784498642%;'></div>
+</div>
+<div class='bar-bg abv'>
+<div class='bar' style='height: 36.25219421083592%;'></div>
+</div>
+</div>
+<figcaption>
+<p class='og'>
+1.058
+<abbr title='Original Gravity'>OG</abbr>
+</p>
+<p class='fg'>
+1.015
+<abbr title='Final Gravity'>FG</abbr>
+</p>
+<p class='ibu'>
+53
+<abbr title='International Bitterness Units'>IBU</abbr>
+</p>
+<p class='abv'>
+5.7%
+<abbr title='Alcohol by Volume'>ABV</abbr>
+</p>
+<p class='type'>Partial Mash</p>
+</figcaption>
+</div>
+<div class='buy-kit'>
+<form class="button_to" method="post" action="/recipes/jalapeno-brown/order"><button class="btn btn-blue btn-small" title="Buy Ingredients for this Recipe" rel="nofollow" type="submit"><i class='ion-bag'></i>
+Buy Recipe Kit
+</button><input type="hidden" name="authenticity_token" value="iIzv478jdGUTVUipFHBq2/tdIlkiwAYB6EvkOrvM2TAzT+ILF6EW53IiR6e+KBJtlUeU2lT9aLTMuW1YuLR8RA==" /></form></div>
+</figure>
+<div class='author'>
+by <a href="/users/2478">DoctorMirk</a>
+</div>
+</div>
+</li>
+
+<li class='recipe-container'>
+<div class='recipe'>
+<a class='recipe-link' href='/recipes/just-a-wee-scottish'>
+<span class='name'>Just a Wee Scottish</span>
+<span class='style'>Scottish Light 60/-</span>
+</a>
+<figure class='recipe-color srm5'>
+<span class='icon icon-pint-glass'></span>
+</figure>
+<figure class='recipe-stats show-desktop-wide-and-up'>
+<div class='content'>
+<div class='graphs'>
+<div class='bar-bg og'>
+<div class='bar' style='height: 23.51872203031332%;'></div>
+</div>
+<div class='bar-bg fg'>
+<div class='bar' style='height: 6.350054948186598%;'></div>
+</div>
+<div class='bar-bg ibu'>
+<div class='bar' style='height: 16.80858369803408%;'></div>
+</div>
+<div class='bar-bg abv'>
+<div class='bar' style='height: 18.258792935678155%;'></div>
+</div>
+</div>
+<figcaption>
+<p class='og'>
+1.035
+<abbr title='Original Gravity'>OG</abbr>
+</p>
+<p class='fg'>
+1.010
+<abbr title='Final Gravity'>FG</abbr>
+</p>
+<p class='ibu'>
+20
+<abbr title='International Bitterness Units'>IBU</abbr>
+</p>
+<p class='abv'>
+3.4%
+<abbr title='Alcohol by Volume'>ABV</abbr>
+</p>
+<p class='type'>Partial Mash</p>
+</figcaption>
+</div>
+<div class='buy-kit'>
+<form class="button_to" method="post" action="/recipes/just-a-wee-scottish/order"><button class="btn btn-blue btn-small" title="Buy Ingredients for this Recipe" rel="nofollow" type="submit"><i class='ion-bag'></i>
+Buy Recipe Kit
+</button><input type="hidden" name="authenticity_token" value="Y7zfxnT+sBjsWlDxYwskpUN5u05ZciBZaEPr9NWi+OPYf9Iu3HzSmo0tX//JU1wTLWMNzS9PTuxMsWKW1tpdlw==" /></form></div>
+</figure>
+<div class='author'>
+by <a href="/users/2473">Merkin</a>
+</div>
+</div>
+</li>
+
+<li class='recipe-container'>
+<div class='recipe'>
+<a class='recipe-link' href='/recipes/pale-ale-5'>
+<span class='name'>Pale Ale</span>
+<span class='style'>English IPA</span>
+</a>
+<figure class='recipe-color srm9'>
+<span class='icon icon-pint-glass'></span>
+</figure>
+<figure class='recipe-stats show-desktop-wide-and-up'>
+<div class='content'>
+<div class='graphs'>
+<div class='bar-bg og'>
+<div class='bar' style='height: 40.113285628526604%;'></div>
+</div>
+<div class='bar-bg fg'>
+<div class='bar' style='height: 10.429454263420013%;'></div>
+</div>
+<div class='bar-bg ibu'>
+<div class='bar' style='height: 49.07402418855025%;'></div>
+</div>
+<div class='bar-bg abv'>
+<div class='bar' style='height: 37.17594510187846%;'></div>
+</div>
+</div>
+<figcaption>
+<p class='og'>
+1.060
+<abbr title='Original Gravity'>OG</abbr>
+</p>
+<p class='fg'>
+1.016
+<abbr title='Final Gravity'>FG</abbr>
+</p>
+<p class='ibu'>
+59
+<abbr title='International Bitterness Units'>IBU</abbr>
+</p>
+<p class='abv'>
+5.8%
+<abbr title='Alcohol by Volume'>ABV</abbr>
+</p>
+<p class='type'>All Grain</p>
+</figcaption>
+</div>
+<div class='buy-kit'>
+<form class="button_to" method="post" action="/recipes/pale-ale-5/order"><button class="btn btn-blue btn-small" title="Buy Ingredients for this Recipe" rel="nofollow" type="submit"><i class='ion-bag'></i>
+Buy Recipe Kit
+</button><input type="hidden" name="authenticity_token" value="BT6sWkAFgkdkqeYfXOtpF8+ojiWe8JH4GBALEkpelGa+/aGy6IfgxQXe6RH2sxGhobI4pujN/0084oJwSSYxEg==" /></form></div>
+</figure>
+<div class='author'>
+by <a href="/users/2470">Akerris</a>
+</div>
+</div>
+</li>
+
+<li class='recipe-container'>
+<div class='recipe'>
+<a class='recipe-link' href='/recipes/bond-st-baby'>
+<span class='name'>Bond St, Baby</span>
+<span class='style'>Specialty Beer</span>
+</a>
+<figure class='recipe-color srm20'>
+<span class='icon icon-pint-glass'></span>
+</figure>
+<figure class='recipe-stats show-desktop-wide-and-up'>
+<div class='content'>
+<div class='graphs'>
+<div class='bar-bg og'>
+<div class='bar' style='height: 35.013291693706705%;'></div>
+</div>
+<div class='bar-bg fg'>
+<div class='bar' style='height: 10.153854591173388%;'></div>
+</div>
+<div class='bar-bg ibu'>
+<div class='bar' style='height: 38.01760971088125%;'></div>
+</div>
+<div class='bar-bg abv'>
+<div class='bar' style='height: 29.883687620364313%;'></div>
+</div>
+</div>
+<figcaption>
+<p class='og'>
+1.053
+<abbr title='Original Gravity'>OG</abbr>
+</p>
+<p class='fg'>
+1.015
+<abbr title='Final Gravity'>FG</abbr>
+</p>
+<p class='ibu'>
+46
+<abbr title='International Bitterness Units'>IBU</abbr>
+</p>
+<p class='abv'>
+4.9%
+<abbr title='Alcohol by Volume'>ABV</abbr>
+</p>
+<p class='type'>Partial Mash</p>
+</figcaption>
+</div>
+<div class='buy-kit'>
+<form class="button_to" method="post" action="/recipes/bond-st-baby/order"><button class="btn btn-blue btn-small" title="Buy Ingredients for this Recipe" rel="nofollow" type="submit"><i class='ion-bag'></i>
+Buy Recipe Kit
+</button><input type="hidden" name="authenticity_token" value="LI6XcDnvVyMAnptbAqle5AArJD3LS6Yh1CDoP8EnD1OXTZqYkW01oWHplFWo8SZSbjGSvr12yJTw0mFdwl+qJw==" /></form></div>
+</figure>
+<div class='author'>
+by <a href="/users/2470">Akerris</a>
+</div>
+</div>
+</li>
+
+<li class='recipe-container'>
+<div class='recipe'>
+<a class='recipe-link' href='/recipes/leap-year'>
+<span class='name'>leap year</span>
+<span class='style'>American Pale Ale</span>
+</a>
+<figure class='recipe-color srm6'>
+<span class='icon icon-pint-glass'></span>
+</figure>
+<figure class='recipe-stats show-desktop-wide-and-up'>
+<div class='content'>
+<div class='graphs'>
+<div class='bar-bg og'>
+<div class='bar' style='height: 38.02662144343335%;'></div>
+</div>
+<div class='bar-bg fg'>
+<div class='bar' style='height: 9.8869215752934%;'></div>
+</div>
+<div class='bar-bg ibu'>
+<div class='bar' style='height: 38.98505751012908%;'></div>
+</div>
+<div class='bar-bg abv'>
+<div class='bar' style='height: 34.841930954532614%;'></div>
+</div>
+</div>
+<figcaption>
+<p class='og'>
+1.057
+<abbr title='Original Gravity'>OG</abbr>
+</p>
+<p class='fg'>
+1.015
+<abbr title='Final Gravity'>FG</abbr>
+</p>
+<p class='ibu'>
+47
+<abbr title='International Bitterness Units'>IBU</abbr>
+</p>
+<p class='abv'>
+5.5%
+<abbr title='Alcohol by Volume'>ABV</abbr>
+</p>
+<p class='type'>Partial Mash</p>
+</figcaption>
+</div>
+<div class='buy-kit'>
+<form class="button_to" method="post" action="/recipes/leap-year/order"><button class="btn btn-blue btn-small" title="Buy Ingredients for this Recipe" rel="nofollow" type="submit"><i class='ion-bag'></i>
+Buy Recipe Kit
+</button><input type="hidden" name="authenticity_token" value="3WTf57BNILFot0vtK7z1S0PBlJn6ZDN0li0hbNX6Ch5mp9IPGM9CMwnAROOB5I39LdsiGoxZXcGy36gO1oKvag==" /></form></div>
+</figure>
+<div class='author'>
+by <a href="/users/2482">chrismumaw</a>
+</div>
+</div>
+</li>
+
+<li class='recipe-container'>
+<div class='recipe'>
+<a class='recipe-link' href='/recipes/simpleton-stout'>
+<span class='name'>Simpleton Stout</span>
+<span class='style'>Dry Stout</span>
+</a>
+<figure class='recipe-color srm34'>
+<span class='icon icon-pint-glass'></span>
+</figure>
+<figure class='recipe-stats show-desktop-wide-and-up'>
+<div class='content'>
+<div class='graphs'>
+<div class='bar-bg og'>
+<div class='bar' style='height: 41.359950812593326%;'></div>
+</div>
+<div class='bar-bg fg'>
+<div class='bar' style='height: 11.580786227526712%;'></div>
+</div>
+<div class='bar-bg ibu'>
+<div class='bar' style='height: 27.52978367226675%;'></div>
+</div>
+<div class='bar-bg abv'>
+<div class='bar' style='height: 37.320044930507464%;'></div>
+</div>
+</div>
+<figcaption>
+<p class='og'>
+1.062
+<abbr title='Original Gravity'>OG</abbr>
+</p>
+<p class='fg'>
+1.017
+<abbr title='Final Gravity'>FG</abbr>
+</p>
+<p class='ibu'>
+33
+<abbr title='International Bitterness Units'>IBU</abbr>
+</p>
+<p class='abv'>
+5.9%
+<abbr title='Alcohol by Volume'>ABV</abbr>
+</p>
+<p class='type'>Partial Mash</p>
+</figcaption>
+</div>
+<div class='buy-kit'>
+<form class="button_to" method="post" action="/recipes/simpleton-stout/order"><button class="btn btn-blue btn-small" title="Buy Ingredients for this Recipe" rel="nofollow" type="submit"><i class='ion-bag'></i>
+Buy Recipe Kit
+</button><input type="hidden" name="authenticity_token" value="GXjEtIsbPHwHsGxCFvpDV6id926Of5ncU8kuSC7dsgmiu8lcI5le/mbHY0y8ojvhxodB7fhC92l3O6cqLaUXfQ==" /></form></div>
+</figure>
+<div class='author'>
+by <a href="/users/2714">Perth</a>
+</div>
+</div>
+</li>
+
+<li class='recipe-container'>
+<div class='recipe'>
+<a class='recipe-link' href='/recipes/rainy-day-stout-2'>
+<span class='name'>Rainy Day Stout</span>
+<span class='style'>Dry Stout</span>
+</a>
+<figure class='recipe-color srm30'>
+<span class='icon icon-pint-glass'></span>
+</figure>
+<figure class='recipe-stats show-desktop-wide-and-up'>
+<div class='content'>
+<div class='graphs'>
+<div class='bar-bg og'>
+<div class='bar' style='height: 29.20489545156002%;'></div>
+</div>
+<div class='bar-bg fg'>
+<div class='bar' style='height: 8.177370726439944%;'></div>
+</div>
+<div class='bar-bg ibu'>
+<div class='bar' style='height: 28.680497020678164%;'></div>
+</div>
+<div class='bar-bg abv'>
+<div class='bar' style='height: 24.091604680667384%;'></div>
+</div>
+</div>
+<figcaption>
+<p class='og'>
+1.044
+<abbr title='Original Gravity'>OG</abbr>
+</p>
+<p class='fg'>
+1.012
+<abbr title='Final Gravity'>FG</abbr>
+</p>
+<p class='ibu'>
+34
+<abbr title='International Bitterness Units'>IBU</abbr>
+</p>
+<p class='abv'>
+4.1%
+<abbr title='Alcohol by Volume'>ABV</abbr>
+</p>
+<p class='type'>Partial Mash</p>
+</figcaption>
+</div>
+<div class='buy-kit'>
+<form class="button_to" method="post" action="/recipes/rainy-day-stout-2/order"><button class="btn btn-blue btn-small" title="Buy Ingredients for this Recipe" rel="nofollow" type="submit"><i class='ion-bag'></i>
+Buy Recipe Kit
+</button><input type="hidden" name="authenticity_token" value="CksWjMG/XigoFxsO5ITpK+4s/yNbDUn0khWqT/faO42xiBtkaT08qklgFABO3JGdgDZJoC0wJ0G25yMt9KKe+Q==" /></form></div>
+</figure>
+<div class='author'>
+by <a href="/users/15384">GoodFriend</a>
+</div>
+</div>
+</li>
+
+<li class='recipe-container'>
+<div class='recipe'>
+<a class='recipe-link' href='/recipes/guiness-cloned'>
+<span class='name'>Guiness Cloned</span>
+<span class='style'>Dry Stout</span>
+</a>
+<figure class='recipe-color srm30'>
+<span class='icon icon-pint-glass'></span>
+</figure>
+<figure class='recipe-stats show-desktop-wide-and-up'>
+<div class='content'>
+<div class='graphs'>
+<div class='bar-bg og'>
+<div class='bar' style='height: 29.188859961133407%;'></div>
+</div>
+<div class='bar-bg fg'>
+<div class='bar' style='height: 7.880992189506664%;'></div>
+</div>
+<div class='bar-bg ibu'>
+<div class='bar' style='height: 46.45147632043533%;'></div>
+</div>
+<div class='bar-bg abv'>
+<div class='bar' style='height: 24.515353977883766%;'></div>
+</div>
+</div>
+<figcaption>
+<p class='og'>
+1.044
+<abbr title='Original Gravity'>OG</abbr>
+</p>
+<p class='fg'>
+1.012
+<abbr title='Final Gravity'>FG</abbr>
+</p>
+<p class='ibu'>
+56
+<abbr title='International Bitterness Units'>IBU</abbr>
+</p>
+<p class='abv'>
+4.2%
+<abbr title='Alcohol by Volume'>ABV</abbr>
+</p>
+<p class='type'>Partial Mash</p>
+</figcaption>
+</div>
+<div class='buy-kit'>
+<form class="button_to" method="post" action="/recipes/guiness-cloned/order"><button class="btn btn-blue btn-small" title="Buy Ingredients for this Recipe" rel="nofollow" type="submit"><i class='ion-bag'></i>
+Buy Recipe Kit
+</button><input type="hidden" name="authenticity_token" value="KoSp+fWcd/A5q+1WuJhJ6DQ3YlfyLcSBrPUK3lFdwUCRR6QRXR4Vcljc4lgSwDFeWi3U1IQQqjSIB4O8UiVkNA==" /></form></div>
+</figure>
+<div class='author'>
+by <a href="/users/2489">Paul</a>
+</div>
+</div>
+</li>
+
+<li class='recipe-container'>
+<div class='recipe'>
+<a class='recipe-link' href='/recipes/guiness-cloned-strong-52-alcohol'>
+<span class='name'>Guiness Cloned Strong (5.2% Alcohol)</span>
+<span class='style'>Dry Stout</span>
+</a>
+<figure class='recipe-color srm31'>
+<span class='icon icon-pint-glass'></span>
+</figure>
+<figure class='recipe-stats show-desktop-wide-and-up'>
+<div class='content'>
+<div class='graphs'>
+<div class='bar-bg og'>
+<div class='bar' style='height: 36.299964024753294%;'></div>
+</div>
+<div class='bar-bg fg'>
+<div class='bar' style='height: 9.800990286680022%;'></div>
+</div>
+<div class='bar-bg ibu'>
+<div class='bar' style='height: 42.65721389471975%;'></div>
+</div>
+<div class='bar-bg abv'>
+<div class='bar' style='height: 32.361910304081846%;'></div>
+</div>
+</div>
+<figcaption>
+<p class='og'>
+1.054
+<abbr title='Original Gravity'>OG</abbr>
+</p>
+<p class='fg'>
+1.015
+<abbr title='Final Gravity'>FG</abbr>
+</p>
+<p class='ibu'>
+51
+<abbr title='International Bitterness Units'>IBU</abbr>
+</p>
+<p class='abv'>
+5.2%
+<abbr title='Alcohol by Volume'>ABV</abbr>
+</p>
+<p class='type'>Partial Mash</p>
+</figcaption>
+</div>
+<div class='buy-kit'>
+<form class="button_to" method="post" action="/recipes/guiness-cloned-strong-52-alcohol/order"><button class="btn btn-blue btn-small" title="Buy Ingredients for this Recipe" rel="nofollow" type="submit"><i class='ion-bag'></i>
+Buy Recipe Kit
+</button><input type="hidden" name="authenticity_token" value="iQRgEaqkcMUi3akZVk6ZrWU2sI91PodxgZT4AlTE7WQyx235AiYSR0Oqphf8FuEbCywGDAMD6cSlZnFgV7xIEA==" /></form></div>
+</figure>
+<div class='author'>
+by <a href="/users/2489">Paul</a>
+</div>
+</div>
+</li>
+
+<li class='recipe-container'>
+<div class='recipe'>
+<a class='recipe-link' href='/recipes/abt-de-la-gdb'>
+<span class='name'>ABT De La GDB</span>
+<span class='style'>Belgian Pale Ale</span>
+</a>
+<figure class='recipe-color srm40'>
+<span class='icon icon-snifter'></span>
+</figure>
+<figure class='recipe-stats show-desktop-wide-and-up'>
+<div class='content'>
+<div class='graphs'>
+<div class='bar-bg og'>
+<div class='bar' style='height: 62.186592711133294%;'></div>
+</div>
+<div class='bar-bg fg'>
+<div class='bar' style='height: 14.924782250673285%;'></div>
+</div>
+<div class='bar-bg ibu'>
+<div class='bar' style='height: 67.5661245233485%;'></div>
+</div>
+<div class='bar-bg abv'>
+<div class='bar' style='height: 63.745736580623536%;'></div>
+</div>
+</div>
+<figcaption>
+<p class='og'>
+1.093
+<abbr title='Original Gravity'>OG</abbr>
+</p>
+<p class='fg'>
+1.022
+<abbr title='Final Gravity'>FG</abbr>
+</p>
+<p class='ibu'>
+81
+<abbr title='International Bitterness Units'>IBU</abbr>
+</p>
+<p class='abv'>
+9.3%
+<abbr title='Alcohol by Volume'>ABV</abbr>
+</p>
+<p class='type'>All Grain</p>
+</figcaption>
+</div>
+<div class='buy-kit'>
+<form class="button_to" method="post" action="/recipes/abt-de-la-gdb/order"><button class="btn btn-blue btn-small" title="Buy Ingredients for this Recipe" rel="nofollow" type="submit"><i class='ion-bag'></i>
+Buy Recipe Kit
+</button><input type="hidden" name="authenticity_token" value="FPGAqvzVxgJa7u5hlXKf+mPMnhXSYQgRCQZ6gyBvxhmvMo1CVFekgDuZ4W8/KudMDdYolqRcZqQt9PPhIxdjbQ==" /></form></div>
+</figure>
+<div class='author'>
+by <a href="/users/2487">maxym</a>
+</div>
+</div>
+</li>
+
+<li class='recipe-container'>
+<div class='recipe'>
+<a class='recipe-link' href='/recipes/german-alt'>
+<span class='name'>German Alt</span>
+<span class='style'>Northern German Altbier</span>
+</a>
+<figure class='recipe-color srm9'>
+<span class='icon icon-stange'></span>
+</figure>
+<figure class='recipe-stats show-desktop-wide-and-up'>
+<div class='content'>
+<div class='graphs'>
+<div class='bar-bg og'>
+<div class='bar' style='height: 35.44238911707994%;'></div>
+</div>
+<div class='bar-bg fg'>
+<div class='bar' style='height: 8.860597279273316%;'></div>
+</div>
+<div class='bar-bg ibu'>
+<div class='bar' style='height: 29.64838470274217%;'></div>
+</div>
+<div class='bar-bg abv'>
+<div class='bar' style='height: 32.487093047151774%;'></div>
+</div>
+</div>
+<figcaption>
+<p class='og'>
+1.053
+<abbr title='Original Gravity'>OG</abbr>
+</p>
+<p class='fg'>
+1.013
+<abbr title='Final Gravity'>FG</abbr>
+</p>
+<p class='ibu'>
+36
+<abbr title='International Bitterness Units'>IBU</abbr>
+</p>
+<p class='abv'>
+5.2%
+<abbr title='Alcohol by Volume'>ABV</abbr>
+</p>
+<p class='type'>Partial Mash</p>
+</figcaption>
+</div>
+<div class='buy-kit'>
+<form class="button_to" method="post" action="/recipes/german-alt/order"><button class="btn btn-blue btn-small" title="Buy Ingredients for this Recipe" rel="nofollow" type="submit"><i class='ion-bag'></i>
+Buy Recipe Kit
+</button><input type="hidden" name="authenticity_token" value="lXpvzCwGzD96vqz+ApLNnNumurobRcpodZuqDxC68qEuuWIkhISuvRvJo/CoyrUqtbwMOW14pN1RaSNtE8JX1Q==" /></form></div>
+</figure>
+<div class='author'>
+by <a href="/users/2495">Mayday99</a>
+</div>
+</div>
+</li>
+
+<li class='recipe-container'>
+<div class='recipe'>
+<a class='recipe-link' href='/recipes/look-out-below'>
+<span class='name'>Look out below</span>
+<span class='style'>American IPA</span>
+</a>
+<figure class='recipe-color srm10'>
+<span class='icon icon-pint-glass'></span>
+</figure>
+<figure class='recipe-stats show-desktop-wide-and-up'>
+<div class='content'>
+<div class='graphs'>
+<div class='bar-bg og'>
+<div class='bar' style='height: 50.933272760833304%;'></div>
+</div>
+<div class='bar-bg fg'>
+<div class='bar' style='height: 15.789314555860006%;'></div>
+</div>
+<div class='bar-bg ibu'>
+<div class='bar' style='height: 71.45088368055517%;'></div>
+</div>
+<div class='bar-bg abv'>
+<div class='bar' style='height: 45.429136825215%;'></div>
+</div>
+</div>
+<figcaption>
+<p class='og'>
+1.076
+<abbr title='Original Gravity'>OG</abbr>
+</p>
+<p class='fg'>
+1.024
+<abbr title='Final Gravity'>FG</abbr>
+</p>
+<p class='ibu'>
+86
+<abbr title='International Bitterness Units'>IBU</abbr>
+</p>
+<p class='abv'>
+6.9%
+<abbr title='Alcohol by Volume'>ABV</abbr>
+</p>
+<p class='type'>Partial Mash</p>
+</figcaption>
+</div>
+<div class='buy-kit'>
+<form class="button_to" method="post" action="/recipes/look-out-below/order"><button class="btn btn-blue btn-small" title="Buy Ingredients for this Recipe" rel="nofollow" type="submit"><i class='ion-bag'></i>
+Buy Recipe Kit
+</button><input type="hidden" name="authenticity_token" value="bGqnRlBDXMmcxFKHuSg96ZidN1GEU/osMZau0iL9Kn3Xqaqu+ME+S/2zXYkTcEVf9oeB0vJulJkVZCewIYWPCQ==" /></form></div>
+</figure>
+<div class='author'>
+by <a href="/users/2504">MrSchultz</a>
+</div>
+</div>
+</li>
+
+<li class='recipe-container'>
+<div class='recipe'>
+<a class='recipe-link' href='/recipes/irish-red-lager'>
+<span class='name'>Irish Red Lager</span>
+<span class='style'>Irish Red Ale</span>
+</a>
+<figure class='recipe-color srm9'>
+<span class='icon icon-pint-glass'></span>
+</figure>
+<figure class='recipe-stats show-desktop-wide-and-up'>
+<div class='content'>
+<div class='graphs'>
+<div class='bar-bg og'>
+<div class='bar' style='height: 42.836763101980004%;'></div>
+</div>
+<div class='bar-bg fg'>
+<div class='bar' style='height: 10.709190775493335%;'></div>
+</div>
+<div class='bar-bg ibu'>
+<div class='bar' style='height: 39.87763277588517%;'></div>
+</div>
+<div class='bar-bg abv'>
+<div class='bar' style='height: 40.869753555036695%;'></div>
+</div>
+</div>
+<figcaption>
+<p class='og'>
+1.064
+<abbr title='Original Gravity'>OG</abbr>
+</p>
+<p class='fg'>
+1.016
+<abbr title='Final Gravity'>FG</abbr>
+</p>
+<p class='ibu'>
+48
+<abbr title='International Bitterness Units'>IBU</abbr>
+</p>
+<p class='abv'>
+6.3%
+<abbr title='Alcohol by Volume'>ABV</abbr>
+</p>
+<p class='type'>All Grain</p>
+</figcaption>
+</div>
+<div class='buy-kit'>
+<form class="button_to" method="post" action="/recipes/irish-red-lager/order"><button class="btn btn-blue btn-small" title="Buy Ingredients for this Recipe" rel="nofollow" type="submit"><i class='ion-bag'></i>
+Buy Recipe Kit
+</button><input type="hidden" name="authenticity_token" value="J7Asqd23AzBDgjF8yQtKZsas8hJUCl1cXvAQOIV1QIKccyFBdTVhsiL1PnJjUzLQqLZEkSI3M+l6Aplahg3l9g==" /></form></div>
+</figure>
+<div class='author'>
+by <a href="/users/2499">Joshua Nelson</a>
+</div>
+</div>
+</li>
+
+<li class='recipe-container'>
+<div class='recipe'>
+<a class='recipe-link' href='/recipes/honey-red-4'>
+<span class='name'>Honey Red</span>
+<span class='style'>Irish Red Ale</span>
+</a>
+<figure class='recipe-color srm13'>
+<span class='icon icon-pint-glass'></span>
+</figure>
+<figure class='recipe-stats show-desktop-wide-and-up'>
+<div class='content'>
+<div class='graphs'>
+<div class='bar-bg og'>
+<div class='bar' style='height: 51.33333333333331%;'></div>
+</div>
+<div class='bar-bg fg'>
+<div class='bar' style='height: 16.666666666666607%;'></div>
+</div>
+<div class='bar-bg ibu'>
+<div class='bar' style='height: 31.0%;'></div>
+</div>
+<div class='bar-bg abv'>
+<div class='bar' style='height: 44.61538461538461%;'></div>
+</div>
+</div>
+<figcaption>
+<p class='og'>
+1.077
+<abbr title='Original Gravity'>OG</abbr>
+</p>
+<p class='fg'>
+1.025
+<abbr title='Final Gravity'>FG</abbr>
+</p>
+<p class='ibu'>
+37
+<abbr title='International Bitterness Units'>IBU</abbr>
+</p>
+<p class='abv'>
+6.8%
+<abbr title='Alcohol by Volume'>ABV</abbr>
+</p>
+<p class='type'>All Grain</p>
+</figcaption>
+</div>
+<div class='buy-kit'>
+<form class="button_to" method="post" action="/recipes/honey-red-4/order"><button class="btn btn-blue btn-small" title="Buy Ingredients for this Recipe" rel="nofollow" type="submit"><i class='ion-bag'></i>
+Buy Recipe Kit
+</button><input type="hidden" name="authenticity_token" value="zkm87UZi8Zg57V0rQz8g3bDMAOyFlYOfI6QN/XD2LHZ1irEF7uCTGliaUiXpZ1hr3ta2b/Oo7SoHVoSfc46JAg==" /></form></div>
+</figure>
+<div class='author'>
+by <a href="/users/7587">Rob K</a>
+</div>
+</div>
+</li>
+
+<li class='recipe-container'>
+<div class='recipe'>
+<a class='recipe-link' href='/recipes/spontaneous-ale'>
+<span class='name'>Spontaneous Ale</span>
+<span class='style'>American Amber Ale</span>
+</a>
+<figure class='recipe-color srm12'>
+<span class='icon icon-pint-glass'></span>
+</figure>
+<figure class='recipe-stats show-desktop-wide-and-up'>
+<div class='content'>
+<div class='graphs'>
+<div class='bar-bg og'>
+<div class='bar' style='height: 29.04996545227334%;'></div>
+</div>
+<div class='bar-bg fg'>
+<div class='bar' style='height: 7.8434906721132815%;'></div>
+</div>
+<div class='bar-bg ibu'>
+<div class='bar' style='height: 40.81287375762416%;'></div>
+</div>
+<div class='bar-bg abv'>
+<div class='bar' style='height: 24.362094571545153%;'></div>
+</div>
+</div>
+<figcaption>
+<p class='og'>
+1.044
+<abbr title='Original Gravity'>OG</abbr>
+</p>
+<p class='fg'>
+1.012
+<abbr title='Final Gravity'>FG</abbr>
+</p>
+<p class='ibu'>
+49
+<abbr title='International Bitterness Units'>IBU</abbr>
+</p>
+<p class='abv'>
+4.2%
+<abbr title='Alcohol by Volume'>ABV</abbr>
+</p>
+<p class='type'>Partial Mash</p>
+</figcaption>
+</div>
+<div class='buy-kit'>
+<form class="button_to" method="post" action="/recipes/spontaneous-ale/order"><button class="btn btn-blue btn-small" title="Buy Ingredients for this Recipe" rel="nofollow" type="submit"><i class='ion-bag'></i>
+Buy Recipe Kit
+</button><input type="hidden" name="authenticity_token" value="95h0zVYAWipehYk+g2d9Rfu6pdxmZAkqTUZ1z4jGdS5MW3kl/oI4qD/yhjApPwXzlaATXxBZZ59ptPyti77QWg==" /></form></div>
+</figure>
+<div class='author'>
+by <a href="/users/2509">mpvanwinkle77</a>
+</div>
+</div>
+</li>
+
+<li class='recipe-container'>
+<div class='recipe'>
+<a class='recipe-link' href='/recipes/whitehorse-stout'>
+<span class='name'>Whitehorse Stout</span>
+<span class='style'>Dry Stout</span>
+</a>
+<figure class='recipe-color srm40'>
+<span class='icon icon-pint-glass'></span>
+</figure>
+<figure class='recipe-stats show-desktop-wide-and-up'>
+<div class='content'>
+<div class='graphs'>
+<div class='bar-bg og'>
+<div class='bar' style='height: 42.54692164485338%;'></div>
+</div>
+<div class='bar-bg fg'>
+<div class='bar' style='height: 11.48766884411338%;'></div>
+</div>
+<div class='bar-bg ibu'>
+<div class='bar' style='height: 42.9719161723715%;'></div>
+</div>
+<div class='bar-bg abv'>
+<div class='bar' style='height: 39.25494750266484%;'></div>
+</div>
+</div>
+<figcaption>
+<p class='og'>
+1.064
+<abbr title='Original Gravity'>OG</abbr>
+</p>
+<p class='fg'>
+1.017
+<abbr title='Final Gravity'>FG</abbr>
+</p>
+<p class='ibu'>
+52
+<abbr title='International Bitterness Units'>IBU</abbr>
+</p>
+<p class='abv'>
+6.1%
+<abbr title='Alcohol by Volume'>ABV</abbr>
+</p>
+<p class='type'>Partial Mash</p>
+</figcaption>
+</div>
+<div class='buy-kit'>
+<form class="button_to" method="post" action="/recipes/whitehorse-stout/order"><button class="btn btn-blue btn-small" title="Buy Ingredients for this Recipe" rel="nofollow" type="submit"><i class='ion-bag'></i>
+Buy Recipe Kit
+</button><input type="hidden" name="authenticity_token" value="kjanxx5eqV8tX8dtgVEjNNYbSAVRjJuXaStryyrfjM4p9aovttzL3UwoyGMrCVuCuAH+hiex9SJN2eKpKacpug==" /></form></div>
+</figure>
+<div class='author'>
+by <a href="/users/2505">disjunction</a>
+</div>
+</div>
+</li>
+
+<li class='recipe-container'>
+<div class='recipe'>
+<a class='recipe-link' href='/recipes/hunters-55'>
+<span class='name'>Hunter's 55</span>
+<span class='style'>American Pale Ale</span>
+</a>
+<figure class='recipe-color srm7'>
+<span class='icon icon-pint-glass'></span>
+</figure>
+<figure class='recipe-stats show-desktop-wide-and-up'>
+<div class='content'>
+<div class='graphs'>
+<div class='bar-bg og'>
+<div class='bar' style='height: 37.41495550418665%;'></div>
+</div>
+<div class='bar-bg fg'>
+<div class='bar' style='height: 9.72788843108674%;'></div>
+</div>
+<div class='bar-bg ibu'>
+<div class='bar' style='height: 46.41922840407525%;'></div>
+</div>
+<div class='bar-bg abv'>
+<div class='bar' style='height: 34.15775907587769%;'></div>
+</div>
+</div>
+<figcaption>
+<p class='og'>
+1.056
+<abbr title='Original Gravity'>OG</abbr>
+</p>
+<p class='fg'>
+1.015
+<abbr title='Final Gravity'>FG</abbr>
+</p>
+<p class='ibu'>
+56
+<abbr title='International Bitterness Units'>IBU</abbr>
+</p>
+<p class='abv'>
+5.4%
+<abbr title='Alcohol by Volume'>ABV</abbr>
+</p>
+<p class='type'>Partial Mash</p>
+</figcaption>
+</div>
+<div class='buy-kit'>
+<form class="button_to" method="post" action="/recipes/hunters-55/order"><button class="btn btn-blue btn-small" title="Buy Ingredients for this Recipe" rel="nofollow" type="submit"><i class='ion-bag'></i>
+Buy Recipe Kit
+</button><input type="hidden" name="authenticity_token" value="yEiwIWertXDrq2xWqmQUuXxjNSPUor1ddZcOqJOP2u5zi73JzynX8orcY1gAPGwPEnmDoKKf0+hRZYfKkPd/mg==" /></form></div>
+</figure>
+<div class='author'>
+by <a href="/users/2512">Adam Hackman</a>
+</div>
+</div>
+</li>
+
+<li class='recipe-container'>
+<div class='recipe'>
+<a class='recipe-link' href='/recipes/bitter-blonde-ale-2'>
+<span class='name'>Bitter Blonde Ale 2</span>
+<span class='style'>German Pilsner (Pils)</span>
+</a>
+<figure class='recipe-color srm5'>
+<span class='icon icon-pilsner-glass'></span>
+</figure>
+<figure class='recipe-stats show-desktop-wide-and-up'>
+<div class='content'>
+<div class='graphs'>
+<div class='bar-bg og'>
+<div class='bar' style='height: 42.99994886222673%;'></div>
+</div>
+<div class='bar-bg fg'>
+<div class='bar' style='height: 11.609986192799997%;'></div>
+</div>
+<div class='bar-bg ibu'>
+<div class='bar' style='height: 50.19312875734483%;'></div>
+</div>
+<div class='bar-bg abv'>
+<div class='bar' style='height: 39.75482818878262%;'></div>
+</div>
+</div>
+<figcaption>
+<p class='og'>
+1.064
+<abbr title='Original Gravity'>OG</abbr>
+</p>
+<p class='fg'>
+1.017
+<abbr title='Final Gravity'>FG</abbr>
+</p>
+<p class='ibu'>
+60
+<abbr title='International Bitterness Units'>IBU</abbr>
+</p>
+<p class='abv'>
+6.2%
+<abbr title='Alcohol by Volume'>ABV</abbr>
+</p>
+<p class='type'>Extract</p>
+</figcaption>
+</div>
+<div class='buy-kit'>
+<form class="button_to" method="post" action="/recipes/bitter-blonde-ale-2/order"><button class="btn btn-blue btn-small" title="Buy Ingredients for this Recipe" rel="nofollow" type="submit"><i class='ion-bag'></i>
+Buy Recipe Kit
+</button><input type="hidden" name="authenticity_token" value="QWyaFH1CjsjPleINv+IjjsSGHchPesVEBkILyo7at876r5f81cDsSq7i7QMVuls4qpyrSzlHq/EisIKojaISug==" /></form></div>
+</figure>
+<div class='author'>
+by <a href="/users/2513">dam</a>
+</div>
+</div>
+</li>
+
+<li class='recipe-container'>
+<div class='recipe'>
+<a class='recipe-link' href='/recipes/bitter-blonde-ale'>
+<span class='name'>Bitter Blonde Ale</span>
+<span class='style'>German Pilsner (Pils)</span>
+</a>
+<figure class='recipe-color srm5'>
+<span class='icon icon-pilsner-glass'></span>
+</figure>
+<figure class='recipe-stats show-desktop-wide-and-up'>
+<div class='content'>
+<div class='graphs'>
+<div class='bar-bg og'>
+<div class='bar' style='height: 42.99994886222673%;'></div>
+</div>
+<div class='bar-bg fg'>
+<div class='bar' style='height: 11.609986192799997%;'></div>
+</div>
+<div class='bar-bg ibu'>
+<div class='bar' style='height: 47.76746605449066%;'></div>
+</div>
+<div class='bar-bg abv'>
+<div class='bar' style='height: 39.75482818878262%;'></div>
+</div>
+</div>
+<figcaption>
+<p class='og'>
+1.064
+<abbr title='Original Gravity'>OG</abbr>
+</p>
+<p class='fg'>
+1.017
+<abbr title='Final Gravity'>FG</abbr>
+</p>
+<p class='ibu'>
+57
+<abbr title='International Bitterness Units'>IBU</abbr>
+</p>
+<p class='abv'>
+6.2%
+<abbr title='Alcohol by Volume'>ABV</abbr>
+</p>
+<p class='type'>Extract</p>
+</figcaption>
+</div>
+<div class='buy-kit'>
+<form class="button_to" method="post" action="/recipes/bitter-blonde-ale/order"><button class="btn btn-blue btn-small" title="Buy Ingredients for this Recipe" rel="nofollow" type="submit"><i class='ion-bag'></i>
+Buy Recipe Kit
+</button><input type="hidden" name="authenticity_token" value="czoy0x8Zlz24T7RUVLyK3UcwO9RP7KvK8Nb2t+Jz8qXI+T87t5v1v9k4u1r+5PJrKSqNVznRxX/UJH/V4QtX0Q==" /></form></div>
+</figure>
+<div class='author'>
+by <a href="/users/2513">dam</a>
+</div>
+</div>
+</li>
+
+<li class='recipe-container'>
+<div class='recipe'>
+<a class='recipe-link' href='/recipes/cambridge-common-steam-beer'>
+<span class='name'>Cambridge Common Steam Beer</span>
+<span class='style'>California Common Beer</span>
+</a>
+<figure class='recipe-color srm7'>
+<span class='icon icon-mug'></span>
+</figure>
+<figure class='recipe-stats show-desktop-wide-and-up'>
+<div class='content'>
+<div class='graphs'>
+<div class='bar-bg og'>
+<div class='bar' style='height: 37.226622394833285%;'></div>
+</div>
+<div class='bar-bg fg'>
+<div class='bar' style='height: 10.05118804660669%;'></div>
+</div>
+<div class='bar-bg ibu'>
+<div class='bar' style='height: 60.97842761862483%;'></div>
+</div>
+<div class='bar-bg abv'>
+<div class='bar' style='height: 33.384406534050456%;'></div>
+</div>
+</div>
+<figcaption>
+<p class='og'>
+1.056
+<abbr title='Original Gravity'>OG</abbr>
+</p>
+<p class='fg'>
+1.015
+<abbr title='Final Gravity'>FG</abbr>
+</p>
+<p class='ibu'>
+73
+<abbr title='International Bitterness Units'>IBU</abbr>
+</p>
+<p class='abv'>
+5.3%
+<abbr title='Alcohol by Volume'>ABV</abbr>
+</p>
+<p class='type'>Partial Mash</p>
+</figcaption>
+</div>
+<div class='buy-kit'>
+<form class="button_to" method="post" action="/recipes/cambridge-common-steam-beer/order"><button class="btn btn-blue btn-small" title="Buy Ingredients for this Recipe" rel="nofollow" type="submit"><i class='ion-bag'></i>
+Buy Recipe Kit
+</button><input type="hidden" name="authenticity_token" value="T9e65P7jngiC3KuLdEvfRT9WPMHz/Oq67FD7Ao83pev0FLcMVmH8iuOrpIXeE6fzUUyKQoXBhA/IonJgjE8Anw==" /></form></div>
+</figure>
+<div class='author'>
+by <a href="/users/2473">Merkin</a>
+</div>
+</div>
+</li>
+
+<li class='recipe-container'>
+<div class='recipe'>
+<a class='recipe-link' href='/recipes/scottish-ale-2008-12-06-version'>
+<span class='name'>Scottish Ale (2008-12-06 version)</span>
+<span class='style'>Scottish Export 80/-</span>
+</a>
+<figure class='recipe-color srm12'>
+<span class='icon icon-pint-glass'></span>
+</figure>
+<figure class='recipe-stats show-desktop-wide-and-up'>
+<div class='content'>
+<div class='graphs'>
+<div class='bar-bg og'>
+<div class='bar' style='height: 33.11246062093994%;'></div>
+</div>
+<div class='bar-bg fg'>
+<div class='bar' style='height: 9.60261358007338%;'></div>
+</div>
+<div class='bar-bg ibu'>
+<div class='bar' style='height: 17.372032275241416%;'></div>
+</div>
+<div class='bar-bg abv'>
+<div class='bar' style='height: 27.843730334849%;'></div>
+</div>
+</div>
+<figcaption>
+<p class='og'>
+1.050
+<abbr title='Original Gravity'>OG</abbr>
+</p>
+<p class='fg'>
+1.014
+<abbr title='Final Gravity'>FG</abbr>
+</p>
+<p class='ibu'>
+21
+<abbr title='International Bitterness Units'>IBU</abbr>
+</p>
+<p class='abv'>
+4.6%
+<abbr title='Alcohol by Volume'>ABV</abbr>
+</p>
+<p class='type'>All Grain</p>
+</figcaption>
+</div>
+<div class='buy-kit'>
+<form class="button_to" method="post" action="/recipes/scottish-ale-2008-12-06-version/order"><button class="btn btn-blue btn-small" title="Buy Ingredients for this Recipe" rel="nofollow" type="submit"><i class='ion-bag'></i>
+Buy Recipe Kit
+</button><input type="hidden" name="authenticity_token" value="a4UVvfS1HnE6jwIewZ8LlsryUoLG2N1dmGJBV/QvNs3QRhhVXDd881v4DRBrx3MgpOjkAbDls+i8kMg191eTuQ==" /></form></div>
+</figure>
+<div class='author'>
+by <a href="/users/2754">Bob</a>
+</div>
+</div>
+</li>
+
+</ol>
+<div class='aligncenter will-paginate soft--ends'>
+<div class="pagination"><span class="previous_page disabled">&#8592; Previous</span> <em class="current">1</em> <a rel="next" href="/recipes?page=2&amp;sort=created_at&amp;sort_reverse=true">2</a> <a href="/recipes?page=3&amp;sort=created_at&amp;sort_reverse=true">3</a> <span class="gap">&hellip;</span> <a href="/recipes?page=11093&amp;sort=created_at&amp;sort_reverse=true">11093</a> <a href="/recipes?page=11094&amp;sort=created_at&amp;sort_reverse=true">11094</a> <a class="next_page" rel="next" href="/recipes?page=2&amp;sort=created_at&amp;sort_reverse=true">Next &#8594;</a></div>
+</div>
+
+
+</div>
+</div>
+</div>
+
+</div>
+
+<footer class='site-footer soft--top layer-0 hide-on-mobile'>
+<div class='soft--sides'>
+<div class='footer-nav container-row row'>
+<div class='col-fourths soft--half-sides'>
+<ul>
+<li>Home</li>
+<li>
+<a href='/recipes' title='Explore homebrew recipes'>All Recipes</a>
+</li>
+<li>
+<a href='/users' title='Find homebrewers'>Brewers</a>
+</li>
+<li>
+<a href='/groups' title='Find homebrew groups near you!'>Groups</a>
+</li>
+<!-- %li -->
+<!-- %a{:href => forums_path, :title => t("footer.forums_link.title")}= t("footer.forums_link.text") -->
+<li>
+<a href='/pro' title='Learn about Brewtoad Pro'>Features &amp; Pricing</a>
+</li>
+<li>
+<a href='/sponsors' title='Thanks to our Sponsors!'>Deals &amp; Sponsorship</a>
+</li>
+<!--
+<li><a href="http://brewtoad.myshopify.com/" target="_blank" class="blue"><haml_loud> t("footer.store_link.text") </haml_loud></a></li>
+<li><a href="http://blog.brewtoad.com/"      target="_blank" class="blue"><haml_loud> t("footer.blog_link.text") </haml_loud></a></li>
+<li><a href="http://brewtoad.com/faq/"       target="_blank" class="blue"><haml_loud> t("footer.faq_link.text") </haml_loud></a></li>
+-->
+</ul>
+</div>
+<div class='col-fourths soft--half-sides'>
+<ul>
+<li>Tools &amp; Calculators</li>
+<li>
+<a href='/tools/mash-water-calculator' title='Mash Water Calculator'>Mash Water Calculator</a>
+</li>
+<li>
+<a href='/tools/mash-infusion-calculator' title='Mash Infusion Calculator'>Mash Infusion Calculator</a>
+</li>
+<li>
+<a href='/tools/alcohol-calculator' title='Alcohol Calculator'>Alcohol Calculator</a>
+</li>
+<li>
+<a href='/tools/color-converter' title='Color Converter'>Color Converter</a>
+</li>
+<li>
+<a href='/tools/malt-potential-extract-calculator' title='Malt Potential Extract Calculator'>Malt Potential Extract Calculator</a>
+</li>
+<li>
+<a href='/tools/hydrometer-temperature-correction' title='Hydrometer Temperature Correction'>Hydrometer Temperature Correction</a>
+</li>
+<li>
+<a href='/tools/pitch-rate-calculator' title='Pitch Rate Calculator'>Pitch Rate Calculator</a>
+</li>
+</ul>
+</div>
+<div class='col-fourths soft--half-sides'>
+<ul>
+<li>Styles &amp; Ingredients</li>
+<li>
+<a href='/styles' title='Research Styles'>Styles</a>
+</li>
+<li>
+<a href='/generic-fermentables' title='Research Fermentables'>Fermentables</a>
+</li>
+<li>
+<a href='/hops' title='Research Hops'>Hops</a>
+</li>
+<li>
+<a href='/yeasts' title='Research Yeasts'>Yeasts</a>
+</li>
+<li>
+<a href='/extras' title='Research extras'>Extras</a>
+</li>
+</ul>
+</div>
+<div class='col-fourths soft--half-sides'>
+<ul class='social'>
+<li>
+Follow Us
+</li>
+<li>
+<a href='https://twitter.com/brewtoad' target='_blank'>
+<i class='icon ion-social-twitter'></i>
+@Brewtoad
+</a>
+</li>
+<li>
+<a href='https://www.facebook.com/Brewtoad' target='_blank'>
+<i class='icon icon-facebook'></i>
+Facebook
+</a>
+</li>
+<li>
+<a href='https://instagram.com/brewtoad/' target='_blank'>
+<i class='icon icon-instagram'></i>
+#Brewtoad
+</a>
+</li>
+<li>
+<a href='https://plus.google.com/+Brewtoad/posts' target='_blank'>
+<i class='icon icon-google-plus'></i>
+Google+
+</a>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class='sep'></div>
+<div class='copyright soft--bottom'>
+<ul class='nav with-separator footer-links'>
+<li class='about'>
+<a href='/about' title='pricing and features'>About</a>
+</li>
+<li class='advertise'>
+<a href='/sponsors' title='Sponsorship'>Sponsorship</a>
+</li>
+<!-- <li class="ad no-border"><a href="http://www.ackmanndickenson.com" target="_blank" title="<haml_loud> t("footer.ackmann_dickenson_link.title") </haml_loud>"><img src="<haml_loud> asset_path('ad-logo.png') </haml_loud>"/></a></li> -->
+<li class='contact'>
+<a href='/contact' title='Contact us'>Contact</a>
+</li>
+<li class='legal no-border'>
+<a href='/legal' title='Terms &amp; Conditions'>Terms &amp; Privacy</a>
+</li>
+</ul>
+</div>
+</footer>
+
+</div>
+</div>
+<!-- = render :partial => 'shared/pro_modal' -->
+
+
+</body>
+</html>
