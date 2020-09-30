@@ -3,9 +3,12 @@ import numpy as np
 import os
 import pandas as pd
 
+from .config import DATA_DIR
+
 
 def get_style_guide():
-    with open(DATA_DIR + "/styleguide.json") as f:
+    fname = os.path.join(DATA_DIR, "processed/styleguide.json")
+    with open(fname) as f:
         return json.load(f)
 
 
@@ -25,11 +28,11 @@ def split_series_on_range(series, min_value, max_value, return_mask=False):
         Whether or not to return a pair of masks.
         If False, return a pair of Series.
         Default: False
-    
-    Return: 
+
+    Return:
     =======
     Tuple of length 2 whose values are either masks or Series.
-    The first value is the part inside the range, 
+    The first value is the part inside the range,
     the second value is the part outside the range.
     """
     inside_mask = series.between(min_value, max_value)
@@ -42,7 +45,7 @@ def split_series_on_range(series, min_value, max_value, return_mask=False):
 
 def scale_ferm(df, scale_volume="batch_size"):
     """
-    Scale the fermentables by a volume measure. 
+    Scale the fermentables by a volume measure.
 
         scaled = `ferm_amount` / scale_volume
 
@@ -306,7 +309,7 @@ def gravity_final(df, og_col="og"):
     ==========
     df: DataFrame
         A DataFrame optionally containing og_col.
-    og_col: str, default "og"   
+    og_col: str, default "og"
         Column in df containing the original gravity of the recipes.
         If og_col is not in df, calculate it by calling `original_gravity()`
         (which has its own requirements)
@@ -361,7 +364,7 @@ def srm(df, ferm_col="ferm_scaled"):
         ferm_scaled = scale_ferm(df)
 
     # malt color units
-    mcu = df["ferm_color"] * df[ferm_col] * kg_to_lb / l_to_gal
+    mcu = df["ferm_color"] * ferm_scaled * kg_to_lb / l_to_gal
     srm = 1.4922 * mcu.groupby(mcu.index).sum() ** 0.6859
     return srm
 
