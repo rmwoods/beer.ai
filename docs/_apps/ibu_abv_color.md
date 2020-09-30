@@ -2,7 +2,7 @@
 title: Style Landscape
 author: rory
 app_src: ibu_abv_color.html
-excerpt: "Where does each beer style live in the world of IBU, ABV and SRM?"
+excerpt: "Where does each beer style live in the space of IBU, ABV and SRM?"
 header:
   teaser: assets/images/ibu_abv_color.png
 position: 1
