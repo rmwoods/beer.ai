@@ -9,6 +9,7 @@ jupyter
 lxml
 matplotlib
 pandas
+plotly
 pybeerxml
 python-dotenv
 requests
