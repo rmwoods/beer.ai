@@ -3,7 +3,7 @@ permalink: /about/
 title: About 
 ---
 
-Compubeer is a data-driven exploration of beer and brewing. We use data science tools to tap the collective knowledge of brewers.  
+Compubeer is a data-driven exploration of beer and brewing.
 
 Contributors:
 <ul> 
