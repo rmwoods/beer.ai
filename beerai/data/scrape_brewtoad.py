@@ -1,16 +1,18 @@
 import bs4
-from pathlib import Path
 import pickle
 import re
 import requests
 import sys
 import wget
 
+from pathlib import Path
+
+from ..config import DATA_DIR
 # Brewtoad.com URLs: https://www.brewtoad.com/recipes?page=1&sort=created_at&sort_reverse=true
 
 WEBSITE = "https://www.brewtoad.com"
 URL = "https://www.brewtoad.com/recipes?page={}&sort=created_at&sort_reverse=true"
-CHECKPOINT_FILE = "checkpoint.pickle"
+CHECKPOINT_FILE = os.path.join(DATA_DIR, "raw/recipes/brewtoad_checkpoint.pickle")
 R = re.compile("[0-9]+")
 
 # Start by trying to load checkpoint file so we don't redo work.
@@ -45,7 +47,8 @@ for i in range(start + 1, n_pages + 1):
         address = sub.get("href")
         # The xml files are nicely named after the page they're from
         link = WEBSITE + address + ".xml"
-        fname = "recipes/" + link.split("/")[-1]
+        fname = "raw/recipes/brewtoad/" + link.split("/")[-1]
+        fname = os.path.join(DATA_DIR, fname)
         f = Path(fname)
         # If we don't already have this file, download it. This skips a recipe
         # if it has the same name as another recipe, but I'm not sure if that's
