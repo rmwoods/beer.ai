@@ -2,12 +2,15 @@
 layout: splash-post
 title: Welcome To Compubeer
 author: everyone
+read_time: false
 draft: true
 #notebook_src: welcome-to-compubeer.html
 header:
-  image: /assets/images/kettle-feature.jpg
-  teaser: /assets/images/kettle-thumbnail.jpg
+  image: /assets/images/fermenter_bottoms.jpg
+  teaser: /assets/images/fermenter_bottoms.jpg
 ---
+
+What can computers tell us about beer?
 
 # Outline
 
