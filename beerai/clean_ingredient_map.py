@@ -14,7 +14,7 @@ def load_map(map_category):
         print("Category is not valid.")
         return {}
 
-    fname = os.path.join(DATA_DIR, f"/{map_category}map.pickle")
+    fname = os.path.join(DATA_DIR, f"interim/{map_category}map.pickle")
     try:
         f = open(fname, "rb")
         d = pickle.load(f)
@@ -39,8 +39,8 @@ def show_ingred_cont(d, substr):
 
 def show_ingred_cleaned(d, ingred):
     """Display the list of ingredients that have been mapped to a single target ingredient."""
-    l = [k for k in d.keys() if d[k] == ingred]
-    print(*l, sep="\n")
+    cleaned_ingreds = [k for k in d.keys() if d[k] == ingred]
+    print(*cleaned_ingreds, sep="\n")
 
 
 def rename_ingred(d, ingred_to_rename, ingred_target):
@@ -64,7 +64,7 @@ def ingred_to_csv(d, name):
     unique_values = set(val for val in d.values())
     unique_values_list = sorted(unique_values)
 
-    fname = os.path.join(DATA_DIR, f"{name}.csv")
+    fname = os.path.join(DATA_DIR, f"interim/{name}.csv")
 
     with open(fname, "w") as f:
         out = csv.writer(f, delimiter=",", quoting=csv.QUOTE_ALL)
@@ -85,7 +85,7 @@ def save_map(d, map_category, *suffix):
     else:
         suffix_str = ""
 
-    fname = os.path.join(DATA_DIR, f"{map_category}map_{suffix_str}.pickle")
+    fname = os.path.join(DATA_DIR, f"interim/{map_category}map_{suffix_str}.pickle")
     if os.path.exists(fname):
         print(
             f"a file named {fname} already exists! Map not saved. Add a suffix to make a unique filename."
