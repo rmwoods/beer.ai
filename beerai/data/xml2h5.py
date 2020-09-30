@@ -1,29 +1,25 @@
 """Script to convert beer XMLs to a ML friendly format."""
 
 import argparse
-import glob
 import os
-import os.path as path
 import numpy as np
 import pandas as pd
 import random
 import re
 import sys
-import traceback
 
 from itertools import zip_longest
 from joblib import delayed, Parallel
 from pybeerxml import Parser
 from xml.etree.ElementTree import ParseError
 
+from ..config import DATA_DIR
+
 # From https://coderwall.com/p/xww5mq/two-letter-country-code-regex
 ORIGIN_RE = re.compile(
     "\((AF|AX|AL|DZ|AS|AD|AO|AI|AQ|AG|AR|AM|AW|AU|AT|AZ|BS|BH|BD|BB|BY|BE|BZ|BJ|BM|BT|BO|BQ|BA|BW|BV|BR|IO|BN|BG|BF|BI|KH|CM|CA|CV|KY|CF|TD|CL|CN|CX|CC|CO|KM|CG|CD|CK|CR|CI|HR|CU|CW|CY|CZ|DK|DJ|DM|DO|EC|EG|SV|GQ|ER|EE|ET|FK|FO|FJ|FI|FR|GF|PF|TF|GA|GM|GE|DE|GH|GI|GR|GL|GD|GP|GU|GT|GG|GN|GW|GY|HT|HM|VA|HN|HK|HU|IS|IN|ID|IR|IQ|IE|IM|IL|IT|JM|JP|JE|JO|KZ|KE|KI|KP|KR|KW|KG|LA|LV|LB|LS|LR|LY|LI|LT|LU|MO|MK|MG|MW|MY|MV|ML|MT|MH|MQ|MR|MU|YT|MX|FM|MD|MC|MN|ME|MS|MA|MZ|MM|NA|NR|NP|NL|NC|NZ|NI|NE|NG|NU|NF|MP|NO|OM|PK|PW|PS|PA|PG|PY|PE|PH|PN|PL|PT|PR|QA|RE|RO|RU|RW|BL|SH|KN|LC|MF|PM|VC|WS|SM|ST|SA|SN|RS|SC|SL|SG|SX|SK|SI|SB|SO|ZA|GS|SS|ES|LK|SD|SR|SJ|SZ|SE|CH|SY|TW|TJ|TZ|TH|TL|TG|TK|TO|TT|TN|TR|TM|TC|TV|UG|UA|AE|GB|UK|US|UM|UY|UZ|VU|VE|VN|VG|VI|WF|EH|YE|ZM|ZW)\)"
 )
-RECIPES_DIR = "test_recipes"
 MODIFIER_RE = re.compile("\([\w ]*\)")
-LEAF_STR = "leaf"
-
 
 UNIT_RE = re.compile("(?P<amount>\d*\.?\d*) *(?P<unit>g|kg|oz|lb)")
 TO_KG = {"kg": 1, "g": 0.001, "oz": 0.0283495, "lb": 0.453592}
@@ -137,7 +133,6 @@ def fill_hop(d, hop, core_vals):
         if d["hop_alpha"] is not None:
             d["hop_alpha"] /= 100.0
         d["hop_form"] = clean_text(getattr(hop, "form", None))
-        is_leaf = int(d["hop_form"] == LEAF_STR)
         # From brewerstoad:
         # ['boil', 'dry hop', 'first wort', 'whirlpool', 'mash', 'aroma']
         d["hop_use"] = clean_text(getattr(hop, "use", None))
@@ -281,11 +276,12 @@ def convert_a_bunch(filenames, n, jobs=N_CPUS):
         # Note that this is a bit slower than just assuming the source directory
         # has a certain structure of origin/*.xml and letting the OS glob the files
         recipe_files = []
-        for dirpath, dirnames, filenames in os.walk("recipes"):
+        recipes_dir = os.path.join(DATA_DIR, "raw/recipes")
+        for dirpath, dirnames, filenames in os.walk(recipes_dir):
             for f in filenames:
                 if f.endswith("xml"):
                     origin = dirpath.split("/")[-1]
-                    fpath = path.join(dirpath, f)
+                    fpath = os.path.join(dirpath, f)
                     recipe_files.append((origin, fpath))
         if n != -1:
             samples = random.sample(recipe_files, min(len(recipe_files), n))
@@ -316,10 +312,11 @@ def convert_a_bunch(filenames, n, jobs=N_CPUS):
 
     write_options = {"complevel": 9, "complib": "blosc", "format": "table"}
     if n == -1:
-        fname = "all_recipes.h5"
+        fname = "interim/all_recipes.h5"
     else:
         # Calculate a filename as a hash of the xml files that were read in.
-        fname = str(abs(hash(tuple(samples)))) + ".h5"
+        fname = "interim/" + str(abs(hash(tuple(samples)))) + ".h5"
+    fname = os.path.join(DATA_DIR, fname)
     print(f"Writing {len(samples)} examples to {fname}.")
     df_core.to_hdf(fname, "core", mode="w", data_columns=True, **write_options)
     df_ing.to_hdf(fname, "ingredients", mode="a", data_columns=True, **write_options)
