@@ -4,6 +4,7 @@
 # External
 bs4
 dropbox
+imblearn
 joblib
 jupyter
 lxml
