@@ -3,10 +3,13 @@ Given a recipe (or recipes), convert the recipe to a vector for use in training
 a model.
 """
 
-import numpy as np
+import os
 import pandas as pd
 import pickle
+
 from tqdm import tqdm
+
+from .config import DATA_DIR, INGREDIENT_CATEGORIES
 from .utils import scale_ferm, scale_hop, scale_misc, scale_yeast
 
 CORE_COLS = ["batch_size", "boil_size", "boil_time", "efficiency"]
@@ -25,12 +28,11 @@ ING_COLS = [
     "misc_amount",
     "yeast_name",
 ]
-RECIPE_FILE = "all_recipes.h5"
+RECIPE_FILE = os.path.join(DATA_DIR, "interim/all_recipes.h5")
 CORE_TABLE = "/core"
 ING_TABLE = "/ingredients"
-VECTOR_FILE = "recipe_vecs.h5"
-CATEGORIES = ["ferm", "hop", "yeast", "misc"]
-VOCAB_FILE = "vocab.pickle"
+VECTOR_FILE = os.path.join(DATA_DIR, "processed/recipe_vecs.h5")
+VOCAB_FILE = os.path.join(DATA_DIR, "processed/vocab.pickle")
 CHUNK_SIZE = 10000
 
 with open(VOCAB_FILE, "rb") as f:
@@ -41,8 +43,8 @@ with open(VOCAB_FILE, "rb") as f:
 def recipes2vec(recipes):
     """Given a list of recipes, convert them all to vectors."""
 
-    name_cols = ["recipe_id"] + [cat + "_name" for cat in CATEGORIES]
-    amount_cols = ["recipe_id"] + [cat + "_amount" for cat in CATEGORIES]
+    name_cols = ["recipe_id"] + [cat + "_name" for cat in INGREDIENT_CATEGORIES]
+    amount_cols = ["recipe_id"] + [cat + "_amount" for cat in INGREDIENT_CATEGORIES]
 
     # Turn mapped ingredients to their integer labels
     recipes[name_cols] = recipes[name_cols].replace(ING2INT)
@@ -99,7 +101,7 @@ def apply_map(df):
     and ING_COLS), use the ingredient maps to replace names with standard names
     for use in recipe2vec.
     """
-    for category in CATEGORIES:
+    for category in INGREDIENT_CATEGORIES:
         map_file = f"{category}map.pickle"
         with open(map_file, "rb") as f:
             ing_map = pickle.load(f)
@@ -115,7 +117,7 @@ def finalize_names(df):
     """For each ingredient category, change the names to the style that is used
     inside of the vocabulary."""
 
-    for category in CATEGORIES:
+    for category in INGREDIENT_CATEGORIES:
         col = f"{category}_name"
         prepend = category + "_"
         nans = df[col].isna()
