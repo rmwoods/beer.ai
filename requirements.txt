@@ -1,3 +1,7 @@
+# Local Repo
+-e .
+
+# External
 bs4
 joblib
 jupyter
