@@ -4,14 +4,13 @@ minimal_mistakes_skin: "default" # "air", "aqua", "contrast", "dark", "dirt", "n
 # Site Settings
 locale: "en-US"
 title: "Compubeer"
-description: "beer that's smarter than you"
+description: "beer: the funnest thing you can do with computers"
 url: "https://compubeer.com"
 baseurl: "/"
 repository: "rmwoods/beer.ai"
 
 plugins:
   - jekyll-include-cache
-
 
 include:
   - "_pages"
@@ -22,6 +21,9 @@ collections:
     output: true
     permalink: /:collection/:path/
 
+# specify a default teaser image site-wide here
+# teaser: /assets/images/shit-logo.png
+
 # Defaults
 defaults:
   # _pages
@@ -31,6 +33,7 @@ defaults:
     values:
       layout: single
       author_profile: true
+      read_time: false
   # _posts
   - scope:
       path: ""
@@ -38,9 +41,9 @@ defaults:
     values:
       layout: single
       author_profile: true
-      read_time: true
-      comments: true
-      share: true
+      read_time: false
+      comments: false
+      share: false
       related: false
   # _apps
   - scope:
@@ -51,5 +54,5 @@ defaults:
       author_profile: false
       read_time: false
       comments: false
-      share: true
+      share: false
       related: false
