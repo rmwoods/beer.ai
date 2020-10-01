@@ -1,6 +1,6 @@
 ---
 permalink: /posts/
-layout: posts
+layout: collection
+collection: posts
 ---
-
-
+# Posts
