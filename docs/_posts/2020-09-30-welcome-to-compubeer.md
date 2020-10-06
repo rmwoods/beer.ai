@@ -32,9 +32,40 @@ Who would write a beer recipe in a computer-readable format? Hundreds of thousan
 
 *But what about professional beer recipes?*
 
-It would be wonderful to have a comprehensive picture of commercially-made beer recipes. Unfortunately that's a a lot harder for a few reasons. Firstly, most professional brewers don't publish their recipes. This makes sense - they're trade secrets. So there is no public website for professional beer recipes. But secondly, it's also the case that there are fewer of them. In 2019 there were [8000+ breweries in the US](https://www.brewersassociation.org/statistics-and-data/national-beer-stats/) and [1100+ in Canada](https://industry.beercanada.com/statistics). This seems like a lot, but on Brewtoad alone there are recipes from **32,000+ brewers**.  Although looking to homebrewers does give a biased view on what a typical beer recipe looks like, it's necessary to get sample that's larger than a few dozen recipes. Also, it turns out this sample is limited than you might think - several professional brewers actually upload their recipes to homebrew sites as well. 
+It would be wonderful to have a comprehensive picture of commercially-made beer recipes. Unfortunately that's a lot harder for a few reasons. Firstly, most professional brewers don't publish their recipes. This makes sense - they're trade secrets. So there is no public website for professional beer recipes. But secondly, it's also the case that there are fewer of them. In 2019 there were [8000+ breweries in the US](https://www.brewersassociation.org/statistics-and-data/national-beer-stats/) and [1100+ in Canada](https://industry.beercanada.com/statistics). This seems like a lot, but on Brewtoad alone there are recipes from **32,000+ brewers**.  Although looking to homebrewers does give a biased view on what a typical beer recipe looks like, it's necessary to get sample that's larger than a few dozen recipes. Also, it turns out this sample is less limited than you might think - several professional brewers actually upload their recipes to homebrew sites as well. 
 
 # What does a beer recipe look like in BeerXML?
+
+[XXX - to be reviewed by Rob.]
+
+As a brewer, you might see a recipe written down [like this](https://sierranevada.com/blog/pale-ale-homebrew-recipe/). There are some important measured quantites - fermentables and hops being the most obvious. There are important ingredients that have implied quantities, such as yeast. And if you're a professional brewer, you'd also be looking for particulars such as fermentation temperature, pitch rate, aging schedule, target water composition, and plenty of other details.
+
+BeerXML files can contain plenty of details - brewer info, ingredients and amounts, end properties of a beer style, a yeast, a hop, [and plenty more](http://www.beerxml.com/beerxml.htm). However, only a small subset of tags are actually required, and we've found different sites include different sets of information. Amongst brewtoad and brewer's friend, we found the following tags to always exist:
+
+|:---:|---|:---:|---|
+| **Style** | ABV\_MAX | **Recipe** | BATCH\_SIZE |
+|  | ABV\_MIN |  | BOIL\_SIZE |
+|  | CATEGORY\_NUMBER |  | BOIL\_TIME |
+|  | COLOR\_MAX |  | BREWER |
+|  | COLOR\_MIN |  | EFFICIENCY |
+|  | FG\_MAX |  | NAME |
+|  | FG\_MIN |  | TYPE |
+|  | IBU\_MAX |  |  |
+|  | IBU\_MIN |  |  |
+|  | NAME |  |  |
+|  | OG\_MAX |  |  |
+|  | OG\_MIN |  |  |
+|  | STYLE\_GUIDE |  |  |
+|  | STYLE\_LETTER |  |  |
+|  | TYPE |  |  |
+|  | VERSION |  |  |
+| **Fermentables** | ADD\_AFTER\_BOIL | **Hops** | ALPHA |
+|  | AMOUNT |  | AMOUNT |
+|  | COLOR |  | FORM |
+|  | NAME |  | NAME |
+|  | ORIGIN |  | TIME |
+|  | TYPE |  | USE |
+|  | YIELD |  |  |
 
 * What is beerXML
   * Load and print a beerXML file
