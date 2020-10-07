@@ -36,11 +36,9 @@ It would be wonderful to have a comprehensive picture of commercially-made beer 
 
 # What does a beer recipe look like in BeerXML?
 
-[XXX - to be reviewed by Rob.]
+As a brewer, you might see a recipe written down [like this](https://sierranevada.com/blog/pale-ale-homebrew-recipe/). There are some important measured quantites - fermentables and hops being the most obvious. There are also important ingredients whose quantities are up to the brewer, such as yeast or clarifying agents. And if you're a professional brewer, you'd also be looking for particulars such as fermentation temperature, pitch rate, aging schedule, target water composition, and plenty of other details.
 
-As a brewer, you might see a recipe written down [like this](https://sierranevada.com/blog/pale-ale-homebrew-recipe/). There are some important measured quantites - fermentables and hops being the most obvious. There are important ingredients that have implied quantities, such as yeast. And if you're a professional brewer, you'd also be looking for particulars such as fermentation temperature, pitch rate, aging schedule, target water composition, and plenty of other details.
-
-BeerXML files can contain plenty of details - brewer info, ingredients and amounts, end properties of a beer style, a yeast, a hop, [and plenty more](http://www.beerxml.com/beerxml.htm). However, only a small subset of tags are actually required, and we've found different sites include different sets of information. Amongst brewtoad and brewer's friend, we found the following tags to always exist:
+BeerXML files can contain [plenty of these details](http://www.beerxml.com/beerxml.htm). However, only a small subset of tags are actually required, and we've found different sites include different sets of information. Amongst brewtoad and brewer's friend, recipes usually have at least the following tags:
 
 |:---:|---|:---:|---|
 | **Style** | ABV\_MAX | **Recipe** | BATCH\_SIZE |
@@ -67,9 +65,7 @@ BeerXML files can contain plenty of details - brewer info, ingredients and amoun
 |  | TYPE |  | USE |
 |  | YIELD |  |  |
 
-* What is beerXML
-  * Load and print a beerXML file
-  * Compare brewtoad and brewersfriend: presence/absense of tags
+In addition, where applicable, many of the `MISC` tags show up ("Raspberry Puree" is an example of a misc ingredient). From here, the next step is to read the consistent tags from the beerXML files into a data structure that we can start to work with in our modeling.
 
 # 2) Dataset
 * How much did we get
