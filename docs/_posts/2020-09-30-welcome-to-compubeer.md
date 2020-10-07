@@ -34,6 +34,14 @@ Who would write a beer recipe in a computer-readable format? Hundreds of thousan
 
 It would be wonderful to have a comprehensive picture of commercially-made beer recipes. Unfortunately that's a lot harder for a few reasons. Firstly, most professional brewers don't publish their recipes. This makes sense - they're trade secrets. So there is no public website for professional beer recipes. But secondly, it's also the case that there are fewer of them. In 2019 there were [8000+ breweries in the US](https://www.brewersassociation.org/statistics-and-data/national-beer-stats/) and [1100+ in Canada](https://industry.beercanada.com/statistics). This seems like a lot, but on Brewtoad alone there are recipes from **32,000+ brewers**.  Although looking to homebrewers does give a biased view on what a typical beer recipe looks like, it's necessary to get sample that's larger than a few dozen recipes. Also, it turns out this sample is less limited than you might think - several professional brewers actually upload their recipes to homebrew sites as well. 
 
+# What recipes did we get?
+In 2018 and 2019 we scraped:
+* 330,790 recipes from [Brewtoad](https://web.archive.org/web/20171231191610/https://www.brewtoad.com/) 
+* 72,367 recipes from [Brewer's Friend](https://www.brewersfriend.com/)
+* 403,157 recipes in total
+
+Since then, Brewtoad has gone defunct and its recipes are no longer available.
+
 # What does a beer recipe look like in BeerXML?
 
 As a brewer, you might see a recipe written down [like this](https://sierranevada.com/blog/pale-ale-homebrew-recipe/). There are some important measured quantites - fermentables and hops being the most obvious. There are also important ingredients whose quantities are up to the brewer, such as yeast or clarifying agents. And if you're a professional brewer, you'd also be looking for particulars such as fermentation temperature, pitch rate, aging schedule, target water composition, and plenty of other details.
@@ -68,9 +76,46 @@ BeerXML files can contain [plenty of these details](http://www.beerxml.com/beerx
 In addition, where applicable, many of the `MISC` tags show up ("Raspberry Puree" is an example of a misc ingredient). From here, the next step is to read the consistent tags from the beerXML files into a data structure that we can start to work with in our modeling.
 
 # 2) Dataset
-* How much did we get
-  * Count recipes
-* How do we represent it? (print dataframe)
+We assembled a single dataset from our 400,000+ BeerXML files using [Pandas DataFrames](https://pandas.pydata.org/pandas-docs/stable/user_guide/dsintro.html).
+
+We organized recipe data into DataFrames like this:
+* Each recipe has a unique index number, `id`
+* Two DataFrames use `id` as an index:
+  * `core`, for quantities specific to a recipe 
+    * *eg. boil size, batch size, boil time*
+  * `ingredients`, for types and quantities relating to each ingredient addition in the recipe 
+    * *eg. hop, malt, yeast, hops*
+
+Here's an example of how those look, from a Brewtoad recipe for a Sierra Nevada Pale Ale clone:
+
+### `core`: recipe details
+
+|      id | batch_size | boil_size | boil_time | efficiency | name      | style_name        | origin   |
+| ------- | ---------- | --------- | --------- | ---------- | --------- | ----------------- | -------- |
+| 258754  |    20.820… |   26.498… |        60 |       0.75 | snpaclone | american pale ale | brewtoad |
+
+### `ingredients`: fermentables
+
+|      id | ferm_name   | ferm_origin | ferm_type            | ferm_yield | ferm_amount | ferm_color |
+| ------- | ----------- | ----------- | -------------------- | ---------- | ----------- | ---------- |
+| 258754  | 2-row       | us          | base malt            |     0.799… |      4.536… |          1 |
+| 258754  | crystal 40l | ca          | caramel/crystal malt |     0.734… |      0.454… |         40 |
+
+### `ingredients`: hops
+
+|      id | hop_name | hop_origin | hop_amount | hop_form | hop_time | hop_use |
+| ------- | -------- | ---------- | ---------- | -------- | -------- | ------- |
+| 258754  | perle    | us         |     0.028… | pellet   |       60 | boil    |
+| 258754  | cascade  | us         |     0.028… | pellet   |       15 | boil    |
+| 258754  | cascade  | us         |     0.028… | pellet   |        0 | boil    |
+| 258754  | cascade  | us         |     0.028… | pellet   |    7,200 | dry hop |
+
+### `ingredients`: yeast
+
+|      id | yeast_name   | yeast_form | yeast_amount | yeast_attenuation |
+| ------- | ------------ | ---------- | ------------ | ----------------- |
+| 258754  | safale us-05 | dry        |          NaN |              85.5 |
+
   * Comment - can do some basic statistics on this
   * Comment - need to transform this for any sort of ML
 * IBU, ABV, OG, FG, etc.
