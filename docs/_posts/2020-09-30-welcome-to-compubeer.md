@@ -86,7 +86,7 @@ We organized recipe data into DataFrames like this:
   * `ingredients`, for types and quantities relating to each ingredient addition in the recipe 
     * *eg. hop, malt, yeast, hops*
 
-Here's an example of how those look, from a Brewtoad recipe for a Sierra Nevada Pale Ale clone:
+Here's an example of what recipe data we have available and how it looks. (These are from a real recipe, for Sierra Nevada Pale Ale clone from Brewtoad):
 
 ### `core`: recipe details
 
@@ -115,6 +115,26 @@ Here's an example of how those look, from a Brewtoad recipe for a Sierra Nevada 
 |      id | yeast_name   | yeast_form | yeast_amount | yeast_attenuation |
 | ------- | ------------ | ---------- | ------------ | ----------------- |
 | 258754  | safale us-05 | dry        |          NaN |              85.5 |
+
+  
+These numbers give a basic, simplified idea of what goes into a beer. They're enough to brew it with some educated guesses.
+They give good detail on the ingredients: 
+* The name and quantity of each ingredient
+* The yield and colour of each fermentable
+* The time and alpha acid of each hop addition
+
+As well as some basics about process:
+* The batch-specific parameters necessary to adjust to your brewhouse (batch and boil size, efficiency)
+
+But we're left to our own judgement to fill in most of the process details:
+* Mash (grist to liquor ratio, mash temperature(s), )
+* Fermentation (pitch rate, oxygenation, temperature)
+
+Also worth noting is the absense of **target measurements**! We'll have to write our own formulas to calculate:
+* ABV (as well as OG and FG)
+* IBU
+* SRM
+(Spoiler: we did)
 
   * Comment - can do some basic statistics on this
   * Comment - need to transform this for any sort of ML
