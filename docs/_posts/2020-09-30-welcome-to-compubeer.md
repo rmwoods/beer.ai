@@ -76,6 +76,7 @@ BeerXML files can contain [plenty of these details](http://www.beerxml.com/beerx
 In addition, where applicable, many of the `MISC` tags show up ("Raspberry Puree" is an example of a misc ingredient). From here, the next step is to read the consistent tags from the beerXML files into a data structure that we can start to work with in our modeling.
 
 # 2) Dataset
+
 We assembled a single dataset from our 400,000+ BeerXML files using [Pandas DataFrames](https://pandas.pydata.org/pandas-docs/stable/user_guide/dsintro.html).
 
 We organized recipe data into DataFrames like this:
@@ -395,18 +396,188 @@ magic hat #9                  19
 
 Very cool! We're seeing some of the classics like Sierra Nevada's [Pale Ale](https://sierranevada.com/beer/pale-ale/) ("sierra nevada pale ale" and "snpa"), New Belgium's [Fat Tire Amber Ale](https://www.newbelgium.com/beer/fat-tire/), and [Blue Moon](https://www.bluemoonbrewingcompany.com/currently-available/blue-moon-belgian-white)'s (presmably) Belgian White. We're also seeing some of the ["Whales"](https://www.eater.com/drinks/2015/2/20/8077349/the-white-while-the-most-elusive-craft-beers) (XXX what to link to here?) of the brewing world like Russian River Brewing's [Pliny The Elder](https://russianriverbrewing.com/pliny-the-elder/), The Alchemist's [Heady Topper](https://alchemistbeer.com/), and even a few clones for Westvleteren's [Westy 12](https://en.wikipedia.org/wiki/Westvleteren_Brewery)'s. What clones have you made?
 
+What about ingredients? That is, after all, one of the most special aspects of this data set. While we'll do plenty of analysis on this later on, let's start with a simple question: what are the most common ingredients in each of fermentables, hops, and yeasts?
 
-* What does the beer recipe landscape look like
-  * most common malt, hop, yeast names
-  * batch sizes
-* Sneak preview: beer measurables (IBU, ABV, SRM)
+First, fermentables:
+
+```
+2-row                           182624
+pilsen malt                      76485
+carapils® malt                   70712
+white wheat                      66763
+caramel/crystal 60l              65671
+maris otter pale                 55600
+caramel malt 40l                 51434
+roasted barley                   43401
+flaked oats                      42731
+dry malt extract - light         40349
+vienna                           39865
+chocolate malt                   34444
+liquid malt extract - light      34401
+munich malt                      33850
+chocolate                        33824
+caramel malt 20l                 31473
+caramel malt 120l                30474
+caramel malt 80l                 27799
+black malt                       26567
+flaked wheat                     24530
+munich malt 10l                  24255
+victory® malt                    23014
+special b                        22431
+caramel malt 10l                 21377
+corn sugar (dextrose)            20527
+honey malt                       20209
+biscuit® md™                     20133
+aromatic barley malt             18286
+flaked barley                    16834
+acidulated malt                  13003
+melanoidin                       11755
+dry malt extract - pilsen        11350
+pale chocolate                   11038
+munich light                     10597
+rye                               9756
+honey                             9720
+golden promise                    9277
+dry malt extract - wheat          9158
+rice hulls                        8801
+liquid malt extract - pilsen      8760
+flaked corn                       8438
+liquid malt extract - amber       8254
+sugar, table (sucrose)            8158
+6-row                             8146
+carared                           8127
+dry malt extract - amber          7921
+dark munich                       7748
+brown malt                        7648
+candi sugar, clear                7293
+caramunich i                      7266
+```
+
+Hops...
+
+```
+cascade                   91148
+centennial                50993
+east kent golding         49612
+citra                     43659
+amarillo                  42270
+columbus                  37940
+simcoe                    35402
+chinook                   34627
+saaz                      34032
+willamette                33842
+magnum                    33416
+fuggle                    32692
+hallertau                 31963
+northern brewer           23779
+tettnanger                17670
+warrior                   16663
+nugget                    16317
+mosaic™                   13943
+perle                     13484
+styrian golding           12927
+galaxy                    10141
+mount hood                 9431
+nelson sauvin              8151
+summit                     7860
+hallertauer mittelfrüh     7538
+challenger                 7430
+galena                     6750
+cluster                    6682
+hersbrucker                6211
+liberty                    5752
+crystal                    5718
+sorachi ace                5077
+sterling                   4816
+strisselspalt              4625
+falconer's flight          4526
+ahtanum                    4348
+target                     4104
+motueka                    4071
+glacier                    3645
+horizon                    3240
+brewers gold               3171
+apollo                     3149
+palisade                   3103
+el dorado                  3079
+bravo                      2854
+zythos                     2516
+pacific gem                2088
+calypso                    1836
+pacific jade               1835
+bramling cross             1810
+```
+
+and yeasts:
+
+```
+safale us-05                       51247
+american ale                       22138
+american ale ii                    19856
+safale s-04                        18634
+french saison                       6062
+london ale iii                      5690
+london esb ale                      5120
+california lager                    4462
+scottish ale                        4152
+irish ale                           3958
+weihenstephan weizen                3897
+california ale                      3766
+belgian abbey ii                    3262
+belgian ale                         3192
+belgian wit ale                     3158
+fermentis us-05                     3012
+german ale                          2932
+british ale                         2812
+safbrew t-58                        2802
+london ale                          2635
+denny's favorite 50                 2528
+saflager w-34/70                    2487
+trappist high gravity               2458
+northwest ale                       2456
+safbrew wb-06                       2371
+saflager s-23                       2275
+american wheat                      2139
+safbrew s-33                        2126
+kölsh                               1961
+nottingham ale                      1960
+belle saison                        1915
+british ale ii                      1850
+bohemian lager                      1773
+vermont ale                         1735
+brettanomyces bruxellensis          1684
+bavarian lager                      1678
+thames valley ale                   1541
+ringwood ale                        1229
+whitbread ale                       1096
+u.s. west coast                     1090
+belgian strong ale                  1081
+munich lager                        1075
+roeselare ale blend                 1066
+kolsch (2565)                       1064
+bavarian wheat                       940
+super high gravity ale (wlp099)      856
+bavarian wheat blend                 836
+lactobacillus                        815
+german wheat                         804
+west yorkshire (1469)                787
+```
+
+These are just about the simplest questions we can ask about our beer landscape. But it gets a bit more interesting and fun when we start to calculate our own quantities from ingredients, like IBU, ABV, and SRM. We'll have an entire post dedicated to this, but we created a [fun little visualization tool]({% link _apps/ibu_abv_color.md %}) to explore beer styles in the IBU-ABV-SRM space. This allows you to explore beer styles by where they live in this space.
+
 
 # 4) What Next?
-* Roadmap:
-  * Recipe analysis
-  * Recipe generation
-* Link to app 
 
-{% if page.notebook_src %}
-  {% include {{ page.notebook_src }} %}
-{% endif %}
+So where are we going with all this? There's a huge range of different analyses we could do and tools we can create, and this is just the start. We're planning to continue making posts that explore the recipe landscape and answer fun and interesting questions, such as:
+
+* What differentiates a stout and a porter?
+* What ingredients define particular styles?
+* How do beer styles empirically compare to their BJCP definitions?
+
+Not only this, we'll be making interesting apps that let you do things like:
+
+* Generate a completely AI-based recipe (or AI-assisted if you want to start with a certain set of ingredients)
+* Analyze recipes - how does your recipe compare to all of the others in the dataset?
+* Hybridize recipe - how do I make a style X - style Y hybrid that retains the most defining characteristics of each style?
+
+But until the next post - happy drinking!
