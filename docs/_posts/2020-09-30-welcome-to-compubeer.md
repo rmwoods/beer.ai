@@ -19,9 +19,9 @@ But you can tell your computer how a beer is made: there's a file format for tha
 **Compubeer** is a project to do just that, between 4 people who like numbers and beer. This first post is the starting point for these explorations: a discussion about our beer recipe dataset. We've assembled 400,000 homebrew beer recipes. Here's what that looks like.
 
 # Where do recipes come from?
-Who would write a beer recipe in a computer-readable format? Hundreds of thousands of people, it turns out. Or at least, they would in exchange for using a tool. BeerXML is the most popular export format for homebrew recipe sites. These sites give homebrewers a good reason to upload their recipes: they make it easy to store recipes, do calculations, record notes and share them. Here's a few examples:
+Who would write a beer recipe in a computer-readable format? Hundreds of thousands of homebrewers, it turns out. Or at least, they would in exchange for using a tool. Homebrew sites give homebrewers a good reason to upload their recipes: they make it easy to store recipes, do calculations, record notes and share them. Here are the most popular:
 
-| Site                                                                             | # Recipes       | Format  | Status  |
+| Site                                                                             | # Recipes\*     | Format  | Status  |
 | -------------------------------------------------------------------------------- | --------------- | ------- | ------- |
 | [Brewtoad](https://web.archive.org/web/20171231191610/https://www.brewtoad.com/) | 390,000+        | BeerXML | Defunct |
 | [Brewer's Friend](https://www.brewersfriend.com/)                                | 190,000+        | BeerXML | Active  |
@@ -29,10 +29,11 @@ Who would write a beer recipe in a computer-readable format? Hundreds of thousan
 | [BeerCalc](https://beercalc.org/)                                                | 150,000+        | Other   | Active  |
 | [BrewGR](https://brewgr.com)                                                     | 60,000+         | Other   | Active  |
 
+*\*As of October 2020* 
 
-*But what about professional beer recipes?*
+But what about professional beer recipes? It would be wonderful to have a comprehensive picture of commercially-made beer recipes. Unfortunately that's a lot harder for a few reasons. Firstly, most professional brewers don't publish their recipes. This makes sense - they're trade secrets. So there is no public website for professional beer recipes. But secondly, it's also the case that there are fewer of them. In 2019 there were [8000+ breweries in the US](https://www.brewersassociation.org/statistics-and-data/national-beer-stats/) and [1100+ in Canada](https://industry.beercanada.com/statistics). This seems like a lot, but on Brewtoad alone there are recipes from **32,000+ brewers**.  
 
-It would be wonderful to have a comprehensive picture of commercially-made beer recipes. Unfortunately that's a lot harder for a few reasons. Firstly, most professional brewers don't publish their recipes. This makes sense - they're trade secrets. So there is no public website for professional beer recipes. But secondly, it's also the case that there are fewer of them. In 2019 there were [8000+ breweries in the US](https://www.brewersassociation.org/statistics-and-data/national-beer-stats/) and [1100+ in Canada](https://industry.beercanada.com/statistics). This seems like a lot, but on Brewtoad alone there are recipes from **32,000+ brewers**.  Although looking to homebrewers does give a biased view on what a typical beer recipe looks like, it's necessary to get sample that's larger than a few dozen recipes. Also, it turns out this sample is less limited than you might think - several professional brewers actually upload their recipes to homebrew sites as well. 
+Although looking to homebrewers does give a biased view on what a typical beer recipe looks like, it's the only way to get a sample that's larger than a few dozen recipes. Also, it turns out this sample is less limited than you might think - several professional brewers actually upload their recipes to homebrew sites as well. 
 
 # What recipes did we get?
 In 2018 and 2019 we scraped:
@@ -79,15 +80,15 @@ In addition, where applicable, many of the `MISC` tags show up ("Raspberry Puree
 
 We assembled a single dataset from our 400,000+ BeerXML files using [Pandas DataFrames](https://pandas.pydata.org/pandas-docs/stable/user_guide/dsintro.html).
 
-We organized recipe data into DataFrames like this:
+We organized the recipes into DataFrames like this:
 * Each recipe has a unique index number, `id`
-* Two DataFrames use `id` as an index:
-  * `core`, for quantities specific to a recipe 
+* Two DataFrames share that `id` as an index:
+  * `core`, for recipe-level data
     * *eg. boil size, batch size, boil time*
-  * `ingredients`, for types and quantities relating to each ingredient addition in the recipe 
+  * `ingredients`, for ingredient-level data
     * *eg. hop, malt, yeast, hops*
 
-Here's an example of what recipe data we have available and how it looks. (These are from a real recipe, for Sierra Nevada Pale Ale clone from Brewtoad):
+Here's an example of how this looks. (These are from a real recipe, for a Sierra Nevada Pale Ale clone from Brewtoad):
 
 ### `core`: recipe details
 
@@ -127,20 +128,15 @@ They give good detail on the ingredients:
 As well as some basics about process:
 * The batch-specific parameters necessary to adjust to your brewhouse (batch and boil size, efficiency)
 
-But we're left to our own judgement to fill in most of the process details:
-* Mash (grist to liquor ratio, mash temperature(s), )
+But we're left to our own judgement to fill in most of details to do with process:
+* Brewhouse (grist to liquor ratio, mash temperature(s), sparge volumes)
 * Fermentation (pitch rate, oxygenation, temperature)
 
-Also worth noting is the absense of **target measurements**! We'll have to write our own formulas to calculate:
+Also worth noting is the absense of **target measurements**! We'll have to write our own formulas to calculate the numbers we're used to seeing on beer labels:
 * ABV (as well as OG and FG)
 * IBU
 * SRM
-(Spoiler: we did)
-
-  * Comment - can do some basic statistics on this
-  * Comment - need to transform this for any sort of ML
-* IBU, ABV, OG, FG, etc.
-  * Included by some recipes, but we wrote our own functions... more later
+(Spoiler: we did).
 
 # 3) Recipe Landscape
 
