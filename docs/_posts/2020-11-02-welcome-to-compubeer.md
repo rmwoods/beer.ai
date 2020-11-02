@@ -16,10 +16,13 @@ Ideally, you pour it one. But as much as a CD tray looks like a coaster, that do
 
 But you can tell your computer how a beer is made: there's a file format for that. [BeerXML](http://beerxml.com/) is a free standard for storing beer recipes in a computer-readable way. And with enough of these files, representing a large enough number of recipes, we can use data science tools to teach computers and ourselves about beer. 
 
-**Compubeer** is a project to do just that, between 4 people who like numbers and beer. This first post is the starting point for these explorations: a discussion about our beer recipe dataset. We've assembled 400,000 homebrew beer recipes. Here's what that looks like.
+**Compubeer** is a project by four people who like both numbers and beer. We've assembled 400,000 homebrew beer recipes. Here's what that looks like.
 
-# Where do recipes come from?
-Who would write a beer recipe in a computer-readable format? Hundreds of thousands of homebrewers, it turns out. Or at least, they would in exchange for using a tool. Homebrew sites give homebrewers a good reason to upload their recipes: they make it easy to store recipes, do calculations, record notes and share them. Here are the most popular:
+# Where do these recipes come from?
+
+The modern homebrewing community makes extensive use of online tools for
+recipe creation, tracking their brew process, and sharing with others.
+Here are the most popular online tools:
 
 | Site                                                                             | # Recipes\*     | Format  | Status  |
 | -------------------------------------------------------------------------------- | --------------- | ------- | ------- |
@@ -31,11 +34,15 @@ Who would write a beer recipe in a computer-readable format? Hundreds of thousan
 
 *\*As of October 2020* 
 
-But what about professional beer recipes? It would be wonderful to have a comprehensive picture of commercially-made beer recipes. Unfortunately that's a lot harder for a few reasons. Firstly, most professional brewers don't publish their recipes. This makes sense - they're trade secrets. So there is no public website for professional beer recipes. But secondly, it's also the case that there are fewer of them. In 2019 there were [8000+ breweries in the US](https://www.brewersassociation.org/statistics-and-data/national-beer-stats/) and [1100+ in Canada](https://industry.beercanada.com/statistics). This seems like a lot, but on Brewtoad alone there are recipes from **32,000+ brewers**.  
-
-Although looking to homebrewers does give a biased view on what a typical beer recipe looks like, it's the only way to get a sample that's larger than a few dozen recipes. Also, it turns out this sample is less limited than you might think - several professional brewers actually upload their recipes to homebrew sites as well. 
+These online tools represent a large repository of user-contributed beer
+recipe information. Getting a similar volume of recipes for commercial 
+beers would be much more difficult if not impossible!
+Consider that in 2019 there were [8000+ breweries in the US](https://www.brewersassociation.org/statistics-and-data/national-beer-stats/) and [1100+ in Canada](https://industry.beercanada.com/statistics), whereas on Brewtoad alone there are recipes from **32,000+ brewers**. It is our hope that this diversity
+will be a strength, despite most recipes coming from homebrewers rather than
+pros. 
 
 # What recipes did we get?
+
 In 2018 and 2019 we scraped:
 * 330,790 recipes from [Brewtoad](https://web.archive.org/web/20171231191610/https://www.brewtoad.com/) 
 * 72,367 recipes from [Brewer's Friend](https://www.brewersfriend.com/)
@@ -45,9 +52,9 @@ Since then, Brewtoad has gone defunct and its recipes are no longer available.
 
 # What does a beer recipe look like in BeerXML?
 
-As a brewer, you might see a recipe written down [like this](https://sierranevada.com/blog/pale-ale-homebrew-recipe/). There are some important measured quantites - fermentables and hops being the most obvious. There are also important ingredients whose quantities are up to the brewer, such as yeast or clarifying agents. And if you're a professional brewer, you'd also be looking for particulars such as fermentation temperature, pitch rate, aging schedule, target water composition, and plenty of other details.
+As a brewer, you might see a recipe written down [like this](https://sierranevada.com/blog/pale-ale-homebrew-recipe/). There are some important measured quantites - fermentables and hops being the most obvious. There are also important ingredients whose quantities are up to the brewer, such as yeast or clarifying agents. There are also particulars such as fermentation temperature, pitch rate, aging schedule, target water composition, and other details.
 
-BeerXML files can contain [plenty of these details](http://www.beerxml.com/beerxml.htm). However, only a small subset of tags are actually required, and we've found different sites include different sets of information. Amongst brewtoad and brewer's friend, recipes usually have at least the following tags:
+BeerXML files can contain [plenty of these details](http://www.beerxml.com/beerxml.htm). However, only a small subset of tags are actually required, and we've found that different websites include different sets of information. Brewtoad and Brewer's Friend recipes usually have at least the following tags:
 
 |:---:|---|:---:|---|
 | **Style** | ABV\_MAX | **Recipe** | BATCH\_SIZE |
@@ -74,7 +81,7 @@ BeerXML files can contain [plenty of these details](http://www.beerxml.com/beerx
 |  | TYPE |  | USE |
 |  | YIELD |  |  |
 
-In addition, where applicable, many of the `MISC` tags show up ("Raspberry Puree" is an example of a misc ingredient). From here, the next step is to read the consistent tags from the beerXML files into a data structure that we can start to work with in our modeling.
+In addition, where applicable, many of the `MISC` tags show up ("Raspberry Puree" is an example of a misc ingredient). We read these common tags from the beerXML files into a data structure that we can use for subsequent analysis of these recipes.
 
 # 2) Dataset
 
@@ -88,7 +95,7 @@ We organized the recipes into DataFrames like this:
   * `ingredients`, for ingredient-level data
     * *eg. hop, malt, yeast, hops*
 
-Here's an example of how this looks. (These are from a real recipe, for a Sierra Nevada Pale Ale clone from Brewtoad):
+Here's an example from a real recipe, for a Sierra Nevada Pale Ale clone from Brewtoad:
 
 ### `core`: recipe details
 
@@ -140,7 +147,8 @@ Also worth noting is the absense of **target measurements**! We'll have to write
 
 # 3) Recipe Landscape
 
-Now of course, anyone who has worked with data knows that a _huge_ part of data science is data cleanup, and this project is no exception. However, we're going to talk about our (very hefty) cleaning process in another post. So for now, let's start with some of the fun steps - digging in to see what we have!
+Stay tuned for details on our (very hefty) data cleaning process in a future post.
+In the meantime, let's get digging and see what we have!
 
 How many recipes per style?
 
@@ -333,7 +341,7 @@ french cider                                          2
 burton ale                                            1
 ```
 
-Now of course, home brewers often start by cloning a favorite beer of theirs. What beers are cloned the most often? This is actually kind of a hard question to answer since we're relying on beer titles and text is inconsistent. Here's a first order estimate, anyway:
+Cloning commercial beers is one way that pro(-ish) recipes are included in the data. What beers are cloned the most often? Judging only by beer recipe names, we can get a general picture:
 
 ```python
 >>> clones = core[core.name.str.contains("clone")]
@@ -390,7 +398,7 @@ punk ipa                      19
 magic hat #9                  19
 ```
 
-Very cool! We're seeing some of the classics like Sierra Nevada's [Pale Ale](https://sierranevada.com/beer/pale-ale/) ("sierra nevada pale ale" and "snpa"), New Belgium's [Fat Tire Amber Ale](https://www.newbelgium.com/beer/fat-tire/), and [Blue Moon](https://www.bluemoonbrewingcompany.com/currently-available/blue-moon-belgian-white)'s (presmably) Belgian White. We're also seeing some of the ["Whales"](https://www.eater.com/drinks/2015/2/20/8077349/the-white-while-the-most-elusive-craft-beers) (XXX what to link to here?) of the brewing world like Russian River Brewing's [Pliny The Elder](https://russianriverbrewing.com/pliny-the-elder/), The Alchemist's [Heady Topper](https://alchemistbeer.com/), and even a few clones for Westvleteren's [Westy 12](https://en.wikipedia.org/wiki/Westvleteren_Brewery)'s. What clones have you made?
+Very cool! We're seeing some of the classics like Sierra Nevada's [Pale Ale](https://sierranevada.com/beer/pale-ale/) ("sierra nevada pale ale" and "snpa"), New Belgium's [Fat Tire Amber Ale](https://www.newbelgium.com/beer/fat-tire/), and [Blue Moon](https://www.bluemoonbrewingcompany.com/currently-available/blue-moon-belgian-white)'s (presmably) Belgian White. We're also seeing some of the ["Whales"](https://www.eater.com/drinks/2015/2/20/8077349/the-white-while-the-most-elusive-craft-beers) (XXX what to link to here?) of the brewing world like Russian River Brewing's [Pliny The Elder](https://russianriverbrewing.com/pliny-the-elder/), The Alchemist's [Heady Topper](https://alchemistbeer.com/), and even a few clones for Westvleteren's [Westy 12](https://en.wikipedia.org/wiki/Westvleteren_Brewery)'s.
 
 What about ingredients? That is, after all, one of the most special aspects of this data set. While we'll do plenty of analysis on this later on, let's start with a simple question: what are the most common ingredients in each of fermentables, hops, and yeasts?
 
@@ -559,12 +567,12 @@ german wheat                         804
 west yorkshire (1469)                787
 ```
 
-These are just about the simplest questions we can ask about our beer landscape. But it gets a bit more interesting and fun when we start to calculate our own quantities from ingredients, like IBU, ABV, and SRM. We'll have an entire post dedicated to this, but we created a [fun little visualization tool]({% link _apps/ibu_abv_color.md %}) to explore beer styles in the IBU-ABV-SRM space. This allows you to explore beer styles by where they live in this space.
+These are just about the simplest questions we can ask about our beer recipe landscape. By calculating characteristics like IBU, ABV, and SRM, we can go one step further. We are planning a future post dedicated to this, but for now we created a [fun little visualization tool]({% link _apps/ibu_abv_color.md %}) to explore beer styles by their position in the IBU-ABV-SRM space.
 
 
 # 4) What Next?
 
-So where are we going with all this? There's a huge range of different analyses we could do and tools we can create, and this is just the start. We're planning to continue making posts that explore the recipe landscape and answer fun and interesting questions, such as:
+We're planning to continue exploring the recipe data to answer fun and interesting questions, such as:
 
 * What differentiates a stout and a porter?
 * What ingredients define particular styles?
@@ -576,4 +584,4 @@ Not only this, we'll be making interesting apps that let you do things like:
 * Analyze recipes - how does your recipe compare to all of the others in the dataset?
 * Hybridize recipe - how do I make a style X - style Y hybrid that retains the most defining characteristics of each style?
 
-But until the next post - happy drinking!
+That's all for now - Cheers!
