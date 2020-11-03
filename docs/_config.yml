@@ -1,10 +1,30 @@
-theme: jekyll-theme-hacker
-title: [Compubeer]
-description: [Beer that thinks while you drink]
 remote_theme: "mmistakes/minimal-mistakes@4.19.3"
+minimal_mistakes_skin: "default" # "air", "aqua", "contrast", "dark", "dirt", "neon", "mint", "plum" "sunrise"
+
+# Site Settings
+locale: "en-US"
+title: "Compubeer"
+description: "beer: the funnest thing you can do with computers"
+url: "https://compubeer.com"
+baseurl: "/"
+repository: "rmwoods/beer.ai"
+
 plugins:
   - jekyll-include-cache
-include: ["_pages", "_posts"] 
+
+include:
+  - "_pages"
+
+# Collections
+collections:
+  apps:
+    output: true
+    permalink: /:collection/:path/
+
+# specify a default teaser image site-wide here
+# teaser: /assets/images/shit-logo.png
+
+# Defaults
 defaults:
   # _pages
   - scope:
@@ -13,6 +33,7 @@ defaults:
     values:
       layout: single
       author_profile: true
+      read_time: false
   # _posts
   - scope:
       path: ""
@@ -20,7 +41,18 @@ defaults:
     values:
       layout: single
       author_profile: true
-      read_time: true
-      comments: true
-      share: true
-      related: true     
+      read_time: false
+      comments: false
+      share: false
+      related: false
+  # _apps
+  - scope:
+      path: ""
+      type: apps
+    values:
+      layout: splash
+      author_profile: false
+      read_time: false
+      comments: false
+      share: false
+      related: false

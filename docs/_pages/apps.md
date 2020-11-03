@@ -1,5 +1,9 @@
 ---
+title: Data Explorers
+layout: collection
 permalink: /apps/
+collection: apps
+entries_layout: grid
+sort_by: "position"
 ---
-We have a bunch of cool apps
-
+# Apps

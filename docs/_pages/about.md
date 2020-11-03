@@ -1,12 +1,11 @@
 ---
 permalink: /about/
-title: About the project 
+title: About 
 ---
 
-Compubeer was made by 3 guys with computers who like beer.
+Compubeer is a data-driven exploration of beer and brewing.
 
-# Contributors
-
+Contributors:
 <ul> 
 {% for member in site.data.members %}
   <li>

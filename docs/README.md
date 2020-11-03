@@ -1,4 +1,15 @@
-This project is a data-driven exploration of beer and brewing.
+---
+layout: splash
+permalink: /
+header:  
+    overlay_image: /assets/images/fermenter_bottoms.jpg
+    overlay_filter: 0.5
+excerpt: "*beer: the funnest thing you can do with computers*"
+---
 
-We want to understand beer from first principals to pints - to produce new insights and recipes by applying data science to the collective knowledge of brewers.  
-
+<h2>Recent posts</h2>
+<div class="grid__wrapper">
+  {% for post in site.posts limit:2 %}
+    {% include archive-single.html type="grid" %}
+  {% endfor %}
+</div>
