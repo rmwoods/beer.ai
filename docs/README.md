@@ -4,7 +4,7 @@ permalink: /
 header:  
     overlay_image: /assets/images/fermenter_bottoms.jpg
     overlay_filter: 0.5
-excerpt: "*beer: the funnest thing you can do with computers*"
+excerpt: "A data-driven exploration of beer!"
 ---
 
 <h2>Recent posts</h2>
