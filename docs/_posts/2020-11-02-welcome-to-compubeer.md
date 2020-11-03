@@ -8,6 +8,19 @@ header:
   image: /assets/images/bells_kettle.png
   teaser: /assets/images/bells_kettle.png
   caption: Boil kettle, Bell's
+gallery:
+  - url: /assets/images/fermentable_wordcloud.png
+    image_path: /assets/images/fermentable_wordcloud.png
+    alt: "Fermentable wordcloud"
+    title: "The most common fermentables in our recipes."
+  - url: /assets/images/hops_wordcloud.png
+    image_path: /assets/images/hops_wordcloud.png
+    alt: "Hops wordcloud"
+    title: "The most common hops in our recipes."
+  - url: /assets/images/yeast_wordcloud.png
+    image_path: /assets/images/yeast_wordcloud.png
+    alt: "Yeast wordcloud"
+    title: "The most common yeasts in our recipes."
 ---
 
 How do you teach a computer about beer?
@@ -125,7 +138,7 @@ Here's an example from a real recipe, for a Sierra Nevada Pale Ale clone from Br
 | ------- | ------------ | ---------- | ------------ | ----------------- |
 | 258754  | safale us-05 | dry        |          NaN |              85.5 |
 
-  
+
 These numbers give a basic, simplified idea of what goes into a beer. They're enough to brew it with some educated guesses.
 They give good detail on the ingredients: 
 * The name and quantity of each ingredient
@@ -143,6 +156,7 @@ Also worth noting is the absense of **target measurements**! We'll have to write
 * ABV (as well as OG and FG)
 * IBU
 * SRM
+
 (Spoiler: we did).
 
 # 3) Recipe Landscape
@@ -343,229 +357,13 @@ burton ale                                            1
 
 Cloning commercial beers is one way that pro(-ish) recipes are included in the data. What beers are cloned the most often? Judging only by beer recipe names, we can get a general picture:
 
-```python
->>> clones = core[core.name.str.contains("clone")]
->>> print(clones[:50])
-pliny the elder              122
-sierra nevada pale ale       114
-zombie dust                  111
-fat tire                      91
-blue moon                     76
-arrogant bastard              70
-pliny                         62
-stone ipa                     61
-left hand milk stout          61
-heady topper                  57
-guinness                      51
-oberon                        48
-sierra nevada                 46
-gumballhead                   46
-two hearted                   46
-lagunitas ipa                 43
-hopslam                       42
-snpa                          41
-mirror pond                   41
-moose drool                   40
-founders breakfast stout      39
-hoegaarden                    38
-tank 7                        35
-bell's two hearted            34
-sculpin                       33
-black butte porter            31
-ruination                     31
-anchor steam                  31
-dead guy                      30
-blind pig                     29
-spotted cow                   29
-kbs                           28
-duvel                         28
-old rasputin                  27
-nugget nectar                 27
-bell's two hearted ale        26
-fuller's esb                  26
-racer 5                       26
-orval                         25
-alaskan amber                 24
-1554                          23
-saison dupont                 23
-celebration                   22
-founders porter               22
-fullers esb                   21
-westvleteren 12               21
-westy 12                      20
-rochefort 8                   20
-punk ipa                      19
-magic hat #9                  19
-```
+[![Clones wordcloud](/assets/images/clones_wordcloud.png)](/assets/images/clones_wordcloud.png)
 
 Very cool! We're seeing some of the classics like Sierra Nevada's [Pale Ale](https://sierranevada.com/beer/pale-ale/) ("sierra nevada pale ale" and "snpa"), New Belgium's [Fat Tire Amber Ale](https://www.newbelgium.com/beer/fat-tire/), and [Blue Moon](https://www.bluemoonbrewingcompany.com/currently-available/blue-moon-belgian-white)'s (presmably) Belgian White. We're also seeing some of the ["Whales"](https://www.eater.com/drinks/2015/2/20/8077349/the-white-while-the-most-elusive-craft-beers) (XXX what to link to here?) of the brewing world like Russian River Brewing's [Pliny The Elder](https://russianriverbrewing.com/pliny-the-elder/), The Alchemist's [Heady Topper](https://alchemistbeer.com/), and even a few clones for Westvleteren's [Westy 12](https://en.wikipedia.org/wiki/Westvleteren_Brewery)'s.
 
 What about ingredients? That is, after all, one of the most special aspects of this data set. While we'll do plenty of analysis on this later on, let's start with a simple question: what are the most common ingredients in each of fermentables, hops, and yeasts?
 
-First, fermentables:
-
-```
-2-row                           182624
-pilsen malt                      76485
-carapils® malt                   70712
-white wheat                      66763
-caramel/crystal 60l              65671
-maris otter pale                 55600
-caramel malt 40l                 51434
-roasted barley                   43401
-flaked oats                      42731
-dry malt extract - light         40349
-vienna                           39865
-chocolate malt                   34444
-liquid malt extract - light      34401
-munich malt                      33850
-chocolate                        33824
-caramel malt 20l                 31473
-caramel malt 120l                30474
-caramel malt 80l                 27799
-black malt                       26567
-flaked wheat                     24530
-munich malt 10l                  24255
-victory® malt                    23014
-special b                        22431
-caramel malt 10l                 21377
-corn sugar (dextrose)            20527
-honey malt                       20209
-biscuit® md™                     20133
-aromatic barley malt             18286
-flaked barley                    16834
-acidulated malt                  13003
-melanoidin                       11755
-dry malt extract - pilsen        11350
-pale chocolate                   11038
-munich light                     10597
-rye                               9756
-honey                             9720
-golden promise                    9277
-dry malt extract - wheat          9158
-rice hulls                        8801
-liquid malt extract - pilsen      8760
-flaked corn                       8438
-liquid malt extract - amber       8254
-sugar, table (sucrose)            8158
-6-row                             8146
-carared                           8127
-dry malt extract - amber          7921
-dark munich                       7748
-brown malt                        7648
-candi sugar, clear                7293
-caramunich i                      7266
-```
-
-Hops...
-
-```
-cascade                   91148
-centennial                50993
-east kent golding         49612
-citra                     43659
-amarillo                  42270
-columbus                  37940
-simcoe                    35402
-chinook                   34627
-saaz                      34032
-willamette                33842
-magnum                    33416
-fuggle                    32692
-hallertau                 31963
-northern brewer           23779
-tettnanger                17670
-warrior                   16663
-nugget                    16317
-mosaic™                   13943
-perle                     13484
-styrian golding           12927
-galaxy                    10141
-mount hood                 9431
-nelson sauvin              8151
-summit                     7860
-hallertauer mittelfrüh     7538
-challenger                 7430
-galena                     6750
-cluster                    6682
-hersbrucker                6211
-liberty                    5752
-crystal                    5718
-sorachi ace                5077
-sterling                   4816
-strisselspalt              4625
-falconer's flight          4526
-ahtanum                    4348
-target                     4104
-motueka                    4071
-glacier                    3645
-horizon                    3240
-brewers gold               3171
-apollo                     3149
-palisade                   3103
-el dorado                  3079
-bravo                      2854
-zythos                     2516
-pacific gem                2088
-calypso                    1836
-pacific jade               1835
-bramling cross             1810
-```
-
-and yeasts:
-
-```
-safale us-05                       51247
-american ale                       22138
-american ale ii                    19856
-safale s-04                        18634
-french saison                       6062
-london ale iii                      5690
-london esb ale                      5120
-california lager                    4462
-scottish ale                        4152
-irish ale                           3958
-weihenstephan weizen                3897
-california ale                      3766
-belgian abbey ii                    3262
-belgian ale                         3192
-belgian wit ale                     3158
-fermentis us-05                     3012
-german ale                          2932
-british ale                         2812
-safbrew t-58                        2802
-london ale                          2635
-denny's favorite 50                 2528
-saflager w-34/70                    2487
-trappist high gravity               2458
-northwest ale                       2456
-safbrew wb-06                       2371
-saflager s-23                       2275
-american wheat                      2139
-safbrew s-33                        2126
-kölsh                               1961
-nottingham ale                      1960
-belle saison                        1915
-british ale ii                      1850
-bohemian lager                      1773
-vermont ale                         1735
-brettanomyces bruxellensis          1684
-bavarian lager                      1678
-thames valley ale                   1541
-ringwood ale                        1229
-whitbread ale                       1096
-u.s. west coast                     1090
-belgian strong ale                  1081
-munich lager                        1075
-roeselare ale blend                 1066
-kolsch (2565)                       1064
-bavarian wheat                       940
-super high gravity ale (wlp099)      856
-bavarian wheat blend                 836
-lactobacillus                        815
-german wheat                         804
-west yorkshire (1469)                787
-```
+{% include gallery caption="The most common ingredients in our recipes." %}
 
 These are just about the simplest questions we can ask about our beer recipe landscape. By calculating characteristics like IBU, ABV, and SRM, we can go one step further. We are planning a future post dedicated to this, but for now we created a [fun little visualization tool]({% link _apps/ibu_abv_color.md %}) to explore beer styles by their position in the IBU-ABV-SRM space.
 
