@@ -41,6 +41,11 @@ Generate a recipe that is:
   * Which are still uncommon
 
 # Low-Level Tasks
+
+## Notebook - style differences
+
+* Need to look at second question - %of each fermentable in by mass in the grain bill. We're currently summing per fermentable and dividing by the total per style, but this weights towards larger recipes. So, we need to average per recipe, and then average all those.
+
 ## Website
 * Add a collection-type page for apps
 * Decide on a list of posts
