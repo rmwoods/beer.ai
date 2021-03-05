@@ -44,7 +44,13 @@ Generate a recipe that is:
 
 ## Notebook - style differences
 
-* Need to look at second question - %of each fermentable in by mass in the grain bill. We're currently summing per fermentable and dividing by the total per style, but this weights towards larger recipes. So, we need to average per recipe, and then average all those.
+* Glancing through some style differences, what do we see what is "problematic" or misleading?
+  * Because we are sorting by absolute difference, ferms/hops that appear in 1 style but not the other can end up at the top of the list
+    * Can maybe approach similar to TF-IDF (look at how frequently ferm/hop appears in style)
+    * What's going on with "american ipa" vs "imperial ipa" (ferm)
+  * Plotting function needs variable names refactored (assumes ferms)
+  * How do we put this into plotly? Do we have to export all the comparisons?
+    * I think we have to generate all the possible combinations of style comparisons. If we do the top 50 styles, we estimate it at ~4+ MB.
 
 ## Website
 * Add a collection-type page for apps
