@@ -39,6 +39,10 @@ Generate a recipe that is:
 * Not terrible
   * Identify patterns in ingredients that produce good flavours
   * Which are still uncommon
+* Investigate GloVe (or similar word representation technique) as a way to  
+  vectorize recipes: 
+  * Does it usefully reduce dimensionality? 
+  * Do we like the way the results smell?
 
 # Low-Level Tasks
 ## Website
