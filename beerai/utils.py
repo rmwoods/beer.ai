@@ -170,7 +170,7 @@ def scale_yeast(df):
     Series representing the scaled yeast. This value has no units.
     """
     inds = df.loc[~df["yeast_name"].isna()].index
-    return pd.Series(np.ones(len(inds), index=inds))
+    return pd.Series(np.ones(len(inds)), index=inds)
 
 
 def ibu(df, hop_col="hop_scaled", pbg_col="pbg", utilization_factor=4.15):
