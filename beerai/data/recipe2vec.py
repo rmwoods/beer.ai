@@ -62,7 +62,7 @@ def recipes2vec(recipes):
         .rename({"value": "amount"}, axis=1)
     )
     flat_recipes = flat_names.merge(
-        flat_amounts, on="recipe_id", left_index=True, right_index=True
+        flat_amounts, on="recipe_id"
     )
     # This avoids multiple additions of the same ingredient, which this
     # simple model can't handle
@@ -88,10 +88,10 @@ def recipes2vec(recipes):
 
 def scale_quantities(df):
     """ Compute scaled ingredient quantities. """
-    df = scale_ferm(df)
-    df = scale_hop(df)
-    df = scale_misc(df)
-    df = scale_yeast(df)
+    df["ferm_amount"] = scale_ferm(df)
+    df["hop_amount"] = scale_hop(df)
+    df["misc_amount"] = scale_misc(df)
+    df.loc[~df["yeast_name"].isna(), "yeast_amount"] = scale_yeast(df)
     df = df.dropna(how="all", subset=["ferm_amount", "hop_amount", "misc_amount"])
     return df
 
@@ -102,7 +102,7 @@ def apply_map(df):
     for use in recipe2vec.
     """
     for category in INGREDIENT_CATEGORIES:
-        map_file = f"{category}map.pickle"
+        map_file = os.path.join(DATA_DIR, f"interim/{category}map.pickle")
         with open(map_file, "rb") as f:
             ing_map = pickle.load(f)
         not_null_ing = df[f"{category}_name"].dropna()
