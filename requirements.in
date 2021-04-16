@@ -1,0 +1,27 @@
+# Local Repo
+-e file:.
+
+# External
+bs4
+dropbox
+flake8
+imblearn
+joblib
+jupyter
+lxml
+matplotlib
+pandas
+plotly
+pybeerxml
+python-dotenv
+requests
+sklearn
+tables
+wget
+tqdm
+seaborn
+
+# external requirements
+--find-links https://download.pytorch.org/whl/torch_stable.html
+torch==1.7.0+cpu
+
